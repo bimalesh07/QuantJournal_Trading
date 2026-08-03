@@ -1,0 +1,301 @@
+import React, { useState, useEffect } from 'react';
+import Navbar from './components/Navbar';
+import DashboardOverview from './components/DashboardOverview';
+import AnalyticsCharts from './components/AnalyticsCharts';
+import PnLCalendar from './components/PnLCalendar';
+import TradeTable from './components/TradeTable';
+import TradeFormModal from './components/TradeFormModal';
+import TradeDetailModal from './components/TradeDetailModal';
+import StrategyManagerModal from './components/StrategyManagerModal';
+
+import { 
+  getTrades, 
+  getStrategies, 
+  getAnalytics, 
+  createTrade, 
+  updateTrade, 
+  deleteTrade, 
+  createStrategy, 
+  deleteStrategy 
+} from './services/api';
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [trades, setTrades] = useState([]);
+  const [strategies, setStrategies] = useState([]);
+  const [analytics, setAnalytics] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Filters State
+  const [filters, setFilters] = useState({
+    symbol: '',
+    asset_class: '',
+    trade_type: '',
+    strategy: '',
+    outcome: '',
+    date_from: '',
+    date_to: '',
+  });
+
+  // Modal States
+  const [isTradeModalOpen, setIsTradeModalOpen] = useState(false);
+  const [editingTrade, setEditingTrade] = useState(null);
+  
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [selectedTradeForDetail, setSelectedTradeForDetail] = useState(null);
+
+  const [isStrategyModalOpen, setIsStrategyModalOpen] = useState(false);
+
+  // Notification Banner
+  const [notification, setNotification] = useState(null);
+
+  const showNotification = (msg, type = 'success') => {
+    setNotification({ msg, type });
+    setTimeout(() => setNotification(null), 4000);
+  };
+
+  // Initial Data Fetching
+  const fetchAllData = async () => {
+    try {
+      setLoading(true);
+      const [tradesData, strategiesData, analyticsData] = await Promise.all([
+        getTrades(filters),
+        getStrategies(),
+        getAnalytics(filters)
+      ]);
+      setTrades(tradesData);
+      setStrategies(strategiesData);
+      setAnalytics(analyticsData);
+    } catch (err) {
+      console.error('Failed to load application data:', err);
+      showNotification('Error connecting to Django backend server.', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllData();
+  }, [filters]);
+
+  // Trade Modal Handlers
+  const handleOpenNewTradeModal = () => {
+    setEditingTrade(null);
+    setIsTradeModalOpen(true);
+  };
+
+  const handleOpenEditTradeModal = (trade) => {
+    setEditingTrade(trade);
+    setIsTradeModalOpen(true);
+  };
+
+  const handleSaveTrade = async (formData, tradeId) => {
+    try {
+      if (tradeId) {
+        await updateTrade(tradeId, formData);
+        showNotification('Trade updated successfully!');
+      } else {
+        await createTrade(formData);
+        showNotification('New trade logged successfully!');
+      }
+      setIsTradeModalOpen(false);
+      setEditingTrade(null);
+      fetchAllData();
+    } catch (err) {
+      console.error('Failed to save trade:', err);
+      showNotification('Failed to save trade record. Check input values.', 'error');
+    }
+  };
+
+  const handleDeleteTrade = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this trade record?')) return;
+    try {
+      await deleteTrade(id);
+      showNotification('Trade deleted successfully.');
+      fetchAllData();
+    } catch (err) {
+      console.error('Failed to delete trade:', err);
+      showNotification('Error deleting trade.', 'error');
+    }
+  };
+
+  // Trade Detail Retrospective View
+  const handleViewTradeDetail = (trade) => {
+    setSelectedTradeForDetail(trade);
+    setIsDetailModalOpen(true);
+  };
+
+  // Strategy Handlers
+  const handleCreateStrategy = async (stratData) => {
+    try {
+      await createStrategy(stratData);
+      showNotification('Strategy created successfully!');
+      const updatedStrat = await getStrategies();
+      setStrategies(updatedStrat);
+    } catch (err) {
+      console.error('Failed to create strategy:', err);
+      showNotification('Error creating strategy.', 'error');
+    }
+  };
+
+  const handleDeleteStrategy = async (id) => {
+    try {
+      await deleteStrategy(id);
+      showNotification('Strategy deleted.');
+      const updatedStrat = await getStrategies();
+      setStrategies(updatedStrat);
+    } catch (err) {
+      console.error('Failed to delete strategy:', err);
+      showNotification('Error deleting strategy.', 'error');
+    }
+  };
+
+  // Calendar Day Filter Handler
+  const handleSelectCalendarDate = (dateStr) => {
+    setFilters(prev => ({
+      ...prev,
+      date_from: dateStr ? `${dateStr}T00:00:00` : '',
+      date_to: dateStr ? `${dateStr}T23:59:59` : ''
+    }));
+    setActiveTab('trades');
+    showNotification(`Filtered trade log for date: ${dateStr}`);
+  };
+
+  const handleResetFilters = () => {
+    setFilters({
+      symbol: '',
+      asset_class: '',
+      trade_type: '',
+      strategy: '',
+      outcome: '',
+      date_from: '',
+      date_to: '',
+    });
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col bg-[#0B0E14] text-slate-100">
+      
+      {/* Top Header Navbar */}
+      <Navbar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        onOpenTradeModal={handleOpenNewTradeModal}
+        onOpenStrategyModal={() => setIsStrategyModalOpen(true)}
+      />
+
+      {/* Notification Toast */}
+      {notification && (
+        <div className="fixed bottom-5 right-5 z-50 animate-bounce">
+          <div className={`px-4 py-3 rounded-xl shadow-2xl border text-xs font-semibold flex items-center gap-2 ${
+            notification.type === 'error'
+              ? 'bg-rose-950 text-rose-300 border-rose-500/50'
+              : 'bg-emerald-950 text-emerald-300 border-emerald-500/50'
+          }`}>
+            <span>{notification.msg}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Main Container */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 space-y-6">
+        
+        {loading && !analytics ? (
+          <div className="py-20 text-center text-slate-500 space-y-2">
+            <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+            <p className="text-xs font-mono">Connecting to Django REST Framework backend...</p>
+          </div>
+        ) : (
+          <>
+            {/* View Tab 1: Dashboard Overview */}
+            {activeTab === 'dashboard' && (
+              <div className="space-y-6 animate-fadeIn">
+                <DashboardOverview analytics={analytics} />
+                <AnalyticsCharts analytics={analytics} />
+                <TradeTable
+                  trades={trades}
+                  strategies={strategies}
+                  onViewTrade={handleViewTradeDetail}
+                  onEditTrade={handleOpenEditTradeModal}
+                  onDeleteTrade={handleDeleteTrade}
+                  filters={filters}
+                  setFilters={setFilters}
+                  onResetFilters={handleResetFilters}
+                />
+              </div>
+            )}
+
+            {/* View Tab 2: Trade Log */}
+            {activeTab === 'trades' && (
+              <div className="space-y-6 animate-fadeIn">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-bold font-mono text-white">Execution Log & Retrospective</h2>
+                  <span className="text-xs text-slate-400 font-mono">Showing {trades.length} trades</span>
+                </div>
+                <TradeTable
+                  trades={trades}
+                  strategies={strategies}
+                  onViewTrade={handleViewTradeDetail}
+                  onEditTrade={handleOpenEditTradeModal}
+                  onDeleteTrade={handleDeleteTrade}
+                  filters={filters}
+                  setFilters={setFilters}
+                  onResetFilters={handleResetFilters}
+                />
+              </div>
+            )}
+
+            {/* View Tab 3: Analytics Engine */}
+            {activeTab === 'analytics' && (
+              <div className="space-y-6 animate-fadeIn">
+                <h2 className="text-xl font-bold font-mono text-white">Quantitative Analytics & Edge Metrics</h2>
+                <DashboardOverview analytics={analytics} />
+                <AnalyticsCharts analytics={analytics} />
+              </div>
+            )}
+
+            {/* View Tab 4: PnL Calendar */}
+            {activeTab === 'calendar' && (
+              <div className="space-y-6 animate-fadeIn">
+                <PnLCalendar
+                  analytics={analytics}
+                  onSelectDateFilter={handleSelectCalendarDate}
+                />
+              </div>
+            )}
+          </>
+        )}
+
+      </main>
+
+      {/* Modals */}
+      <TradeFormModal
+        isOpen={isTradeModalOpen}
+        onClose={() => setIsTradeModalOpen(false)}
+        onSubmit={handleSaveTrade}
+        initialData={editingTrade}
+        strategies={strategies}
+      />
+
+      <TradeDetailModal
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+        trade={selectedTradeForDetail}
+      />
+
+      <StrategyManagerModal
+        isOpen={isStrategyModalOpen}
+        onClose={() => setIsStrategyModalOpen(false)}
+        strategies={strategies}
+        onCreateStrategy={handleCreateStrategy}
+        onDeleteStrategy={handleDeleteStrategy}
+      />
+
+      {/* Footer */}
+      <footer className="border-t border-slate-800/80 py-6 text-center text-xs text-slate-500 font-mono">
+        QuantJournal Pro System • Production Grade Personal Trading & Analytics Engine
+      </footer>
+
+    </div>
+  );
+}

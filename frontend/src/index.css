@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: #0B0E14;
+    color: #F3F4F6;
+  }
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0F131C;
+}
+::-webkit-scrollbar-thumb {
+  background: #1E2536;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2D374D;
+}
+
+/* Custom Bloomberg/TradingView Card Styling */
+.card-dark {
+  background: rgba(21, 25, 33, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 0.75rem;
+}
+
+.card-dark-hover {
+  transition: all 0.2s ease-in-out;
+}
+.card-dark-hover:hover {
+  border-color: rgba(16, 185, 129, 0.3);
+  box-shadow: 0 4px 20px -2px rgba(16, 185, 129, 0.1);
+}
+
+/* Neon Glow Indicators */
+.glow-emerald {
+  box-shadow: 0 0 15px -3px rgba(16, 185, 129, 0.4);
+}
+.glow-rose {
+  box-shadow: 0 0 15px -3px rgba(239, 68, 68, 0.4);
+}
+.glow-violet {
+  box-shadow: 0 0 15px -3px rgba(139, 92, 246, 0.4);
+}
