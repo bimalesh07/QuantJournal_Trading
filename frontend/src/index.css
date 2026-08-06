@@ -169,7 +169,9 @@ html.light-theme,
 .light-theme .bg-\[\#121622\],
 .light-theme .bg-\[\#121622\]\/90,
 .light-theme .bg-\[\#121622\]\/80,
+.light-theme .bg-\[\#121622\]\/40,
 .light-theme .bg-\[\#140F24\],
+.light-theme .bg-\[\#141924\],
 .light-theme .bg-\[\#141926\],
 .light-theme .bg-\[\#151124\],
 .light-theme .bg-\[\#151921\],
@@ -177,7 +179,7 @@ html.light-theme,
 .light-theme .bg-\[\#161B29\],
 .light-theme .bg-\[\#161F2E\],
 .light-theme .bg-\[\#181E2C\],
-.light-theme .bg-\[\#151921\],
+.light-theme .bg-\[\#1A2130\],
 .light-theme .bg-slate-800,
 .light-theme .bg-slate-800\/80,
 .light-theme .bg-slate-800\/60,
@@ -188,6 +190,31 @@ html.light-theme,
   border-color: #E2E8F0 !important;
   color: #0F172A !important;
   box-shadow: 0 4px 25px -4px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Strategy Banner Gradients in Light Mode */
+.light-theme .from-\[\#071F17\]\/90 {
+  --tw-gradient-from: #ECFDF5 !important;
+  --tw-gradient-to: #FFFFFF !important;
+  --tw-gradient-stops: var(--tw-gradient-from), #F0FDF4, var(--tw-gradient-to) !important;
+}
+
+.light-theme .from-\[\#29080F\]\/90 {
+  --tw-gradient-from: #FFF1F2 !important;
+  --tw-gradient-to: #FFFFFF !important;
+  --tw-gradient-stops: var(--tw-gradient-from), #FFF5F5, var(--tw-gradient-to) !important;
+}
+
+.light-theme .via-\[\#0A261D\]\/80 {
+  --tw-gradient-via: #F0FDF4 !important;
+}
+
+.light-theme .via-\[\#2E0B12\]\/80 {
+  --tw-gradient-via: #FFF5F5 !important;
+}
+
+.light-theme .to-\[\#0A0E17\]\/90 {
+  --tw-gradient-to: #FFFFFF !important;
 }
 
 /* Inputs, Textareas & Select Dropdowns in Light Theme */
@@ -273,6 +300,7 @@ html.light-theme,
 .light-theme .border-slate-800,
 .light-theme .border-slate-800\/80,
 .light-theme .border-slate-800\/90,
+.light-theme .border-slate-800\/30,
 .light-theme .border-slate-700,
 .light-theme .border-slate-700\/80,
 .light-theme .border-slate-700\/70,

@@ -274,7 +274,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0B0E14] text-slate-100">
+    <div className="min-h-screen flex flex-col transition-colors">
       
       {/* Top Header Navbar */}
       <Navbar
