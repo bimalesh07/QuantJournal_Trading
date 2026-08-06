@@ -223,13 +223,13 @@ export default function App() {
   // Strategy Handlers
   const handleCreateStrategy = async (stratData) => {
     try {
-      await createStrategy(stratData);
-      showNotification('Strategy created successfully!');
+      const created = await createStrategy(stratData);
+      showNotification(`Strategy "${created?.name || stratData.name}" created successfully!`);
       const updatedStrat = await getStrategies();
       setStrategies(updatedStrat);
     } catch (err) {
       console.error('Failed to create strategy:', err);
-      showNotification('Error creating strategy.', 'error');
+      showNotification('Error creating strategy. Please try again.', 'error');
     }
   };
 
