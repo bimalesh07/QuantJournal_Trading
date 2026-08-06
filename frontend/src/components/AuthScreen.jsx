@@ -56,7 +56,7 @@ export default function AuthScreen({ onAuthSuccess }) {
       console.error('Authentication error:', err);
       let msg = 'Authentication failed. Please check your inputs.';
       if (!err.response) {
-        msg = 'Unable to connect to backend server. Please verify the backend service is reachable.';
+        msg = 'Unable to reach backend server. If server is sleeping on cloud, please wait ~20 seconds and click Unlock Dashboard again!';
       } else if (err.response.data?.error) {
         msg = err.response.data.error;
       } else if (err.response.data?.detail) {

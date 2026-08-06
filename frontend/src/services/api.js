@@ -1,6 +1,20 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+// Smart API_BASE_URL selection:
+// If VITE_API_URL is provided in environment, use it.
+// If running on localhost / 127.0.0.1, use local Django backend (http://localhost:8000/api).
+// Otherwise (e.g. deployed on Vercel), fall back to Render production backend (https://quantjournal-trading.onrender.com/api).
+const getDynamicApiUrl = () => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+    return 'http://localhost:8000/api';
+  }
+  return 'https://quantjournal-trading.onrender.com/api';
+};
+
+const API_BASE_URL = getDynamicApiUrl();
 
 export const getMediaUrl = (urlStr) => {
   if (!urlStr) return null;
@@ -11,6 +25,7 @@ export const getMediaUrl = (urlStr) => {
 
 const api = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 35000, // 35 seconds to allow Render cold start spin up
   headers: {
     'Content-Type': 'application/json',
   },
@@ -59,7 +74,7 @@ export const deleteStrategy = async (id) => {
 export const getTrades = async (filters = {}) => {
   const params = new URLSearchParams();
   Object.keys(filters).forEach((key) => {
-    if (filters[key] !== undefined && filters[key] !== null && filters[key] !== '') {
+    if (filters[key]) {
       params.append(key, filters[key]);
     }
   });
@@ -68,23 +83,29 @@ export const getTrades = async (filters = {}) => {
   return response.data;
 };
 
-export const getTradeById = async (id) => {
-  const response = await api.get(`/trades/${id}/`);
+export const createTrade = async (tradeData) => {
+  let dataToSend = tradeData;
+  let headers = {};
+
+  if (tradeData instanceof FormData) {
+    dataToSend = tradeData;
+    headers['Content-Type'] = 'multipart/form-data';
+  }
+
+  const response = await api.post('/trades/', dataToSend, { headers });
   return response.data;
 };
 
-export const createTrade = async (formData) => {
-  // If formData is FormData (with files), send as multipart/form-data
-  const isFormData = formData instanceof FormData;
-  const config = isFormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : {};
-  const response = await api.post('/trades/', formData, config);
-  return response.data;
-};
+export const updateTrade = async (id, tradeData) => {
+  let dataToSend = tradeData;
+  let headers = {};
 
-export const updateTrade = async (id, formData) => {
-  const isFormData = formData instanceof FormData;
-  const config = isFormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : {};
-  const response = await api.patch(`/trades/${id}/`, formData, config);
+  if (tradeData instanceof FormData) {
+    dataToSend = tradeData;
+    headers['Content-Type'] = 'multipart/form-data';
+  }
+
+  const response = await api.patch(`/trades/${id}/`, dataToSend, { headers });
   return response.data;
 };
 
@@ -96,7 +117,7 @@ export const deleteTrade = async (id) => {
 export const getAnalytics = async (filters = {}) => {
   const params = new URLSearchParams();
   Object.keys(filters).forEach((key) => {
-    if (filters[key] !== undefined && filters[key] !== null && filters[key] !== '') {
+    if (filters[key]) {
       params.append(key, filters[key]);
     }
   });
