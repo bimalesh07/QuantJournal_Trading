@@ -87,7 +87,7 @@ export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData 
   };
 
   const checkedCount = Object.values(checklist).filter(Boolean).length;
-  const isChecklistComplete = checkedCount === 4;
+  const isChecklistComplete = checkedCount >= 1;
 
   const handleEntryFileChange = (e) => {
     const file = e.target.files[0];
@@ -283,7 +283,7 @@ export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData 
                   ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/50 shadow-emerald-500/10' 
                   : 'bg-amber-500/20 text-amber-300 border-amber-400/50 shadow-amber-500/10'
               }`}>
-                {isChecklistComplete ? '4/4 Rules Ticked - Disciplined Setup' : `${checkedCount}/4 Rules Ticked - Warning`}
+                {isChecklistComplete ? `${checkedCount}/4 Rules Ticked - Ready to Save` : '0/4 Rules Ticked - Minimum 1 Required'}
               </span>
             </div>
 
@@ -382,7 +382,7 @@ export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData 
             {!isChecklistComplete && (
               <div className="flex items-center gap-2.5 p-3 rounded-xl bg-gradient-to-r from-amber-950/40 via-[#3a200a] to-[#2b1807] border border-amber-500/40 text-amber-300 text-xs font-bold shadow-md">
                 <AlertCircle className="w-4 h-4 shrink-0 text-amber-400 stroke-[2.5]" />
-                <span>Mandatory: All 4 discipline rules must be ticked to enable saving the trade.</span>
+                <span>Note: Tick at least 1 discipline rule to enable saving the trade.</span>
               </div>
             )}
           </div>
@@ -651,7 +651,7 @@ export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData 
                   ? 'text-slate-950 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 hover:brightness-110 shadow-xl shadow-emerald-500/25 cursor-pointer'
                   : 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed opacity-60'
               }`}
-              title={!isChecklistComplete ? 'Tick all 4 checklist items to enable saving' : 'Save Trade Record'}
+              title={!isChecklistComplete ? 'Tick at least 1 checklist item to enable saving' : 'Save Trade Record'}
             >
               {initialData ? 'Update Trade' : 'Save Trade Record'}
             </button>
