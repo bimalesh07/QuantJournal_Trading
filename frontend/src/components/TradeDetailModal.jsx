@@ -1,27 +1,32 @@
 import React, { useState } from 'react';
-import { X, TrendingUp, TrendingDown, Star, Image as ImageIcon, Calendar, Target, DollarSign, Brain, Layers, Maximize2 } from 'lucide-react';
+import { X, TrendingUp, TrendingDown, Star, Image as ImageIcon, Calendar, Target, DollarSign, Brain, Layers, Maximize2, Tag } from 'lucide-react';
+import ChartLightboxModal from './ChartLightboxModal';
+import { getMediaUrl } from '../services/api';
 
 export default function TradeDetailModal({ trade, isOpen, onClose }) {
   if (!isOpen || !trade) return null;
 
   const [activeChartTab, setActiveChartTab] = useState('entry'); // 'entry' or 'exit'
-  const [isFullscreenImage, setIsFullscreenImage] = useState(null);
+  const [lightboxData, setLightboxData] = useState(null);
 
   const isLong = trade.trade_type === 'LONG';
   const isWin = trade.net_pnl > 0;
   const isLoss = trade.net_pnl < 0;
-
-  const getMediaUrl = (urlStr) => {
-    if (!urlStr) return null;
-    if (urlStr.startsWith('http://') || urlStr.startsWith('https://')) return urlStr;
-    return `http://localhost:8000${urlStr}`;
-  };
 
   const entryImgUrl = getMediaUrl(trade.chart_entry);
   const exitImgUrl = getMediaUrl(trade.chart_exit);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md overflow-y-auto">
+      
+      {/* Lightbox Zoom Modal */}
+      <ChartLightboxModal
+        isOpen={!!lightboxData}
+        onClose={() => setLightboxData(null)}
+        imageUrl={lightboxData?.url}
+        title={lightboxData?.title}
+      />
+
       <div className="card-dark w-full max-w-4xl border border-slate-700/80 my-8 shadow-2xl overflow-hidden">
         
         {/* Top Header Banner */}
@@ -41,7 +46,28 @@ export default function TradeDetailModal({ trade, isOpen, onClose }) {
                 <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-mono">
                   {trade.asset_class}
                 </span>
+                <span className="text-xs px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/30 font-mono font-semibold">
+                  {trade.session === 'NEW_YORK' ? 'New York Session' : trade.session === 'LONDON' ? 'London Session' : trade.session === 'ASIAN' ? 'Asian Session' : 'New York Session'}
+                </span>
               </div>
+              
+              {/* Tags Badges */}
+              {trade.tags && (
+                <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                  {trade.tags.split(',').map((tagStr, idx) => {
+                    const trimmed = tagStr.trim();
+                    if (!trimmed) return null;
+                    const tag = trimmed.startsWith('#') ? trimmed : `#${trimmed}`;
+                    return (
+                      <span key={idx} className="text-xs px-2.5 py-1 rounded-md bg-purple-500/15 text-purple-300 font-mono border border-purple-500/30 flex items-center gap-1 font-medium">
+                        <Tag className="w-3.5 h-3.5 text-purple-400" />
+                        {tag}
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
+
               <p className="text-xs text-slate-400 mt-1 flex items-center gap-2 font-mono">
                 <Calendar className="w-3.5 h-3.5" />
                 {new Date(trade.entry_time).toLocaleString()}
@@ -59,172 +85,139 @@ export default function TradeDetailModal({ trade, isOpen, onClose }) {
                 Return: {Number(trade.return_percentage).toFixed(2)}%
               </div>
             </div>
-            <button onClick={onClose} className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800">
+            <button
+              onClick={onClose}
+              className="p-2 text-slate-400 hover:text-white bg-slate-800/60 hover:bg-slate-800 rounded-xl transition-colors"
+            >
               <X className="w-5 h-5" />
             </button>
           </div>
         </div>
 
-        {/* Retrospective Body */}
-        <div className="p-6 space-y-6 max-h-[80vh] overflow-y-auto">
+        {/* Modal Body Content */}
+        <div className="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
           
-          {/* Key Parameters Cards Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 font-mono">
-            <div className="bg-[#151921] p-3.5 rounded-xl border border-slate-800">
-              <span className="text-[10px] text-slate-400 uppercase">Entry Price</span>
-              <div className="text-sm font-bold text-white mt-1">${Number(trade.entry_price).toLocaleString()}</div>
+          {/* Key Metrics Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="p-4 rounded-xl bg-[#151921] border border-slate-800">
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Entry Price</span>
+              <span className="text-base font-bold font-mono text-slate-200 mt-1 block">${Number(trade.entry_price).toLocaleString()}</span>
             </div>
-
-            <div className="bg-[#151921] p-3.5 rounded-xl border border-slate-800">
-              <span className="text-[10px] text-slate-400 uppercase">Exit Price</span>
-              <div className="text-sm font-bold text-white mt-1">
+            <div className="p-4 rounded-xl bg-[#151921] border border-slate-800">
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Exit Price</span>
+              <span className="text-base font-bold font-mono text-slate-200 mt-1 block">
                 {trade.exit_price ? `$${Number(trade.exit_price).toLocaleString()}` : 'OPEN'}
-              </div>
+              </span>
             </div>
-
-            <div className="bg-[#151921] p-3.5 rounded-xl border border-slate-800">
-              <span className="text-[10px] text-slate-400 uppercase">Stop Loss / TP</span>
-              <div className="text-xs font-bold text-slate-300 mt-1">
-                SL: {trade.stop_loss ? `$${Number(trade.stop_loss).toLocaleString()}` : 'N/A'}
-              </div>
-              <div className="text-[10px] text-emerald-400">
-                TP: {trade.take_profit ? `$${Number(trade.take_profit).toLocaleString()}` : 'N/A'}
-              </div>
+            <div className="p-4 rounded-xl bg-[#151921] border border-slate-800">
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Risk : Reward</span>
+              <span className="text-base font-bold font-mono text-blue-400 mt-1 block">1:{trade.risk_reward_ratio}</span>
             </div>
-
-            <div className="bg-[#151921] p-3.5 rounded-xl border border-slate-800">
-              <span className="text-[10px] text-slate-400 uppercase">Risk : Reward</span>
-              <div className="text-sm font-bold text-blue-300 mt-1">1:{trade.risk_reward_ratio}</div>
+            <div className="p-4 rounded-xl bg-[#151921] border border-slate-800">
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Mindset / Rating</span>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-xs font-bold text-emerald-400 font-mono">{trade.emotion}</span>
+                <div className="flex items-center text-amber-400">
+                  <Star className="w-3.5 h-3.5 fill-amber-400" />
+                  <span className="text-xs font-bold ml-1">{trade.rating}</span>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Strategy, Emotion & Rating Badges */}
-          <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl bg-[#151921]/60 border border-slate-800/80">
-            <div className="flex items-center gap-2">
-              <Layers className="w-4 h-4 text-purple-400" />
-              <span className="text-xs text-slate-400">Strategy:</span>
-              <span className="text-xs font-bold text-purple-300">{trade.strategy_name || 'Unassigned'}</span>
+          {/* Strategy & Retrospective Notes */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h4 className="text-xs sm:text-sm font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                <Layers className="w-4 h-4 text-purple-400" />
+                Strategy Execution & Logic Notes
+              </h4>
+              <span className="text-xs font-semibold text-purple-300 bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20">
+                {trade.strategy_name || 'No Strategy Selected'}
+              </span>
             </div>
-
-            <div className="flex items-center gap-2">
-              <Brain className="w-4 h-4 text-amber-400" />
-              <span className="text-xs text-slate-400">Emotion:</span>
-              <span className="text-xs font-bold text-amber-300">{trade.emotion}</span>
+            <div className="p-4 rounded-xl bg-[#151921] border border-slate-800 text-xs sm:text-sm text-slate-300 leading-relaxed font-sans whitespace-pre-wrap">
+              {trade.notes || 'No setup notes or retrospective recorded for this trade.'}
             </div>
+          </div>
 
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-400">Rating:</span>
-              <div className="flex items-center gap-0.5">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className={`w-3.5 h-3.5 ${
-                      i < trade.rating ? 'text-amber-400 fill-amber-400' : 'text-slate-700'
+          {/* Chart Screenshots Tabbed Container */}
+          {(entryImgUrl || exitImgUrl) && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <ImageIcon className="w-4 h-4 text-emerald-400" />
+                  <h4 className="text-xs sm:text-sm font-bold text-slate-300 uppercase tracking-wider">Chart Screenshots (Click to Zoom)</h4>
+                </div>
+                <div className="flex items-center gap-1 bg-[#151921] p-1 rounded-lg border border-slate-800">
+                  <button
+                    onClick={() => setActiveChartTab('entry')}
+                    className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
+                      activeChartTab === 'entry' ? 'bg-emerald-500/20 text-emerald-300' : 'text-slate-400 hover:text-white'
                     }`}
-                  />
-                ))}
+                  >
+                    Entry Chart
+                  </button>
+                  <button
+                    onClick={() => setActiveChartTab('exit')}
+                    className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
+                      activeChartTab === 'exit' ? 'bg-emerald-500/20 text-emerald-300' : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    Exit Chart
+                  </button>
+                </div>
               </div>
-            </div>
-          </div>
 
-          {/* Setup Logic & Notes */}
-          <div>
-            <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Trade Logic & Notes</h4>
-            <div className="bg-[#151921] p-4 rounded-xl border border-slate-800 text-xs text-slate-300 whitespace-pre-wrap leading-relaxed font-sans">
-              {trade.notes || 'No setup logic or retrospective notes recorded for this trade.'}
-            </div>
-          </div>
-
-          {/* Chart Screenshots Section */}
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <ImageIcon className="w-4 h-4 text-emerald-400" />
-                <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider">Chart Screenshots</h4>
-              </div>
-              <div className="flex items-center gap-1 bg-[#151921] p-1 rounded-lg border border-slate-800">
-                <button
-                  onClick={() => setActiveChartTab('entry')}
-                  className={`px-3 py-1 text-[11px] font-semibold rounded-md transition-all ${
-                    activeChartTab === 'entry' ? 'bg-emerald-500/20 text-emerald-300' : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  Entry Chart
-                </button>
-                <button
-                  onClick={() => setActiveChartTab('exit')}
-                  className={`px-3 py-1 text-[11px] font-semibold rounded-md transition-all ${
-                    activeChartTab === 'exit' ? 'bg-emerald-500/20 text-emerald-300' : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  Exit Chart
-                </button>
-              </div>
-            </div>
-
-            {/* Display Active Chart */}
-            <div className="relative bg-[#151921] p-4 rounded-xl border border-slate-800 min-h-48 flex items-center justify-center">
-              {activeChartTab === 'entry' ? (
-                entryImgUrl ? (
-                  <div className="relative group w-full">
-                    <img
-                      src={entryImgUrl}
-                      alt="Entry Chart Screenshot"
-                      className="max-h-96 w-auto mx-auto rounded-lg object-contain cursor-pointer"
-                      onClick={() => setIsFullscreenImage(entryImgUrl)}
-                    />
-                    <button
-                      onClick={() => setIsFullscreenImage(entryImgUrl)}
-                      className="absolute top-2 right-2 p-2 bg-slate-900/80 hover:bg-slate-900 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                      title="Expand Image"
-                    >
-                      <Maximize2 className="w-4 h-4" />
-                    </button>
-                  </div>
+              {/* Display Active Chart */}
+              <div className="relative bg-[#151921] p-4 rounded-xl border border-slate-800 min-h-48 flex items-center justify-center">
+                {activeChartTab === 'entry' ? (
+                  entryImgUrl ? (
+                    <div className="relative group w-full text-center">
+                      <img
+                        src={entryImgUrl}
+                        alt="Entry Chart Screenshot"
+                        className="max-h-96 w-auto mx-auto rounded-lg object-contain cursor-pointer transition-transform group-hover:scale-[1.01]"
+                        onClick={() => setLightboxData({ url: entryImgUrl, title: `${trade.symbol} Entry Execution Chart` })}
+                      />
+                      <button
+                        onClick={() => setLightboxData({ url: entryImgUrl, title: `${trade.symbol} Entry Execution Chart` })}
+                        className="absolute top-2 right-2 p-2 bg-slate-900/80 hover:bg-slate-900 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer flex items-center gap-1.5 text-xs font-semibold"
+                      >
+                        <Maximize2 className="w-4 h-4 text-emerald-400" />
+                        <span>Zoom Lightbox</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <span className="text-xs text-slate-500">No Entry Chart Uploaded</span>
+                  )
                 ) : (
-                  <div className="text-slate-500 text-xs">No entry chart screenshot uploaded.</div>
-                )
-              ) : (
-                exitImgUrl ? (
-                  <div className="relative group w-full">
-                    <img
-                      src={exitImgUrl}
-                      alt="Exit Chart Screenshot"
-                      className="max-h-96 w-auto mx-auto rounded-lg object-contain cursor-pointer"
-                      onClick={() => setIsFullscreenImage(exitImgUrl)}
-                    />
-                    <button
-                      onClick={() => setIsFullscreenImage(exitImgUrl)}
-                      className="absolute top-2 right-2 p-2 bg-slate-900/80 hover:bg-slate-900 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                      title="Expand Image"
-                    >
-                      <Maximize2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                ) : (
-                  <div className="text-slate-500 text-xs">No exit chart screenshot uploaded.</div>
-                )
-              )}
+                  exitImgUrl ? (
+                    <div className="relative group w-full text-center">
+                      <img
+                        src={exitImgUrl}
+                        alt="Exit Chart Screenshot"
+                        className="max-h-96 w-auto mx-auto rounded-lg object-contain cursor-pointer transition-transform group-hover:scale-[1.01]"
+                        onClick={() => setLightboxData({ url: exitImgUrl, title: `${trade.symbol} Exit Execution Chart` })}
+                      />
+                      <button
+                        onClick={() => setLightboxData({ url: exitImgUrl, title: `${trade.symbol} Exit Execution Chart` })}
+                        className="absolute top-2 right-2 p-2 bg-slate-900/80 hover:bg-slate-900 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer flex items-center gap-1.5 text-xs font-semibold"
+                      >
+                        <Maximize2 className="w-4 h-4 text-emerald-400" />
+                        <span>Zoom Lightbox</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <span className="text-xs text-slate-500">No Exit Chart Uploaded</span>
+                  )
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
         </div>
-
       </div>
-
-      {/* Fullscreen Image Lightbox Overlay */}
-      {isFullscreenImage && (
-        <div
-          className="fixed inset-0 z-60 bg-black/95 flex items-center justify-center p-4 cursor-pointer"
-          onClick={() => setIsFullscreenImage(null)}
-        >
-          <img src={isFullscreenImage} alt="Fullscreen Chart" className="max-w-full max-h-full rounded-lg" />
-          <button className="absolute top-4 right-4 text-white bg-slate-800 p-2 rounded-full">
-            <X className="w-6 h-6" />
-          </button>
-        </div>
-      )}
-
     </div>
   );
 }

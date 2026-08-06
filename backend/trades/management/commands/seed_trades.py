@@ -81,12 +81,14 @@ class Command(BaseCommand):
             entry_dt = now - timedelta(days=35 - i, hours=random.randint(1, 10))
             exit_dt = entry_dt + timedelta(hours=random.randint(2, 48))
 
-            notes = f"Executed {trade_type} trade on {sym} using strategy '{strat.name}'. Emotion during entry was {emotion}."
+            session_choice = random.choice(['ASIAN', 'LONDON', 'NEW_YORK'])
+            notes = f"Executed {trade_type} trade on {sym} during {session_choice} session using strategy '{strat.name}'. Emotion during entry was {emotion}."
 
             Trade.objects.create(
                 symbol=sym,
                 trade_type=trade_type,
                 asset_class=asset,
+                session=session_choice,
                 entry_price=entry,
                 exit_price=exit_p,
                 stop_loss=stop,

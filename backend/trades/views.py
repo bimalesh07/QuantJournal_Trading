@@ -1,24 +1,94 @@
 from rest_framework import viewsets, status
-from rest_framework.decorators import api_view, action
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
 from django.db.models import Q
 from datetime import datetime
 
 from .models import Strategy, Trade
-from .serializers import StrategySerializer, TradeSerializer
+from .serializers import StrategySerializer, TradeSerializer, UserSerializer
 from .services import AnalyticsService
 
+# User Authentication Views
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def register_view(request):
+    username = request.data.get('username', '').strip()
+    email = request.data.get('email', '').strip()
+    password = request.data.get('password', '').strip()
+
+    if not username or not password:
+        return Response({'error': 'Username and password are required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if User.objects.filter(username__iexact=username).exists():
+        return Response({'error': 'Username already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    user = User.objects.create_user(username=username, email=email, password=password)
+    user.first_name = request.data.get('first_name', username)
+    user.save()
+
+    # Automatically claim any unassigned trades to the first registered user so local data isn't lost
+    Trade.objects.filter(user__isnull=True).update(user=user)
+    Strategy.objects.filter(user__isnull=True).update(user=user)
+
+    token, _ = Token.objects.get_or_create(user=user)
+    return Response({
+        'token': token.key,
+        'user': UserSerializer(user).data
+    }, status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def login_view(request):
+    username = request.data.get('username', '').strip()
+    password = request.data.get('password', '').strip()
+
+    if not username or not password:
+        return Response({'error': 'Username and password are required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    user = authenticate(username=username, password=password)
+    if not user:
+        return Response({'error': 'Invalid username or password credentials.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    token, _ = Token.objects.get_or_create(user=user)
+    return Response({
+        'token': token.key,
+        'user': UserSerializer(user).data
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_me_view(request):
+    return Response({'user': UserSerializer(request.user).data}, status=status.HTTP_200_OK)
+
+
 class StrategyViewSet(viewsets.ModelViewSet):
-    queryset = Strategy.objects.all()
     serializer_class = StrategySerializer
+
+    def get_queryset(self):
+        if self.request.user.is_authenticated:
+            return Strategy.objects.filter(Q(user=self.request.user) | Q(user__isnull=True))
+        return Strategy.objects.all()
+
+    def perform_create(self, serializer):
+        user = self.request.user if self.request.user.is_authenticated else None
+        serializer.save(user=user)
 
 
 class TradeViewSet(viewsets.ModelViewSet):
-    queryset = Trade.objects.all()
     serializer_class = TradeSerializer
 
     def get_queryset(self):
-        queryset = Trade.objects.all()
+        if self.request.user.is_authenticated:
+            queryset = Trade.objects.filter(Q(user=self.request.user) | Q(user__isnull=True))
+        else:
+            queryset = Trade.objects.all()
+
         params = self.request.query_params
 
         # Filter by symbol
@@ -51,6 +121,11 @@ class TradeViewSet(viewsets.ModelViewSet):
         if emotion:
             queryset = queryset.filter(emotion=emotion)
 
+        # Filter by tag
+        tag = params.get('tag')
+        if tag:
+            queryset = queryset.filter(tags__icontains=tag)
+
         # Filter by date range
         date_from = params.get('date_from')
         date_to = params.get('date_to')
@@ -74,6 +149,10 @@ class TradeViewSet(viewsets.ModelViewSet):
                 queryset = queryset.filter(id__in=trade_ids)
 
         return queryset
+
+    def perform_create(self, serializer):
+        user = self.request.user if self.request.user.is_authenticated else None
+        serializer.save(user=user)
 
 
 @api_view(['GET'])

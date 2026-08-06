@@ -1,5 +1,11 @@
 from rest_framework import serializers
+from django.contrib.auth.models import User
 from .models import Strategy, Trade
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'first_name', 'last_name']
 
 class StrategySerializer(serializers.ModelSerializer):
     trade_count = serializers.SerializerMethodField()
@@ -27,6 +33,7 @@ class TradeSerializer(serializers.ModelSerializer):
             'symbol',
             'trade_type',
             'asset_class',
+            'session',
             'entry_price',
             'exit_price',
             'stop_loss',
@@ -43,6 +50,7 @@ class TradeSerializer(serializers.ModelSerializer):
             'rating',
             'chart_entry',
             'chart_exit',
+            'tags',
             'gross_pnl',
             'net_pnl',
             'return_percentage',

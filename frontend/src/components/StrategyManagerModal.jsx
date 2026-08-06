@@ -48,19 +48,19 @@ export default function StrategyManagerModal({ isOpen, onClose, strategies = [],
                 placeholder="Strategy Name (e.g., Fair Value Gap, ICT, S/R Bounce)"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full bg-[#0B0E14] text-xs text-white px-3 py-2 rounded-lg border border-slate-700 focus:border-purple-500 focus:outline-none"
+                className="w-full bg-[#0B0E14] text-xs sm:text-sm text-white px-3.5 py-2.5 rounded-lg border border-slate-700 focus:border-purple-500 focus:outline-none font-medium"
               />
               <input
                 type="text"
                 placeholder="Brief Strategy Description / Rules..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full bg-[#0B0E14] text-xs text-white px-3 py-2 rounded-lg border border-slate-700 focus:border-purple-500 focus:outline-none"
+                className="w-full bg-[#0B0E14] text-xs sm:text-sm text-white px-3.5 py-2.5 rounded-lg border border-slate-700 focus:border-purple-500 focus:outline-none font-medium"
               />
             </div>
             <button
               type="submit"
-              className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-slate-950 bg-purple-400 hover:bg-purple-300 rounded-lg shadow-md shadow-purple-500/20 transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-4 py-2.5 text-xs sm:text-sm font-bold text-slate-950 bg-purple-400 hover:bg-purple-300 rounded-lg shadow-md shadow-purple-500/20 transition-all cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>Add Strategy</span>
@@ -76,13 +76,13 @@ export default function StrategyManagerModal({ isOpen, onClose, strategies = [],
                   <div key={s.id} className="flex items-center justify-between p-3 rounded-xl bg-[#151921] border border-slate-800">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-white">{s.name}</span>
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-mono">
+                        <span className="text-xs sm:text-sm font-bold text-white">{s.name}</span>
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 font-mono font-medium">
                           {s.trade_count || 0} trades
                         </span>
                       </div>
                       {s.description && (
-                        <p className="text-[11px] text-slate-400 mt-1">{s.description}</p>
+                        <p className="text-xs text-slate-400 mt-1">{s.description}</p>
                       )}
                     </div>
                     <button
@@ -95,7 +95,7 @@ export default function StrategyManagerModal({ isOpen, onClose, strategies = [],
                   </div>
                 ))
               ) : (
-                <div className="text-center py-6 text-xs text-slate-500">
+                <div className="text-center py-6 text-xs sm:text-sm text-slate-500">
                   No custom strategies created yet.
                 </div>
               )}

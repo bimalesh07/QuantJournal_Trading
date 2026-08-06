@@ -1,8 +1,10 @@
 from django.db import models
+from django.contrib.auth.models import User
 from decimal import Decimal
 
 class Strategy(models.Model):
-    name = models.CharField(max_length=100, unique=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='strategies')
+    name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -44,10 +46,18 @@ class Trade(models.Model):
         ('PATIENT', 'Patient'),
     ]
 
-    # Basic Info
+    SESSION_CHOICES = [
+        ('ASIAN', 'Asian Session'),
+        ('LONDON', 'London Session'),
+        ('NEW_YORK', 'New York Session'),
+    ]
+
+    # Owner & Basic Info
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='trades')
     symbol = models.CharField(max_length=30)
     trade_type = models.CharField(max_length=10, choices=TRADE_TYPE_CHOICES, default='LONG')
     asset_class = models.CharField(max_length=20, choices=ASSET_CLASS_CHOICES, default='CRYPTO')
+    session = models.CharField(max_length=20, choices=SESSION_CHOICES, default='NEW_YORK')
 
     # Price & Size
     entry_price = models.DecimalField(max_digits=18, decimal_places=6)
@@ -71,6 +81,9 @@ class Trade(models.Model):
     # Media
     chart_entry = models.ImageField(upload_to='charts/entry/', null=True, blank=True)
     chart_exit = models.ImageField(upload_to='charts/exit/', null=True, blank=True)
+
+    # Custom Setup Tags
+    tags = models.CharField(max_length=255, blank=True, null=True, help_text="Comma or hash separated tags e.g. #FVG, #LiquidityRaid")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

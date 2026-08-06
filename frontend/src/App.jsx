@@ -7,6 +7,7 @@ import TradeTable from './components/TradeTable';
 import TradeFormModal from './components/TradeFormModal';
 import TradeDetailModal from './components/TradeDetailModal';
 import StrategyManagerModal from './components/StrategyManagerModal';
+import AuthScreen from './components/AuthScreen';
 
 import { 
   getTrades, 
@@ -16,15 +17,39 @@ import {
   updateTrade, 
   deleteTrade, 
   createStrategy, 
-  deleteStrategy 
+  deleteStrategy,
+  getMe
 } from './services/api';
 
 export default function App() {
+  // Authentication State
+  const [authToken, setAuthToken] = useState(() => localStorage.getItem('quant_journal_token') || null);
+  const [currentUser, setCurrentUser] = useState(() => {
+    const saved = localStorage.getItem('quant_journal_user');
+    return saved ? JSON.parse(saved) : null;
+  });
+
   const [activeTab, setActiveTab] = useState('dashboard');
   const [trades, setTrades] = useState([]);
   const [strategies, setStrategies] = useState([]);
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Theme State (Dark / Light)
+  const [theme, setTheme] = useState(() => localStorage.getItem('quant_journal_theme') || 'dark');
+
+  useEffect(() => {
+    localStorage.setItem('quant_journal_theme', theme);
+    if (theme === 'light') {
+      document.documentElement.classList.add('light-theme');
+    } else {
+      document.documentElement.classList.remove('light-theme');
+    }
+  }, [theme]);
+
+  const handleToggleTheme = () => {
+    setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
+  };
 
   // Filters State
   const [filters, setFilters] = useState({
@@ -54,8 +79,41 @@ export default function App() {
     setTimeout(() => setNotification(null), 4000);
   };
 
+  // Check auth session validity on startup
+  useEffect(() => {
+    const checkAuth = async () => {
+      if (authToken) {
+        try {
+          const res = await getMe();
+          setCurrentUser(res.user);
+          localStorage.setItem('quant_journal_user', JSON.stringify(res.user));
+        } catch (err) {
+          handleLogout();
+        }
+      }
+    };
+    checkAuth();
+  }, [authToken]);
+
+  const handleAuthSuccess = (data) => {
+    setAuthToken(data.token);
+    setCurrentUser(data.user);
+    localStorage.setItem('quant_journal_token', data.token);
+    localStorage.setItem('quant_journal_user', JSON.stringify(data.user));
+    showNotification(`Welcome back, ${data.user.username}!`);
+  };
+
+  const handleLogout = () => {
+    setAuthToken(null);
+    setCurrentUser(null);
+    localStorage.removeItem('quant_journal_token');
+    localStorage.removeItem('quant_journal_user');
+    showNotification('System locked. Session ended.', 'error');
+  };
+
   // Initial Data Fetching
   const fetchAllData = async () => {
+    if (!authToken || !currentUser) return;
     try {
       setLoading(true);
       const [tradesData, strategiesData, analyticsData] = await Promise.all([
@@ -74,9 +132,28 @@ export default function App() {
     }
   };
 
+  // Local Auto-Backup Trigger (Saves JSON snapshot to localStorage on every trade change)
   useEffect(() => {
-    fetchAllData();
-  }, [filters]);
+    if (trades && trades.length > 0) {
+      try {
+        const backupSnapshot = {
+          timestamp: new Date().toISOString(),
+          user: currentUser ? currentUser.username : 'Trader',
+          total_trades: trades.length,
+          trades: trades
+        };
+        localStorage.setItem('quant_journal_auto_backup', JSON.stringify(backupSnapshot));
+      } catch (err) {
+        console.error('Failed to save local JSON backup snapshot:', err);
+      }
+    }
+  }, [trades, currentUser]);
+
+  useEffect(() => {
+    if (authToken && currentUser) {
+      fetchAllData();
+    }
+  }, [filters, authToken, currentUser]);
 
   // Trade Modal Handlers
   const handleOpenNewTradeModal = () => {
@@ -116,6 +193,24 @@ export default function App() {
     } catch (err) {
       console.error('Failed to delete trade:', err);
       showNotification('Error deleting trade.', 'error');
+    }
+  };
+
+  const handleImportTrades = async (importedTrades) => {
+    try {
+      setLoading(true);
+      let count = 0;
+      for (const trade of importedTrades) {
+        await createTrade(trade);
+        count++;
+      }
+      showNotification(`Successfully imported ${count} trades from CSV!`);
+      await fetchAllData();
+    } catch (err) {
+      console.error('Failed to import trades:', err);
+      showNotification('Error importing trades from CSV.', 'error');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -173,6 +268,11 @@ export default function App() {
     });
   };
 
+  // If unauthenticated, present AuthScreen lock screen
+  if (!authToken || !currentUser) {
+    return <AuthScreen onAuthSuccess={handleAuthSuccess} />;
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-[#0B0E14] text-slate-100">
       
@@ -182,6 +282,10 @@ export default function App() {
         setActiveTab={setActiveTab}
         onOpenTradeModal={handleOpenNewTradeModal}
         onOpenStrategyModal={() => setIsStrategyModalOpen(true)}
+        currentUser={currentUser}
+        onLogout={handleLogout}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
       />
 
       {/* Notification Toast */}
@@ -218,6 +322,7 @@ export default function App() {
                   onViewTrade={handleViewTradeDetail}
                   onEditTrade={handleOpenEditTradeModal}
                   onDeleteTrade={handleDeleteTrade}
+                  onImportTrades={handleImportTrades}
                   filters={filters}
                   setFilters={setFilters}
                   onResetFilters={handleResetFilters}
@@ -238,6 +343,7 @@ export default function App() {
                   onViewTrade={handleViewTradeDetail}
                   onEditTrade={handleOpenEditTradeModal}
                   onDeleteTrade={handleDeleteTrade}
+                  onImportTrades={handleImportTrades}
                   filters={filters}
                   setFilters={setFilters}
                   onResetFilters={handleResetFilters}
@@ -291,9 +397,8 @@ export default function App() {
         onDeleteStrategy={handleDeleteStrategy}
       />
 
-      {/* Footer */}
-      <footer className="border-t border-slate-800/80 py-6 text-center text-xs text-slate-500 font-mono">
-        QuantJournal Pro System • Production Grade Personal Trading & Analytics Engine
+      <footer className="border-t border-slate-800/80 py-6 text-center text-xs text-slate-400 font-mono">
+        TradeTrack PRO System • Built & Owned by <span className="text-emerald-400 font-bold">Bimalesh Yadav</span> • Quantitative Trading & Analytics Engine
       </footer>
 
     </div>

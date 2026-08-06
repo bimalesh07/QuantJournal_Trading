@@ -46,8 +46,12 @@ class AnalyticsService:
         loss_prob = loss_count / total_closed
         expectancy = float(round((win_prob * avg_win) - (loss_prob * avg_loss), 2))
 
-        rrr_list = [float(t.risk_reward_ratio) for t in closed_trades if t.risk_reward_ratio > 0]
-        avg_rrr = round(sum(rrr_list) / len(rrr_list), 2) if rrr_list else 0.0
+        # Calculate Average RRR strictly as Average Win / Average Loss or filtered valid RRR average
+        if avg_loss > 0 and avg_win > 0:
+            avg_rrr = float(round(avg_win / avg_loss, 2))
+        else:
+            rrr_list = [float(t.risk_reward_ratio) for t in closed_trades if 0 < t.risk_reward_ratio <= 50]
+            avg_rrr = float(round(sum(rrr_list) / len(rrr_list), 2)) if rrr_list else 0.0
 
         # Best & Worst Strategies
         strategy_stats = AnalyticsService._calculate_strategy_stats(closed_trades)
@@ -56,6 +60,9 @@ class AnalyticsService:
 
         # Day of Week Breakdown
         pnl_by_day = AnalyticsService._calculate_day_of_week_stats(closed_trades)
+
+        # Trading Session Breakdown
+        pnl_by_session = AnalyticsService._calculate_session_stats(closed_trades)
 
         # Emotion Breakdown
         pnl_by_emotion = AnalyticsService._calculate_emotion_stats(closed_trades)
@@ -92,6 +99,7 @@ class AnalyticsService:
             'worst_strategy': worst_strategy,
             'strategy_performance': strategy_stats,
             'pnl_by_day': pnl_by_day,
+            'pnl_by_session': pnl_by_session,
             'pnl_by_emotion': pnl_by_emotion,
             'equity_curve': equity_curve,
             'monthly_pnl': monthly_pnl,
@@ -123,6 +131,7 @@ class AnalyticsService:
             'worst_strategy': None,
             'strategy_performance': [],
             'pnl_by_day': [],
+            'pnl_by_session': [],
             'pnl_by_emotion': [],
             'equity_curve': [],
             'monthly_pnl': [],
@@ -289,4 +298,43 @@ class AnalyticsService:
                 'losses': v['losses'],
                 'net_pnl': float(round(v['net_pnl'], 2))
             }
+        return result
+
+    @staticmethod
+    def _calculate_session_stats(closed_trades):
+        session_names = {
+            'ASIAN': 'Asian Session',
+            'LONDON': 'London Session',
+            'NEW_YORK': 'New York Session'
+        }
+        stats = {code: {'session': label, 'code': code, 'net_pnl': Decimal('0'), 'trades': 0, 'wins': 0, 'losses': 0} 
+                 for code, label in session_names.items()}
+
+        for t in closed_trades:
+            sess_code = getattr(t, 'session', 'NEW_YORK') or 'NEW_YORK'
+            if sess_code not in stats:
+                stats[sess_code] = {'session': sess_code, 'code': sess_code, 'net_pnl': Decimal('0'), 'trades': 0, 'wins': 0, 'losses': 0}
+            
+            stats[sess_code]['net_pnl'] += t.net_pnl
+            stats[sess_code]['trades'] += 1
+            if t.net_pnl > 0:
+                stats[sess_code]['wins'] += 1
+            elif t.net_pnl < 0:
+                stats[sess_code]['losses'] += 1
+
+        result = []
+        for code in ['ASIAN', 'LONDON', 'NEW_YORK']:
+            if code in stats:
+                item = stats[code]
+                total = item['trades']
+                win_rate = round((item['wins'] / total) * 100, 2) if total > 0 else 0.0
+                result.append({
+                    'session': item['session'],
+                    'code': code,
+                    'trades': total,
+                    'wins': item['wins'],
+                    'losses': item['losses'],
+                    'win_rate': win_rate,
+                    'net_pnl': float(round(item['net_pnl'], 2))
+                })
         return result
