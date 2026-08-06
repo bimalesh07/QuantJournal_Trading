@@ -3,8 +3,13 @@
 @layer base {
   body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    background-color: #0B0E14;
+    background-color: #0B0E17;
     color: #F3F4F6;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.05) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(14, 165, 233, 0.05) 0px, transparent 50%),
+      radial-gradient(at 50% 100%, rgba(139, 92, 246, 0.04) 0px, transparent 50%);
+    background-attachment: fixed;
   }
 }
 
@@ -12,20 +17,20 @@
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* Custom Scrollbar */
+/* Custom Sleek Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0F131C;
+  background: #0D111A;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1E2536;
+  background: #1E2638;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #2D374D;
+  background: #334155;
 }
 
 /* Universal Custom Dropdown & Option Styling */
@@ -41,7 +46,6 @@ select {
   cursor: pointer;
 }
 
-/* Fix dropdown options popup in browsers (Chrome / Edge / Windows) */
 select option {
   background-color: #121622 !important;
   color: #FFFFFF !important;
@@ -58,37 +62,43 @@ select option:checked {
   color: #34D399 !important;
 }
 
-/* Custom Bloomberg/TradingView Card Styling */
+/* Luxury Glassmorphism & Bloomberg Card Styling */
 .card-dark {
-  background: rgba(21, 25, 33, 0.85);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 0.75rem;
+  background: rgba(18, 22, 34, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
 }
 
 .card-dark-hover {
-  transition: all 0.2s ease-in-out;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .card-dark-hover:hover {
-  border-color: rgba(16, 185, 129, 0.3);
-  box-shadow: 0 4px 20px -2px rgba(16, 185, 129, 0.1);
+  transform: translateY(-2px);
+  border-color: rgba(52, 211, 153, 0.35);
+  box-shadow: 0 12px 30px -8px rgba(16, 185, 129, 0.15);
 }
 
-/* Neon Glow Indicators */
+/* Glow Effects */
 .glow-emerald {
-  box-shadow: 0 0 15px -3px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 0 20px -3px rgba(16, 185, 129, 0.35);
 }
 .glow-rose {
-  box-shadow: 0 0 15px -3px rgba(239, 68, 68, 0.4);
+  box-shadow: 0 0 20px -3px rgba(244, 63, 94, 0.35);
 }
-.glow-violet {
-  box-shadow: 0 0 15px -3px rgba(139, 92, 246, 0.4);
+.glow-sky {
+  box-shadow: 0 0 20px -3px rgba(56, 189, 248, 0.35);
+}
+.glow-purple {
+  box-shadow: 0 0 20px -3px rgba(168, 85, 247, 0.35);
 }
 
-/* Light Mode Comprehensive Theme Overrides */
+/* Light Mode Overrides */
 html.light-theme,
 .light-theme body {
   background-color: #F8FAFC !important;
+  background-image: none !important;
   color: #0F172A !important;
 }
 
@@ -98,294 +108,34 @@ html.light-theme,
 .light-theme ::-webkit-scrollbar-thumb {
   background: #CBD5E1 !important;
 }
-.light-theme ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8 !important;
-}
 
 .light-theme header {
   background-color: rgba(255, 255, 255, 0.95) !important;
   border-color: #E2E8F0 !important;
 }
 
-.light-theme nav {
-  background-color: #F1F5F9 !important;
-  border-color: #E2E8F0 !important;
-}
-
 .light-theme .card-dark,
+.light-theme .bg-\[\#10141D\],
 .light-theme .bg-\[\#121622\],
-.light-theme .bg-\[\#121622\]\/90,
-.light-theme .bg-\[\#121622\]\/80,
-.light-theme .bg-\[\#161B29\],
+.light-theme .bg-\[\#141926\],
 .light-theme .bg-\[\#151921\],
-.light-theme .bg-\[\#181E2C\],
-.light-theme .bg-\[\#141924\],
-.light-theme .bg-\[\#0F131C\],
-.light-theme .bg-\[\#0B0E14\] {
+.light-theme .bg-\[\#161B27\],
+.light-theme .bg-\[\#161B29\],
+.light-theme .bg-\[\#181E2C\] {
   background-color: #FFFFFF !important;
   border-color: #E2E8F0 !important;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05) !important;
+  color: #0F172A !important;
+  box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.05) !important;
 }
 
-.light-theme .bg-\[\#181E2C\]\/60,
-.light-theme .bg-\[\#151921\]\/50,
-.light-theme .bg-\[\#141924\] {
-  background-color: #F8FAFC !important;
-  border-color: #E2E8F0 !important;
-}
-
-/* Text Overrides for Light Mode */
-.light-theme .text-white,
 .light-theme .text-slate-100,
 .light-theme .text-slate-200,
-.light-theme .text-slate-300 {
+.light-theme .text-slate-300,
+.light-theme .text-white {
   color: #0F172A !important;
 }
 
-.light-theme .text-slate-400 {
-  color: #64748B !important;
-}
-
+.light-theme .text-slate-400,
 .light-theme .text-slate-500 {
-  color: #475569 !important;
-}
-
-/* High Contrast Accent Colors in Light Mode */
-.light-theme .text-teal-300,
-.light-theme .text-teal-400 {
-  color: #0F766E !important;
-}
-
-.light-theme .text-purple-300,
-.light-theme .text-purple-400 {
-  color: #6D28D9 !important;
-}
-
-.light-theme .text-blue-300,
-.light-theme .text-blue-400 {
-  color: #1D4ED8 !important;
-}
-
-.light-theme .text-amber-300,
-.light-theme .text-amber-400 {
-  color: #B45309 !important;
-}
-
-.light-theme .text-emerald-300 {
-  color: #047857 !important;
-}
-
-.light-theme .text-emerald-400 {
-  color: #059669 !important;
-}
-
-.light-theme .text-rose-300 {
-  color: #BE123C !important;
-}
-
-.light-theme .text-rose-400 {
-  color: #E11D48 !important;
-}
-
-.light-theme .text-indigo-300 {
-  color: #4338CA !important;
-}
-
-/* Form Controls in Light Mode */
-.light-theme input,
-.light-theme select,
-.light-theme textarea {
-  background-color: #F8FAFC !important;
-  border-color: #CBD5E1 !important;
-  color: #0F172A !important;
-}
-
-.light-theme select {
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
-}
-
-.light-theme select option {
-  background-color: #FFFFFF !important;
-  color: #0F172A !important;
-  font-size: 14px !important;
-}
-
-.light-theme select option:hover,
-.light-theme select option:focus,
-.light-theme select option:checked {
-  background-color: #F1F5F9 !important;
-  color: #047857 !important;
-}
-
-.light-theme input:focus,
-.light-theme select:focus,
-.light-theme textarea:focus {
-  background-color: #FFFFFF !important;
-  border-color: #10B981 !important;
-}
-
-/* Table Light Mode Overrides */
-.light-theme th {
-  background-color: #F1F5F9 !important;
-  color: #334155 !important;
-  border-color: #E2E8F0 !important;
-}
-
-.light-theme td {
-  border-color: #F1F5F9 !important;
-}
-
-.light-theme tr:hover {
-  background-color: #F8FAFC !important;
-}
-
-.light-theme .sticky.right-0 {
-  background-color: #FFFFFF !important;
-  border-color: #E2E8F0 !important;
-}
-
-/* Recharts Axis & Grid Lines in Light Mode */
-.light-theme .recharts-cartesian-axis-tick-value {
-  fill: #334155 !important;
-  font-weight: 700 !important;
-}
-
-.light-theme .recharts-cartesian-grid line {
-  stroke: #CBD5E1 !important;
-}
-
-.light-theme .recharts-legend-item-text {
-  color: #1E293B !important;
-}
-
-/* Badges in Light Mode */
-.light-theme .bg-slate-800 {
-  background-color: #E2E8F0 !important;
-  color: #0F172A !important;
-  border-color: #CBD5E1 !important;
-}
-
-.light-theme .bg-blue-500\/10 {
-  background-color: #EFF6FF !important;
-  color: #1D4ED8 !important;
-  border-color: #BFDBFE !important;
-}
-
-.light-theme .bg-purple-500\/10 {
-  background-color: #FAF5FF !important;
-  color: #6D28D9 !important;
-  border-color: #E9D5FF !important;
-}
-
-.light-theme .bg-emerald-500\/10 {
-  background-color: #ECFDF5 !important;
-  color: #047857 !important;
-  border-color: #A7F3D0 !important;
-}
-
-.light-theme .bg-rose-500\/10 {
-  background-color: #FFF1F2 !important;
-  color: #BE123C !important;
-  border-color: #FECDD3 !important;
-}
-
-/* Light Mode KPI & Calendar Card Gradients */
-.light-theme .bg-gradient-to-br.from-\[\#0a2c20\] {
-  background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%) !important;
-  border-color: #6EE7B7 !important;
-}
-
-.light-theme .bg-gradient-to-br.from-\[\#3b0b13\] {
-  background: linear-gradient(135deg, #FFF1F2 0%, #FFE4E6 100%) !important;
-  border-color: #FDA4AF !important;
-}
-
-.light-theme .bg-gradient-to-br.from-\[\#09292d\] {
-  background: linear-gradient(135deg, #F0FDFA 0%, #CCFBF1 100%) !important;
-  border-color: #5EEAD4 !important;
-}
-
-.light-theme .bg-gradient-to-br.from-\[\#1e0f33\] {
-  background: linear-gradient(135deg, #FDF4FF 0%, #F5D0FE 100%) !important;
-  border-color: #F0ABFC !important;
-}
-
-.light-theme .bg-gradient-to-br.from-\[\#0b2138\] {
-  background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%) !important;
-  border-color: #93C5FD !important;
-}
-
-.light-theme .bg-gradient-to-br.from-\[\#2a1d0a\] {
-  background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%) !important;
-  border-color: #FDE68A !important;
-}
-
-.light-theme .bg-gradient-to-br.from-\[\#062c21\] {
-  background: linear-gradient(135deg, #E6F4EA 0%, #C3E6CB 100%) !important;
-  border-color: #34D399 !important;
-}
-
-.light-theme .bg-gradient-to-br.from-\[\#3b0a12\] {
-  background: linear-gradient(135deg, #FCE8E6 0%, #F8D7DA 100%) !important;
-  border-color: #F87171 !important;
-}
-
-.light-theme .bg-gradient-to-r.from-\[\#092b20\] {
-  background: linear-gradient(90deg, #ECFDF5 0%, #D1FAE5 100%) !important;
-  border-color: #6EE7B7 !important;
-}
-
-.light-theme .bg-gradient-to-r.from-\[\#380e15\] {
-  background: linear-gradient(90deg, #FFF1F2 0%, #FFE4E6 100%) !important;
-  border-color: #FDA4AF !important;
-}
-
-/* Calendar Day Badges in Light Mode */
-.light-theme .bg-slate-800\/80 {
-  background-color: #E2E8F0 !important;
-  color: #0F172A !important;
-  border-color: #CBD5E1 !important;
-}
-
-.light-theme .bg-\[\#141924\] {
-  background-color: #FFFFFF !important;
-  border-color: #E2E8F0 !important;
-}
-
-.light-theme .bg-\[\#181E2C\] {
-  background-color: #F1F5F9 !important;
-  color: #0F172A !important;
-  border-color: #E2E8F0 !important;
-}
-
-/* Trade Form Modal Light Mode Checklist & Container Overrides */
-.light-theme .bg-gradient-to-br.from-\[\#121824\] {
-  background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%) !important;
-  border-color: #CBD5E1 !important;
-  box-shadow: 0 4px 15px -2px rgba(0, 0, 0, 0.05) !important;
-}
-
-.light-theme .bg-gradient-to-r.from-emerald-950\/60 {
-  background: linear-gradient(90deg, #ECFDF5 0%, #D1FAE5 100%) !important;
-  border-color: #34D399 !important;
-}
-
-.light-theme .bg-gradient-to-r.from-amber-950\/40 {
-  background: linear-gradient(90deg, #FFFBEB 0%, #FEF3C7 100%) !important;
-  border-color: #FDE68A !important;
-  color: #B45309 !important;
-}
-
-.light-theme .bg-gradient-to-r.from-amber-950\/40 span {
-  color: #B45309 !important;
-}
-
-.light-theme .bg-\[\#161B29\] {
-  background-color: #F8FAFC !important;
-  border-color: #E2E8F0 !important;
-}
-
-.light-theme .bg-\[\#181E2C\]\/60 {
-  background-color: #F1F5F9 !important;
-  border-color: #E2E8F0 !important;
+  color: #64748B !important;
 }
