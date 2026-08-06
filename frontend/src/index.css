@@ -131,24 +131,151 @@ select option:checked {
   animation: shimmerPass 1.2s ease-in-out infinite;
 }
 
-/* Light Mode Overrides */
+/* ========================================================= */
+/* COMPREHENSIVE LIGHT THEME OVERRIDES (Pristine Light Mode) */
+/* ========================================================= */
+
 html.light-theme,
-.light-theme body {
-  background-color: #F8FAFC !important;
-  background-image: none !important;
+.light-theme body,
+.light-theme .min-h-screen {
+  background-color: #F1F5F9 !important;
+  background-image: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.05) 0%, transparent 60%) !important;
   color: #0F172A !important;
 }
 
+.light-theme ::-webkit-scrollbar-track {
+  background: #E2E8F0 !important;
+}
+.light-theme ::-webkit-scrollbar-thumb {
+  background: #CBD5E1 !important;
+}
+
+/* All Dark Background Utility Overrides in Light Theme */
 .light-theme .aerogel-surface,
+.light-theme .bg-\[\#030508\],
+.light-theme .bg-\[\#05070B\],
+.light-theme .bg-\[\#070A12\],
+.light-theme .bg-\[\#070A12\]\/90,
+.light-theme .bg-\[\#090D16\],
+.light-theme .bg-\[\#090D16\]\/80,
+.light-theme .bg-\[\#09151A\],
+.light-theme .bg-\[\#0A0E17\],
+.light-theme .bg-\[\#0B0E14\],
+.light-theme .bg-\[\#0E121B\],
+.light-theme .bg-\[\#0F131C\],
 .light-theme .bg-\[\#10141D\],
+.light-theme .bg-\[\#120D22\],
+.light-theme .bg-\[\#121620\]\/90,
 .light-theme .bg-\[\#121622\],
+.light-theme .bg-\[\#121622\]\/90,
+.light-theme .bg-\[\#121622\]\/80,
+.light-theme .bg-\[\#140F24\],
 .light-theme .bg-\[\#141926\],
+.light-theme .bg-\[\#151124\],
 .light-theme .bg-\[\#151921\],
 .light-theme .bg-\[\#161B27\],
 .light-theme .bg-\[\#161B29\],
-.light-theme .bg-\[\#181E2C\] {
+.light-theme .bg-\[\#161F2E\],
+.light-theme .bg-\[\#181E2C\],
+.light-theme .bg-\[\#151921\],
+.light-theme .bg-slate-800,
+.light-theme .bg-slate-800\/80,
+.light-theme .bg-slate-800\/60,
+.light-theme .bg-slate-800\/50,
+.light-theme .bg-slate-800\/40,
+.light-theme .bg-slate-900 {
   background-color: #FFFFFF !important;
   border-color: #E2E8F0 !important;
   color: #0F172A !important;
-  box-shadow: 0 4px 20px -3px rgba(0, 0, 0, 0.05) !important;
+  box-shadow: 0 4px 25px -4px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Inputs, Textareas & Select Dropdowns in Light Theme */
+.light-theme input,
+.light-theme select,
+.light-theme textarea {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border-color: #CBD5E1 !important;
+}
+
+.light-theme input::placeholder,
+.light-theme textarea::placeholder {
+  color: #64748B !important;
+}
+
+.light-theme select option {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+}
+
+/* Light Theme Card Tints */
+.light-theme .bg-\[\#091A14\]\/80 {
+  background-color: #ECFDF5 !important;
+  border-color: #A7F3D0 !important;
+}
+.light-theme .bg-\[\#071C1E\]\/80 {
+  background-color: #F0FDF4 !important;
+  border-color: #99F6E4 !important;
+}
+.light-theme .bg-\[\#140A24\]\/80 {
+  background-color: #F3E8FF !important;
+  border-color: #E9D5FF !important;
+}
+.light-theme .bg-\[\#081829\]\/80 {
+  background-color: #F0F9FF !important;
+  border-color: #BAE6FD !important;
+}
+.light-theme .bg-\[\#1C1307\]\/80 {
+  background-color: #FFFBEB !important;
+  border-color: #FDE68A !important;
+}
+.light-theme .bg-\[\#21090E\]\/80 {
+  background-color: #FFF1F2 !important;
+  border-color: #FECDD3 !important;
+}
+
+/* Table Cells & Sticky Columns in Light Mode */
+.light-theme table th,
+.light-theme table td,
+.light-theme tr {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border-color: #F1F5F9 !important;
+}
+
+.light-theme th.sticky,
+.light-theme td.sticky {
+  background-color: #FFFFFF !important;
+}
+
+.light-theme tr:hover {
+  background-color: #F8FAFC !important;
+}
+
+/* Text Colors in Light Theme */
+.light-theme .text-white {
+  color: #0F172A !important;
+}
+.light-theme .text-slate-100,
+.light-theme .text-slate-200,
+.light-theme .text-slate-300 {
+  color: #1E293B !important;
+}
+.light-theme .text-slate-400 {
+  color: #64748B !important;
+}
+.light-theme .text-slate-500 {
+  color: #94A3B8 !important;
+}
+
+/* Border Overrides in Light Theme */
+.light-theme .border-slate-800,
+.light-theme .border-slate-800\/80,
+.light-theme .border-slate-800\/90,
+.light-theme .border-slate-700,
+.light-theme .border-slate-700\/80,
+.light-theme .border-slate-700\/70,
+.light-theme .border-white\/10 {
+  border-color: #E2E8F0 !important;
 }
