@@ -228,8 +228,8 @@ export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData 
                 onChange={handleChange}
                 className="w-full bg-[#181E2C] text-xs sm:text-sm text-white px-3.5 py-2.5 rounded-xl border border-slate-700/80 focus:border-emerald-400 focus:bg-[#1C2333] focus:outline-none transition-all font-semibold shadow-inner cursor-pointer"
               >
-                <option value="LONG" className="bg-[#161B29] text-white font-medium py-2">LONG (Buy)</option>
-                <option value="SHORT" className="bg-[#161B29] text-white font-medium py-2">SHORT (Sell)</option>
+                <option value="LONG" className="bg-[#121622] text-white font-semibold py-2">🟢 LONG (Buy)</option>
+                <option value="SHORT" className="bg-[#121622] text-white font-semibold py-2">🔴 SHORT (Sell)</option>
               </select>
             </div>
 
@@ -241,11 +241,11 @@ export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData 
                 onChange={handleChange}
                 className="w-full bg-[#181E2C] text-xs sm:text-sm text-white px-3.5 py-2.5 rounded-xl border border-slate-700/80 focus:border-emerald-400 focus:bg-[#1C2333] focus:outline-none transition-all font-semibold shadow-inner cursor-pointer"
               >
-                <option value="CRYPTO" className="bg-[#161B29] text-white font-medium py-2">Crypto</option>
-                <option value="STOCKS" className="bg-[#161B29] text-white font-medium py-2">Stocks</option>
-                <option value="FOREX" className="bg-[#161B29] text-white font-medium py-2">Forex</option>
-                <option value="OPTIONS" className="bg-[#161B29] text-white font-medium py-2">Options</option>
-                <option value="FUTURES" className="bg-[#161B29] text-white font-medium py-2">Futures</option>
+                <option value="CRYPTO" className="bg-[#121622] text-white font-semibold py-2">🪙 Crypto</option>
+                <option value="STOCKS" className="bg-[#121622] text-white font-semibold py-2">📈 Stocks</option>
+                <option value="FOREX" className="bg-[#121622] text-white font-semibold py-2">💱 Forex</option>
+                <option value="OPTIONS" className="bg-[#121622] text-white font-semibold py-2">📊 Options</option>
+                <option value="FUTURES" className="bg-[#121622] text-white font-semibold py-2">⚡ Futures</option>
               </select>
             </div>
 
@@ -257,9 +257,9 @@ export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData 
                 onChange={handleChange}
                 className="w-full bg-[#181E2C] text-xs sm:text-sm text-white px-3.5 py-2.5 rounded-xl border border-slate-700/80 focus:border-emerald-400 focus:bg-[#1C2333] focus:outline-none transition-all font-semibold shadow-inner cursor-pointer"
               >
-                <option value="NEW_YORK" className="bg-[#161B29] text-white font-medium py-2">New York Session</option>
-                <option value="LONDON" className="bg-[#161B29] text-white font-medium py-2">London Session</option>
-                <option value="ASIAN" className="bg-[#161B29] text-white font-medium py-2">Asian Session</option>
+                <option value="NEW_YORK" className="bg-[#121622] text-white font-semibold py-2">🗽 New York Session</option>
+                <option value="LONDON" className="bg-[#121622] text-white font-semibold py-2">🏛️ London Session</option>
+                <option value="ASIAN" className="bg-[#121622] text-white font-semibold py-2">🌏 Asian Session</option>
               </select>
             </div>
 
@@ -477,8 +477,8 @@ export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData 
                 onChange={handleChange}
                 className="w-full bg-[#181E2C] text-xs sm:text-sm text-white px-3.5 py-2.5 rounded-xl border border-slate-700/80 focus:border-emerald-400 focus:outline-none font-semibold shadow-inner cursor-pointer"
               >
-                <option value="CLOSED" className="bg-[#161B29] text-white font-medium py-2">CLOSED</option>
-                <option value="OPEN" className="bg-[#161B29] text-white font-medium py-2">OPEN</option>
+                <option value="CLOSED" className="bg-[#121622] text-white font-semibold py-2">✅ CLOSED</option>
+                <option value="OPEN" className="bg-[#121622] text-white font-semibold py-2">⏳ OPEN</option>
               </select>
             </div>
 
@@ -490,9 +490,9 @@ export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData 
                 onChange={handleChange}
                 className="w-full bg-[#181E2C] text-xs sm:text-sm text-white px-3.5 py-2.5 rounded-xl border border-slate-700/80 focus:border-emerald-400 focus:outline-none font-semibold shadow-inner cursor-pointer"
               >
-                <option value="" className="bg-[#161B29] text-white font-medium py-2">No Strategy Assigned</option>
+                <option value="" className="bg-[#121622] text-white font-semibold py-2">📌 No Strategy Assigned</option>
                 {strategies.map((s) => (
-                  <option key={s.id} value={s.id} className="bg-[#161B29] text-white font-medium py-2">{s.name}</option>
+                  <option key={s.id} value={s.id} className="bg-[#121622] text-white font-semibold py-2">⚡ {s.name}</option>
                 ))}
               </select>
             </div>
@@ -522,13 +522,13 @@ export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData 
                 onChange={handleChange}
                 className="w-full bg-[#181E2C] text-xs sm:text-sm text-white px-3.5 py-2.5 rounded-xl border border-slate-700/80 focus:border-emerald-400 focus:outline-none font-semibold shadow-inner cursor-pointer"
               >
-                <option value="DISCIPLINED" className="bg-[#161B29] text-white font-medium py-2">Disciplined</option>
-                <option value="PATIENT" className="bg-[#161B29] text-white font-medium py-2">Patient</option>
-                <option value="FOMO" className="bg-[#161B29] text-white font-medium py-2">FOMO (Chasing)</option>
-                <option value="REVENGE" className="bg-[#161B29] text-white font-medium py-2">Revenge Trading</option>
-                <option value="FEARFUL" className="bg-[#161B29] text-white font-medium py-2">Fearful</option>
-                <option value="GREEDY" className="bg-[#161B29] text-white font-medium py-2">Greedy</option>
-                <option value="IMPULSIVE" className="bg-[#161B29] text-white font-medium py-2">Impulsive</option>
+                <option value="DISCIPLINED" className="bg-[#121622] text-white font-semibold py-2">🎯 Disciplined</option>
+                <option value="PATIENT" className="bg-[#121622] text-white font-semibold py-2">🧘 Patient</option>
+                <option value="FOMO" className="bg-[#121622] text-white font-semibold py-2">🔥 FOMO (Chasing)</option>
+                <option value="REVENGE" className="bg-[#121622] text-white font-semibold py-2">⚡ Revenge Trading</option>
+                <option value="FEARFUL" className="bg-[#121622] text-white font-semibold py-2">😨 Fearful</option>
+                <option value="GREEDY" className="bg-[#121622] text-white font-semibold py-2">🤑 Greedy</option>
+                <option value="IMPULSIVE" className="bg-[#121622] text-white font-semibold py-2">💥 Impulsive</option>
               </select>
             </div>
 

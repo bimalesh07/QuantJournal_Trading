@@ -33,30 +33,29 @@ select {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2334d399' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
   background-repeat: no-repeat !important;
-  background-position: right 0.75rem center !important;
+  background-position: right 0.85rem center !important;
   background-size: 1rem 1rem !important;
-  padding-right: 2.25rem !important;
+  padding-right: 2.5rem !important;
   cursor: pointer;
 }
 
 /* Fix dropdown options popup in browsers (Chrome / Edge / Windows) */
 select option {
-  background-color: #161B29 !important;
-  color: #F8FAFC !important;
+  background-color: #121622 !important;
+  color: #FFFFFF !important;
   font-size: 14px !important;
-  font-weight: 500 !important;
+  font-weight: 600 !important;
   padding: 10px 14px !important;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
-  min-height: 36px;
+  font-family: 'JetBrains Mono', 'Inter', system-ui, sans-serif !important;
 }
 
 select option:hover,
 select option:focus,
 select option:checked {
-  background-color: #1E2536 !important;
-  color: #10B981 !important;
+  background-color: #1E2538 !important;
+  color: #34D399 !important;
 }
 
 /* Custom Bloomberg/TradingView Card Styling */
