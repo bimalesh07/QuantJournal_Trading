@@ -59,24 +59,29 @@ export default function AnalyticsCharts({ analytics }) {
     e => negativeTraits.includes(e.emotion?.toUpperCase()) && e.net_pnl > 0
   );
 
-  // Custom Dark Glassmorphism Tooltip
+  // Custom Glassmorphism Tooltip for Mouse Hover
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       const isBadMindsetProfitable = negativeTraits.includes(data.emotion?.toUpperCase()) && data.net_pnl > 0;
 
       return (
-        <div className="bg-[#121622]/95 border border-slate-700/80 p-3.5 rounded-2xl shadow-2xl text-xs font-mono backdrop-blur-2xl">
+        <div className="bg-[#121622] border border-slate-700/80 p-3.5 rounded-2xl shadow-2xl text-xs font-mono backdrop-blur-2xl z-50 pointer-events-none min-w-[160px]">
           <div className="text-slate-300 font-bold mb-1.5 border-b border-slate-800 pb-1 flex items-center justify-between gap-3">
             <span>{label || data.date || data.month || data.session || data.day || data.emotion}</span>
             {data.trades !== undefined && <span className="text-[10px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded-md font-semibold">{data.trades} Trades</span>}
           </div>
-          {payload.map((entry, index) => (
-            <div key={index} className="flex items-center justify-between gap-5 font-extrabold text-sm py-0.5" style={{ color: entry.color || '#34D399' }}>
-              <span>{entry.name}:</span>
-              <span>${entry.value ? Number(entry.value).toLocaleString() : 0}</span>
-            </div>
-          ))}
+          {payload.map((entry, index) => {
+            const rawVal = entry.value;
+            const valNum = Number(rawVal || 0);
+            const formattedVal = `${valNum >= 0 ? '+' : ''}$${valNum.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+            return (
+              <div key={index} className="flex items-center justify-between gap-4 font-black text-sm py-0.5" style={{ color: entry.color || '#34D399' }}>
+                <span>{entry.name}:</span>
+                <span>{formattedVal}</span>
+              </div>
+            );
+          })}
           {data.win_rate !== undefined && (
             <div className="text-slate-400 text-xs mt-1 font-semibold">
               Win Rate: <span className="text-emerald-400 font-bold">{data.win_rate}%</span>
@@ -148,7 +153,11 @@ export default function AnalyticsCharts({ analytics }) {
                 <CartesianGrid strokeDasharray="3 3" stroke="#1E2638" />
                 <XAxis dataKey="date" stroke="#94A3B8" fontSize={11} fontWeight={600} tickLine={false} tickFormatter={formatShortDate} />
                 <YAxis stroke="#94A3B8" fontSize={11} fontWeight={600} tickLine={false} width={65} tickFormatter={formatCurrencyCondensed} />
-                <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(52, 211, 153, 0.5)', strokeWidth: 2, strokeDasharray: '4 4' }} />
+                <Tooltip 
+                  content={<CustomTooltip />} 
+                  wrapperStyle={{ zIndex: 1000, pointerEvents: 'none' }}
+                  cursor={{ stroke: 'rgba(52, 211, 153, 0.5)', strokeWidth: 2, strokeDasharray: '4 4' }} 
+                />
                 <Area 
                   type="monotone" 
                   dataKey="cumulative_pnl" 
@@ -158,7 +167,7 @@ export default function AnalyticsCharts({ analytics }) {
                   fillOpacity={1} 
                   fill="url(#equityGrad)" 
                   dot={{ r: 4, fill: '#34D399', stroke: '#121622', strokeWidth: 2 }}
-                  activeDot={{ r: 6, fill: '#34D399', stroke: '#FFFFFF', strokeWidth: 2 }}
+                  activeDot={{ r: 7, fill: '#34D399', stroke: '#FFFFFF', strokeWidth: 2.5 }}
                 />
               </AreaChart>
             </ResponsiveContainer>
@@ -193,7 +202,11 @@ export default function AnalyticsCharts({ analytics }) {
                 <CartesianGrid strokeDasharray="3 3" stroke="#1E2638" />
                 <XAxis dataKey="session" stroke="#94A3B8" fontSize={11} fontWeight={600} tickLine={false} />
                 <YAxis stroke="#94A3B8" fontSize={11} fontWeight={600} tickLine={false} width={65} tickFormatter={formatCurrencyCondensed} />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255, 255, 255, 0.05)', rx: 6, ry: 6 }} />
+                <Tooltip 
+                  content={<CustomTooltip />} 
+                  wrapperStyle={{ zIndex: 1000, pointerEvents: 'none' }}
+                  cursor={{ fill: 'rgba(255, 255, 255, 0.05)', rx: 6, ry: 6 }} 
+                />
                 <Bar dataKey="net_pnl" name="Net PnL" maxBarSize={45} radius={[8, 8, 0, 0]}>
                   {pnl_by_session.map((entry, index) => (
                     <Cell key={`sess-cell-${index}`} fill={entry.net_pnl >= 0 ? 'url(#blueSessionGrad)' : 'url(#roseBarGrad)'} />
@@ -232,7 +245,11 @@ export default function AnalyticsCharts({ analytics }) {
                 <CartesianGrid strokeDasharray="3 3" stroke="#1E2638" />
                 <XAxis dataKey="day" stroke="#94A3B8" fontSize={11} fontWeight={600} tickLine={false} tickFormatter={(val) => val.slice(0, 3)} />
                 <YAxis stroke="#94A3B8" fontSize={11} fontWeight={600} tickLine={false} width={65} tickFormatter={formatCurrencyCondensed} />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255, 255, 255, 0.05)', rx: 6, ry: 6 }} />
+                <Tooltip 
+                  content={<CustomTooltip />} 
+                  wrapperStyle={{ zIndex: 1000, pointerEvents: 'none' }}
+                  cursor={{ fill: 'rgba(255, 255, 255, 0.05)', rx: 6, ry: 6 }} 
+                />
                 <Bar dataKey="net_pnl" name="Net PnL" maxBarSize={45} radius={[8, 8, 0, 0]}>
                   {pnl_by_day.map((entry, index) => (
                     <Cell key={`day-cell-${index}`} fill={entry.net_pnl >= 0 ? 'url(#emeraldBarGrad)' : 'url(#roseBarGrad)'} />
@@ -268,7 +285,11 @@ export default function AnalyticsCharts({ analytics }) {
                 <CartesianGrid strokeDasharray="3 3" stroke="#1E2638" />
                 <XAxis dataKey="month" stroke="#94A3B8" fontSize={11} fontWeight={600} tickLine={false} />
                 <YAxis stroke="#94A3B8" fontSize={11} fontWeight={600} tickLine={false} width={65} tickFormatter={formatCurrencyCondensed} />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255, 255, 255, 0.05)', rx: 6, ry: 6 }} />
+                <Tooltip 
+                  content={<CustomTooltip />} 
+                  wrapperStyle={{ zIndex: 1000, pointerEvents: 'none' }}
+                  cursor={{ fill: 'rgba(255, 255, 255, 0.05)', rx: 6, ry: 6 }} 
+                />
                 <Bar dataKey="net_pnl" name="Net PnL" maxBarSize={45} radius={[8, 8, 0, 0]}>
                   {monthly_pnl.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.net_pnl >= 0 ? 'url(#tealBarGrad)' : 'url(#roseBarGrad)'} />
@@ -322,7 +343,7 @@ export default function AnalyticsCharts({ analytics }) {
                       <Cell key={`pie-cell-${index}`} fill={entry.color} stroke="#121622" strokeWidth={3} />
                     ))}
                   </Pie>
-                  <Tooltip content={<CustomTooltip />} />
+                  <Tooltip content={<CustomTooltip />} wrapperStyle={{ zIndex: 1000, pointerEvents: 'none' }} />
                   <Legend 
                     verticalAlign="bottom" 
                     height={32} 
@@ -363,7 +384,11 @@ export default function AnalyticsCharts({ analytics }) {
                 <CartesianGrid strokeDasharray="3 3" stroke="#1E2638" />
                 <XAxis type="number" stroke="#94A3B8" fontSize={11} fontWeight={600} tickFormatter={formatCurrencyCondensed} />
                 <YAxis dataKey="emotion" type="category" stroke="#CBD5E1" fontSize={11} fontWeight={700} tickLine={false} width={100} />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255, 255, 255, 0.05)', rx: 6, ry: 6 }} />
+                <Tooltip 
+                  content={<CustomTooltip />} 
+                  wrapperStyle={{ zIndex: 1000, pointerEvents: 'none' }}
+                  cursor={{ fill: 'rgba(255, 255, 255, 0.05)', rx: 6, ry: 6 }} 
+                />
                 <Bar dataKey="net_pnl" name="Net PnL" maxBarSize={32} radius={[0, 8, 8, 0]}>
                   {pnl_by_emotion.map((entry, index) => (
                     <Cell key={`emo-cell-${index}`} fill={entry.net_pnl >= 0 ? 'url(#emeraldBarGrad)' : 'url(#roseBarGrad)'} />

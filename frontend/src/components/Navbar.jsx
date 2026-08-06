@@ -101,10 +101,9 @@ export default function Navbar({
                 </span>
               </div>
 
-              {/* Status Indicator with Soft Live-Pulsating Cyan Aura */}
               <p className="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5 font-mono font-medium whitespace-nowrap">
                 <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_10px_rgba(6,182,212,0.9)]"></span>
-                <span>Quantitative Trading System & Analytics</span>
+                <span>Trading Journal & Analytics</span>
               </p>
             </div>
 
