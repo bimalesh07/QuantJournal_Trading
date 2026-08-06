@@ -126,7 +126,7 @@ export default function App() {
       setAnalytics(analyticsData);
     } catch (err) {
       console.error('Failed to load application data:', err);
-      showNotification('Error connecting to Django backend server.', 'error');
+      showNotification('Error connecting to TradeTrack PRO server.', 'error');
     } finally {
       setLoading(false);
     }
@@ -307,7 +307,7 @@ export default function App() {
         {loading && !analytics ? (
           <div className="py-20 text-center text-slate-500 space-y-2">
             <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-            <p className="text-xs font-mono">Connecting to Django REST Framework backend...</p>
+            <p className="text-xs font-mono text-emerald-400">Connecting to TradeTrack PRO Secure Cloud Server...</p>
           </div>
         ) : (
           <>
