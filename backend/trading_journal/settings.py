@@ -63,13 +63,22 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'trading_journal.wsgi.application'
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
-}
+# Database Configuration (PostgreSQL on Neon Cloud)
+DATABASE_URL = os.getenv('DATABASE_URL')
+
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600, conn_health_checks=True)
+    }
+    print("[DATABASE STATUS] CONNECTED TO POSTGRESQL (Neon Cloud Database)")
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+    print("[DATABASE STATUS] CONNECTED TO LOCAL SQLITE FALLBACK")
 
 AUTH_PASSWORD_VALIDATORS = [
     {
