@@ -643,7 +643,7 @@ export default function DashboardOverview({ analytics, trades = [] }) {
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
                   <XAxis dataKey="date" stroke="#64748B" fontSize={10} tickFormatter={formatShortDate} />
-                  <YAxis stroke="#64748B" fontSize={10} width={65} tickFormatter={(val) => `$${val}`} />
+                  <YAxis stroke="#64748B" fontSize={10} width={70} tickFormatter={(val) => `$${Number(val).toLocaleString()}`} domain={['auto', 'auto']} />
                   <Tooltip
                     contentStyle={{ backgroundColor: '#0F1422', borderColor: 'rgba(255,255,255,0.15)', borderRadius: '14px', fontSize: '12px', fontFamily: 'JetBrains Mono', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.5)' }}
                     formatter={(val, name, item) => {
