@@ -15,6 +15,7 @@ import {
   Cpu
 } from 'lucide-react';
 import { loginUser, registerUser } from '../services/api';
+import InstitutionalOrderflowCanvas from './InstitutionalOrderflowCanvas';
 
 export default function AuthScreen({ onAuthSuccess, onBackToHome }) {
   const [isLogin, setIsLogin] = useState(true);
@@ -110,6 +111,9 @@ export default function AuthScreen({ onAuthSuccess, onBackToHome }) {
 
       {/* Cyber Grid Background Matrix */}
       <div className="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:24px_24px] opacity-25 pointer-events-none z-0"></div>
+
+      {/* Animated Institutional Orderflow Canvas Background */}
+      <InstitutionalOrderflowCanvas />
 
       {/* Top Left Navigation back to Landing Page */}
       {onBackToHome && (
