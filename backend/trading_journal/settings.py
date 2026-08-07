@@ -10,7 +10,16 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-trading-journal-analytics-
 
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'trading-track.onrender.com',
+    '.onrender.com',
+]
+
+_allowed_hosts_env = os.getenv('ALLOWED_HOSTS', '')
+if _allowed_hosts_env:
+    ALLOWED_HOSTS += [host.strip() for host in _allowed_hosts_env.split(',') if host.strip()]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
