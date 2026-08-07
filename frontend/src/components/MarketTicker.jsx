@@ -19,14 +19,14 @@ export default function MarketTicker({ theme = 'dark' }) {
   const isLight = theme === 'light';
 
   return (
-    <div className={`w-full border-b overflow-hidden backdrop-blur-md py-2 font-mono text-xs shadow-md select-none transition-colors ${
-      isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-[#05070F]/90 border-white/10 text-slate-100'
+    <div className={`w-full border-0 overflow-hidden backdrop-blur-md py-2 font-mono text-xs select-none transition-colors ${
+      isLight ? 'bg-white text-slate-900' : 'bg-[#05070F]/90 text-slate-100'
     }`}>
       <div className="flex items-center">
         
         {/* Live Market Label Badge */}
-        <div className={`px-3 py-1 border-r flex items-center gap-2 shrink-0 z-10 shadow-sm ${
-          isLight ? 'bg-slate-100 border-slate-200 text-slate-900' : 'bg-[#0A0F1D] border-white/10 text-slate-200'
+        <div className={`px-3 py-1 rounded-r-xl flex items-center gap-2 shrink-0 z-10 ${
+          isLight ? 'bg-slate-100 text-slate-900' : 'bg-[#0A0F1D] text-slate-200'
         }`}>
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
           <span className="font-black tracking-wider uppercase text-[10px] flex items-center gap-1">
