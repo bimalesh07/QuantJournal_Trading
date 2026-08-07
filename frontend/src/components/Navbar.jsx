@@ -32,7 +32,7 @@ export default function Navbar({
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: PieChart },
     { id: 'trades', label: 'Trade Log', icon: ListFilter },
-    { id: 'analytics', label: 'Analytics Engine', icon: BarChart3 },
+    { id: 'analytics', label: 'Analytics', icon: BarChart3 },
     { id: 'calendar', label: 'PnL Calendar', icon: Calendar },
     { id: 'playbook', label: 'Playbook & Notes', icon: BookOpen },
   ];
@@ -67,7 +67,7 @@ export default function Navbar({
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full backdrop-blur-2xl bg-[#070A14]/95 border-b border-white/15 px-4 sm:px-8 py-3 shadow-2xl transition-all relative">
+    <header className="sticky top-0 z-40 w-full backdrop-blur-2xl bg-[#070A14]/95 border-b border-white/15 px-3 sm:px-6 py-2.5 shadow-2xl transition-all relative">
       {/* Glowing Bottom Border Gradient Accent */}
       <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent"></div>
 
@@ -76,15 +76,13 @@ export default function Navbar({
         onMouseMove={handleMouseMove}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={handleMouseLeave}
-        className="w-full max-w-[1750px] mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-3 relative"
+        className="w-full max-w-[1850px] mx-auto flex items-center justify-between gap-2 relative"
       >
 
-        {/* 1. Brand Identity & Action Controls Row on Mobile */}
-        <div className="flex items-center justify-between w-full md:w-auto shrink-0 gap-2">
-          
-          {/* Brand Logo with Rotating Neon Beam */}
+        {/* 1. Brand Identity */}
+        <div className="flex items-center justify-between shrink-0 gap-2">
           <div className="flex items-center space-x-2 sm:space-x-3 cursor-pointer" onClick={() => setActiveTab('dashboard')}>
-            <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full p-[2px] overflow-hidden shadow-lg shadow-emerald-500/30 group/orb shrink-0">
+            <div className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full p-[2px] overflow-hidden shadow-lg shadow-emerald-500/30 group/orb shrink-0">
               <div 
                 className="absolute -inset-[150%] animate-spin-slow opacity-100 pointer-events-none"
                 style={{
@@ -92,13 +90,13 @@ export default function Navbar({
                 }}
               />
               <div className="relative w-full h-full bg-[#070A12] rounded-full flex items-center justify-center group-hover/orb:bg-transparent transition-colors">
-                <TrendingUp className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-emerald-400 group-hover/orb:text-slate-950 font-black transition-colors stroke-[2.2]" />
+                <TrendingUp className="w-4 h-4 text-emerald-400 group-hover/orb:text-slate-950 font-black transition-colors stroke-[2.2]" />
               </div>
             </div>
 
             <div>
-              <div className="flex items-center space-x-1.5 sm:space-x-2">
-                <span className="font-black text-base sm:text-xl tracking-wider text-white font-mono">
+              <div className="flex items-center space-x-1.5">
+                <span className="font-black text-base sm:text-lg tracking-wider text-white font-mono">
                   Trade<span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">Track</span>
                 </span>
 
@@ -109,21 +107,21 @@ export default function Navbar({
                       background: 'conic-gradient(from 0deg at 50% 50%, transparent 0deg, transparent 200deg, #06b6d4 260deg, #10b981 310deg, #f59e0b 360deg)'
                     }}
                   />
-                  <span className="relative px-2 py-0.5 text-[9px] sm:text-[10px] font-black tracking-widest bg-[#070A12] text-emerald-300 rounded-full font-mono uppercase block">
+                  <span className="relative px-1.5 py-0.5 text-[8.5px] font-black tracking-widest bg-[#070A12] text-emerald-300 rounded-full font-mono uppercase block">
                     PRO
                   </span>
                 </div>
               </div>
 
-              <p className="text-[9.5px] sm:text-[11px] text-slate-400 flex items-center gap-1 mt-0.5 font-mono font-medium whitespace-nowrap">
-                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_10px_rgba(6,182,212,0.9)]"></span>
+              <p className="text-[9px] text-slate-400 hidden lg:flex items-center gap-1 font-mono font-medium whitespace-nowrap">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(6,182,212,0.9)]"></span>
                 <span>Trading Journal & Analytics</span>
               </p>
             </div>
           </div>
 
           {/* Mobile Quick Action Buttons (+ Log & Hamburger Toggle) */}
-          <div className="flex md:hidden items-center gap-1.5 shrink-0">
+          <div className="flex lg:hidden items-center gap-1.5 shrink-0">
             <button
               onClick={() => onOpenTradeModal()}
               className="h-8 px-3 flex items-center gap-1 rounded-full text-[11px] font-mono font-black text-slate-950 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 shadow-md shadow-emerald-500/20 shrink-0 cursor-pointer active:scale-95 transition-transform"
@@ -132,7 +130,6 @@ export default function Navbar({
               <span>+ Log</span>
             </button>
 
-            {/* Mobile Hamburger Drawer Toggle Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="h-8.5 w-8.5 flex items-center justify-center rounded-xl bg-[#121824] border border-white/15 text-emerald-400 active:scale-95 transition-all cursor-pointer shadow-sm"
@@ -144,8 +141,8 @@ export default function Navbar({
 
         </div>
 
-        {/* 2. Desktop Navigation Tab Bar (Hidden on Mobile, accessed via Hamburger Menu) */}
-        <nav className="hidden md:flex items-center gap-1.5 bg-[#070A12]/90 p-1.5 rounded-full border border-white/10 shadow-inner overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden w-auto shrink-0">
+        {/* 2. Desktop Navigation Tab Bar */}
+        <nav className="hidden lg:flex items-center gap-1 bg-[#070A12]/90 p-1 rounded-full border border-white/10 shadow-inner shrink-0">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -156,9 +153,9 @@ export default function Navbar({
                   setActiveTab(tab.id);
                   setIsMobileMenuOpen(false);
                 }}
-                className={`h-8.5 px-4 flex items-center gap-2 rounded-full text-xs font-mono font-bold leading-none transition-all whitespace-nowrap cursor-pointer shrink-0 relative overflow-hidden ${
+                className={`h-8 px-3 flex items-center gap-1.5 rounded-full text-[11.5px] font-mono font-bold leading-none transition-all whitespace-nowrap cursor-pointer shrink-0 relative overflow-hidden ${
                   isActive
-                    ? 'bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 text-slate-950 shadow-lg shadow-emerald-500/30 scale-[1.02]'
+                    ? 'bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 text-slate-950 shadow-md shadow-emerald-500/30 font-black'
                     : 'text-slate-400 hover:text-white hover:bg-white/5'
                 }`}
               >
