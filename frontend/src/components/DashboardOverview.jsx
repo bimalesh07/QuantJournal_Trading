@@ -208,8 +208,14 @@ export default function DashboardOverview({ analytics, trades = [] }) {
     return d.toLocaleDateString('en-US', { month: 'short', day: '2-digit' });
   };
 
-  // Recent 5 Trades
-  const recentTrades = trades.slice(0, 5);
+  // Sort trades newest first (latest entry time / id descending)
+  const sortedTrades = [...trades].sort((a, b) => {
+    const dateA = new Date(a.entry_time || a.created_at || 0).getTime();
+    const dateB = new Date(b.entry_time || b.created_at || 0).getTime();
+    if (dateB !== dateA) return dateB - dateA;
+    return (b.id || 0) - (a.id || 0);
+  });
+  const recentTrades = sortedTrades.slice(0, 5);
 
   // Strategy Max PnL calculation
   const maxStratPnl = strategy_performance.length > 0
@@ -714,36 +720,56 @@ export default function DashboardOverview({ analytics, trades = [] }) {
 
           <div className="space-y-2.5 pt-1 font-mono">
             {recentTrades.length > 0 ? (
-              recentTrades.map((t) => {
+              recentTrades.map((t, idx) => {
+                const isLatest = idx === 0;
                 const isWin = t.net_pnl > 0;
                 const isLoss = t.net_pnl < 0;
                 const dateFormatted = new Date(t.entry_time).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                 return (
                   <div
-                    key={t.id}
-                    className="p-3 rounded-xl bg-[#0D1220] border border-white/10 hover:border-emerald-500/30 flex items-center justify-between transition-all"
+                    key={t.id || idx}
+                    className={`p-3.5 rounded-xl border transition-all flex items-center justify-between relative overflow-hidden ${
+                      isLatest
+                        ? 'bg-gradient-to-r from-[#08221A]/90 via-[#0C2B22]/80 to-[#0D1220]/90 border-emerald-400/60 shadow-[0_0_20px_rgba(16,185,129,0.25)] ring-1 ring-emerald-400/30'
+                        : 'bg-[#0D1220] border-white/10 hover:border-emerald-500/30'
+                    }`}
                   >
+                    {/* Latest Execution Floating Badge */}
+                    {isLatest && (
+                      <div className="absolute top-0 right-0">
+                        <span className="px-2 py-0.5 text-[8.5px] font-black font-mono tracking-widest bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400 text-slate-950 rounded-bl-lg uppercase flex items-center gap-1 shadow-sm">
+                          <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-ping"></span>
+                          LATEST EXECUTION
+                        </span>
+                      </div>
+                    )}
+
                     <div className="flex items-center gap-3">
-                      <div className={`w-8 h-8 rounded-lg border flex items-center justify-center shrink-0 ${
+                      <div className={`w-8.5 h-8.5 rounded-lg border flex items-center justify-center shrink-0 ${
                         isWin
-                          ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400'
+                          ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
                           : isLoss
-                          ? 'bg-rose-500/15 border-rose-500/30 text-rose-400'
+                          ? 'bg-rose-500/20 border-rose-500/40 text-rose-300'
                           : 'bg-slate-800 border-slate-700 text-slate-400'
                       }`}>
-                        {isWin ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                        {isWin ? <TrendingUp className="w-4 h-4 stroke-[2.5]" /> : <TrendingDown className="w-4 h-4 stroke-[2.5]" />}
                       </div>
                       <div>
-                        <h4 className="text-sm font-bold text-white">{t.symbol}</h4>
+                        <div className="flex items-center gap-1.5">
+                          <h4 className="text-sm font-bold text-white">{t.symbol}</h4>
+                          {isLatest && (
+                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.9)]"></span>
+                          )}
+                        </div>
                         <span className="text-[11px] text-slate-400">{t.strategy_name || t.trade_type}</span>
                       </div>
                     </div>
 
-                    <div className="text-right">
-                      <div className={`text-sm font-extrabold ${isWin ? 'text-emerald-400' : isLoss ? 'text-rose-400' : 'text-slate-400'}`}>
+                    <div className={`text-right ${isLatest ? 'pt-2' : ''}`}>
+                      <div className={`text-sm font-extrabold ${isWin ? 'text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.4)]' : isLoss ? 'text-rose-400' : 'text-slate-400'}`}>
                         {isWin ? '+' : ''}${Number(t.net_pnl).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                       </div>
-                      <span className="text-[10px] text-slate-500">{dateFormatted}</span>
+                      <span className="text-[10px] text-slate-400">{dateFormatted}</span>
                     </div>
                   </div>
                 );

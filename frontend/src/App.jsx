@@ -374,7 +374,7 @@ export default function App() {
             {/* View Tab 3: Analytics Engine */}
             {activeTab === 'analytics' && (
               <div className="space-y-6 animate-fadeIn">
-                <DashboardOverview analytics={analytics} />
+                <DashboardOverview analytics={analytics} trades={trades} />
                 <AnalyticsCharts analytics={analytics} />
               </div>
             )}
