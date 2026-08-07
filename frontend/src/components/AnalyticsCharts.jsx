@@ -13,9 +13,9 @@ import {
   Tooltip,
   CartesianGrid
 } from 'recharts';
-import { TrendingUp, BarChart2, Brain, Clock, Layers, Target } from 'lucide-react';
+import { TrendingUp, BarChart2, Brain, Clock, Layers, Target, Sparkles } from 'lucide-react';
 
-export default function AnalyticsCharts({ analytics }) {
+export default function AnalyticsCharts({ analytics, trades = [] }) {
   if (!analytics) return null;
 
   const { 

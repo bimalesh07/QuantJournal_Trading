@@ -216,6 +216,7 @@ export default function DashboardOverview({ analytics, trades = [] }) {
     return (b.id || 0) - (a.id || 0);
   });
   const recentTrades = sortedTrades.slice(0, 5);
+  const latestTrade = sortedTrades.length > 0 ? sortedTrades[0] : null;
 
   // Strategy Max PnL calculation
   const maxStratPnl = strategy_performance.length > 0
@@ -557,7 +558,8 @@ export default function DashboardOverview({ analytics, trades = [] }) {
 
         {/* Dynamic Cumulative P&L Area Chart */}
         <div className="lg:col-span-2 bg-[#080C16] border border-white/10 rounded-2xl p-5 shadow-xl flex flex-col justify-between relative overflow-hidden">
-          <div className="flex items-center justify-between pb-4 border-b border-white/10">
+          
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-white/10 gap-2">
             <div>
               <h3 className="text-lg sm:text-xl font-bold font-mono text-white tracking-wide flex items-center gap-2">
                 <BarChart2 className="w-5 h-5 text-cyan-400" />
@@ -565,22 +567,65 @@ export default function DashboardOverview({ analytics, trades = [] }) {
               </h3>
               <p className="text-xs text-slate-400 mt-0.5 font-sans">Real-time equity growth trajectory across executed trades</p>
             </div>
-            <div className={`px-3 py-1 rounded-full border text-xs font-mono font-bold ${
-              isNetPositive ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
-            }`}>
-              {overview.win_rate}% Winning Edge
+
+            <div className="flex items-center gap-2">
+              <div className={`px-3 py-1 rounded-full border text-xs font-mono font-bold ${
+                isNetPositive ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+              }`}>
+                {overview.win_rate}% Winning Edge
+              </div>
             </div>
           </div>
 
+          {/* High-Tech LATEST TRADE TELEMETRY SNAPSHOT Bar */}
+          {latestTrade && (
+            <div className="mt-3 p-3 rounded-xl bg-gradient-to-r from-[#0A1A24] via-[#0D2229] to-[#0D1220] border border-cyan-500/40 flex flex-wrap items-center justify-between gap-3 font-mono text-xs shadow-lg relative overflow-hidden">
+              <div className="flex items-center gap-2.5">
+                <span className="px-2 py-0.5 text-[9px] font-black tracking-wider bg-cyan-400 text-slate-950 rounded uppercase flex items-center gap-1 shadow-sm">
+                  <Sparkles className="w-2.5 h-2.5" />
+                  LATEST TRADE
+                </span>
+                <span className="font-extrabold text-white text-sm tracking-wide">{latestTrade.symbol}</span>
+                <span className={`font-black ${latestTrade.net_pnl >= 0 ? 'text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]' : 'text-rose-400'}`}>
+                  {latestTrade.net_pnl >= 0 ? '+' : ''}${Number(latestTrade.net_pnl).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-3 text-slate-300 text-[11px]">
+                <div className="flex items-center gap-1">
+                  <span className="text-slate-400 font-medium">Strategy:</span>
+                  <span className="font-bold text-cyan-300 bg-cyan-500/20 px-2 py-0.5 rounded border border-cyan-500/30">
+                    {latestTrade.strategy_name || latestTrade.strategy || 'Default'}
+                  </span>
+                </div>
+
+                {latestTrade.session && (
+                  <div className="flex items-center gap-1">
+                    <span className="text-slate-400 font-medium">Session:</span>
+                    <span className="font-bold text-purple-300 bg-purple-500/20 px-2 py-0.5 rounded border border-purple-500/30">
+                      {latestTrade.session}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Dynamic Recharts Cumulative Equity Curve */}
-          <div className="w-full h-60 pt-4">
+          <div className="w-full h-64 pt-3">
             {equity_curve.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={equity_curve} margin={{ top: 10, right: 15, left: 10, bottom: 5 }}>
+                <AreaChart data={equity_curve} margin={{ top: 15, right: 15, left: 10, bottom: 5 }}>
                   <defs>
                     <linearGradient id="dynamicPnlCurveGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#10B981" stopOpacity={0.45} />
+                      <stop offset="0%" stopColor="#22D3EE" stopOpacity={0.45} />
+                      <stop offset="50%" stopColor="#10B981" stopOpacity={0.2} />
                       <stop offset="100%" stopColor="#06B6D4" stopOpacity={0.0} />
+                    </linearGradient>
+                    <linearGradient id="equityLineGrad" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stopColor="#38BDF8" />
+                      <stop offset="50%" stopColor="#22D3EE" />
+                      <stop offset="100%" stopColor="#34D399" />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
@@ -593,11 +638,12 @@ export default function DashboardOverview({ analytics, trades = [] }) {
                   <Area
                     type="monotone"
                     dataKey="cumulative_pnl"
-                    stroke="#22D3EE"
-                    strokeWidth={3}
+                    stroke="url(#equityLineGrad)"
+                    strokeWidth={3.5}
                     fillOpacity={1}
                     fill="url(#dynamicPnlCurveGrad)"
-                    dot={{ r: 3, fill: '#22D3EE' }}
+                    dot={{ r: 4, fill: '#22D3EE', stroke: '#0F1422', strokeWidth: 2 }}
+                    activeDot={{ r: 7, fill: '#34D399', stroke: '#22D3EE', strokeWidth: 3 }}
                   />
                 </AreaChart>
               </ResponsiveContainer>
@@ -679,14 +725,34 @@ export default function DashboardOverview({ analytics, trades = [] }) {
               strategy_performance.map((strat, idx) => {
                 const isProfitable = strat.total_net_pnl >= 0;
                 const barPct = Math.min(100, Math.max(15, (Math.abs(strat.total_net_pnl) / maxStratPnl) * 100));
+                const isLatestStrategy = latestTrade && (
+                  strat.strategy_name?.toLowerCase() === (latestTrade.strategy_name || latestTrade.strategy || '').toLowerCase()
+                );
+
                 return (
-                  <div key={idx} className="space-y-1.5 font-mono">
-                    <div className="flex justify-between text-xs font-semibold text-slate-300">
-                      <span>{strat.strategy_name} ({strat.trades_count} trades)</span>
+                  <div
+                    key={idx}
+                    className={`p-2.5 rounded-xl transition-all ${
+                      isLatestStrategy
+                        ? 'bg-gradient-to-r from-cyan-950/60 via-[#0A2028] to-[#0D1220] border border-cyan-400/50 shadow-[0_0_15px_rgba(6,182,212,0.2)]'
+                        : 'space-y-1.5'
+                    }`}
+                  >
+                    <div className="flex justify-between items-center text-xs font-semibold text-slate-300 font-mono mb-1">
+                      <div className="flex items-center gap-1.5">
+                        <span>{strat.strategy_name} ({strat.trades_count} trades)</span>
+                        {isLatestStrategy && (
+                          <span className="px-1.5 py-0.5 text-[8px] font-black bg-cyan-400 text-slate-950 rounded uppercase tracking-wider flex items-center gap-0.5 shadow-sm">
+                            <Sparkles className="w-2.5 h-2.5 text-slate-950" />
+                            LATEST STRATEGY
+                          </span>
+                        )}
+                      </div>
                       <span className={isProfitable ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
                         {isProfitable ? '+' : ''}${strat.total_net_pnl.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                       </span>
                     </div>
+
                     <div className="w-full h-6 rounded-xl bg-[#0D1220] p-1 border border-white/5 overflow-hidden">
                       <div
                         className={`h-full rounded-lg transition-all duration-700 shadow-md ${
