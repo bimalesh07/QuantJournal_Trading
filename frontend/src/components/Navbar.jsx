@@ -135,8 +135,8 @@ export default function Navbar({
 
         </div>
 
-        {/* 2. Desktop & Mobile Scrollable Tab Bar */}
-        <nav className="flex items-center gap-1.5 bg-[#070A12]/90 p-1.5 rounded-xl md:rounded-full border border-white/10 shadow-inner overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden w-full md:w-auto shrink-0">
+        {/* 2. Desktop Navigation Tab Bar (Hidden on Mobile, accessed via Hamburger Menu) */}
+        <nav className="hidden md:flex items-center gap-1.5 bg-[#070A12]/90 p-1.5 rounded-full border border-white/10 shadow-inner overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden w-auto shrink-0">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -147,7 +147,7 @@ export default function Navbar({
                   setActiveTab(tab.id);
                   setIsMobileMenuOpen(false);
                 }}
-                className={`h-8 sm:h-8.5 px-3 sm:px-4 flex items-center gap-1.5 sm:gap-2 rounded-lg md:rounded-full text-xs font-mono font-bold leading-none transition-all whitespace-nowrap cursor-pointer shrink-0 relative overflow-hidden ${
+                className={`h-8.5 px-4 flex items-center gap-2 rounded-full text-xs font-mono font-bold leading-none transition-all whitespace-nowrap cursor-pointer shrink-0 relative overflow-hidden ${
                   isActive
                     ? 'bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 text-slate-950 shadow-lg shadow-emerald-500/30 scale-[1.02]'
                     : 'text-slate-400 hover:text-white hover:bg-white/5'
@@ -158,17 +158,6 @@ export default function Navbar({
               </button>
             );
           })}
-
-          <button
-            onClick={() => {
-              setIsMobileMenuOpen(false);
-              onOpenStrategyModal();
-            }}
-            className="md:hidden h-8 px-3 flex items-center gap-1.5 rounded-lg text-xs font-mono font-bold text-purple-300 bg-[#120D22] border border-purple-500/30 whitespace-nowrap shrink-0 cursor-pointer"
-          >
-            <Layers className="w-3.5 h-3.5 text-purple-400 shrink-0" />
-            <span>Strategies</span>
-          </button>
         </nav>
 
         {/* 3. Right Action Buttons (Desktop MD+ Only) */}
