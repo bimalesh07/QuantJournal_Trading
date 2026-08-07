@@ -198,6 +198,85 @@ export default function DashboardOverview({ analytics, trades = [] }) {
   return (
     <div className="space-y-6 font-sans">
 
+      {/* Executive 10-Metric Quantitative Header Ribbon (User Screenshot Match) */}
+      <div className="grid grid-cols-2 sm:grid-cols-5 lg:grid-cols-10 gap-3 font-mono">
+        
+        {/* 1. Total PnL */}
+        <div className="p-3.5 rounded-2xl bg-[#090E18] border border-emerald-500/30 flex flex-col justify-between space-y-1 shadow-lg hover:border-emerald-500/50 transition-all">
+          <span className="text-[10px] font-bold text-slate-400 uppercase">Total P&L</span>
+          <p className={`text-base font-black tracking-tight ${isNetPositive ? 'text-emerald-400' : 'text-rose-400'}`}>
+            {isNetPositive ? '+' : ''}${overview.total_net_pnl.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+          </p>
+          <span className="text-[9px] text-emerald-400 font-bold">Net Portfolio PnL</span>
+        </div>
+
+        {/* 2. Total Trades */}
+        <div className="p-3.5 rounded-2xl bg-[#090E18] border border-white/10 flex flex-col justify-between space-y-1 shadow-lg hover:border-white/20 transition-all">
+          <span className="text-[10px] font-bold text-slate-400 uppercase">Total Trades</span>
+          <p className="text-base font-black text-white">{overview.closed_trades}</p>
+          <span className="text-[9px] text-slate-400">Total Executed</span>
+        </div>
+
+        {/* 3. Avg Trades/Day */}
+        <div className="p-3.5 rounded-2xl bg-[#090E18] border border-white/10 flex flex-col justify-between space-y-1 shadow-lg hover:border-white/20 transition-all">
+          <span className="text-[10px] font-bold text-slate-400 uppercase">Avg. Trades/Day</span>
+          <p className="text-base font-black text-cyan-400">{overview.avg_trades_per_day || 1.0}</p>
+          <span className="text-[9px] text-slate-400">Per trading day</span>
+        </div>
+
+        {/* 4. Avg PnL per Trade */}
+        <div className="p-3.5 rounded-2xl bg-[#090E18] border border-white/10 flex flex-col justify-between space-y-1 shadow-lg hover:border-white/20 transition-all">
+          <span className="text-[10px] font-bold text-slate-400 uppercase">Avg. P&L / Trade</span>
+          <p className={`text-base font-black ${overview.avg_pnl_per_trade >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+            {overview.avg_pnl_per_trade >= 0 ? '+' : ''}${overview.avg_pnl_per_trade || 0}
+          </p>
+          <span className="text-[9px] text-emerald-400">Per trade</span>
+        </div>
+
+        {/* 5. Highest Win */}
+        <div className="p-3.5 rounded-2xl bg-[#090E18] border border-emerald-500/20 flex flex-col justify-between space-y-1 shadow-lg hover:border-emerald-500/40 transition-all">
+          <span className="text-[10px] font-bold text-slate-400 uppercase">Highest Win</span>
+          <p className="text-base font-black text-emerald-400">+${overview.highest_win || 0}</p>
+          <span className="text-[9px] text-emerald-400/80">Best trade</span>
+        </div>
+
+        {/* 6. Highest Loss */}
+        <div className="p-3.5 rounded-2xl bg-[#090E18] border border-rose-500/20 flex flex-col justify-between space-y-1 shadow-lg hover:border-rose-500/40 transition-all">
+          <span className="text-[10px] font-bold text-slate-400 uppercase">Highest Loss</span>
+          <p className="text-base font-black text-rose-400">-${overview.highest_loss || 0}</p>
+          <span className="text-[9px] text-rose-400/80">Worst trade</span>
+        </div>
+
+        {/* 7. Avg Winning Trade */}
+        <div className="p-3.5 rounded-2xl bg-[#090E18] border border-emerald-500/20 flex flex-col justify-between space-y-1 shadow-lg hover:border-emerald-500/40 transition-all">
+          <span className="text-[10px] font-bold text-slate-400 uppercase">Avg. Win Trade</span>
+          <p className="text-base font-black text-emerald-400">+${overview.avg_win}</p>
+          <span className="text-[9px] text-emerald-400/80">Per winning trade</span>
+        </div>
+
+        {/* 8. Avg Losing Trade */}
+        <div className="p-3.5 rounded-2xl bg-[#090E18] border border-rose-500/20 flex flex-col justify-between space-y-1 shadow-lg hover:border-rose-500/40 transition-all">
+          <span className="text-[10px] font-bold text-slate-400 uppercase">Avg. Loss Trade</span>
+          <p className="text-base font-black text-rose-400">-${overview.avg_loss}</p>
+          <span className="text-[9px] text-rose-400/80">Per losing trade</span>
+        </div>
+
+        {/* 9. Win Days */}
+        <div className="p-3.5 rounded-2xl bg-[#090E18] border border-emerald-500/20 flex flex-col justify-between space-y-1 shadow-lg hover:border-emerald-500/40 transition-all">
+          <span className="text-[10px] font-bold text-slate-400 uppercase">Win Days</span>
+          <p className="text-base font-black text-emerald-400">{overview.win_days || 0}</p>
+          <span className="text-[9px] text-emerald-400">Profitable days</span>
+        </div>
+
+        {/* 10. Loss Days */}
+        <div className="p-3.5 rounded-2xl bg-[#090E18] border border-rose-500/20 flex flex-col justify-between space-y-1 shadow-lg hover:border-rose-500/40 transition-all">
+          <span className="text-[10px] font-bold text-slate-400 uppercase">Loss Days</span>
+          <p className="text-base font-black text-rose-400">{overview.loss_days || 0}</p>
+          <span className="text-[9px] text-rose-400">Loss making days</span>
+        </div>
+
+      </div>
+
       {/* 1. Best Performing Asset / Strategy Top Banner (100% Dynamic) */}
       <AntigravityCard
         bloomColor="emerald"

@@ -53,6 +53,25 @@ class AnalyticsService:
             rrr_list = [float(t.risk_reward_ratio) for t in closed_trades if 0 < t.risk_reward_ratio <= 50]
             avg_rrr = float(round(sum(rrr_list) / len(rrr_list), 2)) if rrr_list else 0.0
 
+        # Highest Win & Highest Loss
+        highest_win = float(round(max((t.net_pnl for t in wins), default=Decimal('0')), 2))
+        highest_loss = float(round(abs(min((t.net_pnl for t in losses), default=Decimal('0'))), 2))
+
+        # Avg PnL per Trade
+        avg_pnl_per_trade = float(round(Decimal(str(total_net_pnl)) / Decimal(total_closed), 2)) if total_closed > 0 else 0.0
+
+        # Unique Trading Days & Win/Loss Days
+        trading_days = defaultdict(Decimal)
+        for t in closed_trades:
+            day_str = (t.exit_time or t.entry_time).strftime('%Y-%m-%d')
+            trading_days[day_str] += t.net_pnl
+
+        unique_trading_days_count = len(trading_days)
+        avg_trades_per_day = float(round(Decimal(total_closed) / Decimal(unique_trading_days_count), 1)) if unique_trading_days_count > 0 else 0.0
+
+        win_days = sum(1 for pnl in trading_days.values() if pnl > 0)
+        loss_days = sum(1 for pnl in trading_days.values() if pnl < 0)
+
         # Best & Worst Strategies
         strategy_stats = AnalyticsService._calculate_strategy_stats(closed_trades)
         best_strategy = max(strategy_stats, key=lambda s: s['total_net_pnl']) if strategy_stats else None
@@ -97,6 +116,12 @@ class AnalyticsService:
                 'avg_loss': avg_loss,
                 'expectancy': expectancy,
                 'avg_rrr': avg_rrr,
+                'highest_win': highest_win,
+                'highest_loss': highest_loss,
+                'avg_pnl_per_trade': avg_pnl_per_trade,
+                'avg_trades_per_day': avg_trades_per_day,
+                'win_days': win_days,
+                'loss_days': loss_days,
             },
             'best_strategy': best_strategy,
             'worst_strategy': worst_strategy,
