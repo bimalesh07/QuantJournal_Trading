@@ -95,8 +95,10 @@ class AnalyticsService:
         # Calendar Data (Daily Net PnL)
         calendar_data = AnalyticsService._calculate_calendar_data(closed_trades)
 
-        # Asset Class Breakdown
+        # Asset Class Breakdown & Best/Worst Asset
         pnl_by_asset_class = AnalyticsService._calculate_asset_class_stats(closed_trades)
+        best_asset = max(pnl_by_asset_class, key=lambda a: a['pnl']) if pnl_by_asset_class else None
+        worst_asset = min(pnl_by_asset_class, key=lambda a: a['pnl']) if pnl_by_asset_class else None
 
         return {
             'overview': {
@@ -125,6 +127,8 @@ class AnalyticsService:
             },
             'best_strategy': best_strategy,
             'worst_strategy': worst_strategy,
+            'best_asset': best_asset,
+            'worst_asset': worst_asset,
             'strategy_performance': strategy_stats,
             'pnl_by_day': pnl_by_day,
             'pnl_by_session': pnl_by_session,

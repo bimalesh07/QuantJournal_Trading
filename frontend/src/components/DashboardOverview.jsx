@@ -113,7 +113,7 @@ export default function DashboardOverview({ analytics, trades = [] }) {
     );
   }
 
-  const { overview, best_strategy, worst_strategy, equity_curve = [], strategy_performance = [] } = analytics;
+  const { overview, best_strategy, worst_strategy, best_asset, worst_asset, equity_curve = [], strategy_performance = [] } = analytics;
   const isNetPositive = overview.total_net_pnl >= 0;
 
   // PDF Report Generator
@@ -277,34 +277,126 @@ export default function DashboardOverview({ analytics, trades = [] }) {
 
       </div>
 
-      {/* 1. Best Performing Asset / Strategy Top Banner (100% Dynamic) */}
-      <AntigravityCard
-        bloomColor="emerald"
-        className="bg-[#0B101C] border border-emerald-500/30 rounded-2xl p-4 sm:p-5 backdrop-blur-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl"
-      >
-        <div className="flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-xl bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shadow-md shrink-0">
-            <Trophy className="w-5.5 h-5.5 stroke-[2]" />
-          </div>
-          <div>
-            <span className="text-[11px] font-mono font-bold text-slate-400 uppercase tracking-wider">
-              Best Performing Asset / Strategy
-            </span>
-            <h3 className="text-xl sm:text-2xl font-black text-white font-mono tracking-wide mt-0.5">
-              {best_strategy ? best_strategy.strategy_name : 'No Trades Logged Yet'}
-            </h3>
-          </div>
-        </div>
+      {/* Dynamic Side-by-Side Performance Banners (Best & Worst Strategies & Assets) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-        <div className="text-left sm:text-right font-mono">
-          <div className={`text-2xl sm:text-3xl font-black ${best_strategy && best_strategy.total_net_pnl >= 0 ? 'text-emerald-400 drop-shadow-[0_0_12px_rgba(52,211,153,0.4)]' : 'text-slate-200'}`}>
-            {best_strategy ? `${best_strategy.total_net_pnl >= 0 ? '+' : ''}$${best_strategy.total_net_pnl.toLocaleString('en-US', { minimumFractionDigits: 2 })}` : '$0.00'}
+        {/* Top Performing Strategy */}
+        <AntigravityCard
+          bloomColor="emerald"
+          className="bg-gradient-to-r from-[#071F17]/90 via-[#0A261D]/80 to-[#0A0E17]/90 border border-emerald-500/40 rounded-2xl p-4 sm:p-5 backdrop-blur-2xl flex items-center justify-between shadow-xl"
+        >
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-300 shadow-md shadow-emerald-500/20 shrink-0">
+              <Trophy className="w-5.5 h-5.5 stroke-[2]" />
+            </div>
+            <div>
+              <span className="text-[11px] font-black text-emerald-400 uppercase tracking-widest font-mono">
+                TOP PERFORMING STRATEGY
+              </span>
+              <h4 className="text-base sm:text-lg font-black text-white mt-0.5 font-mono tracking-wide">
+                {best_strategy ? best_strategy.strategy_name : 'N/A'}
+              </h4>
+            </div>
           </div>
-          <p className="text-xs text-slate-400 font-semibold mt-1">
-            {best_strategy ? `${best_strategy.win_rate}% win rate • ${best_strategy.trades_count} trades` : '0% win rate • 0 trades'}
-          </p>
-        </div>
-      </AntigravityCard>
+
+          <div className="text-right font-mono">
+            <div className="text-lg sm:text-xl font-black text-emerald-400 drop-shadow-[0_0_10px_rgba(52,211,153,0.4)]">
+              {best_strategy ? `${best_strategy.total_net_pnl >= 0 ? '+' : ''}$${best_strategy.total_net_pnl.toLocaleString('en-US', { minimumFractionDigits: 2 })}` : '$0.00'}
+            </div>
+            <div className="text-[11px] font-bold text-slate-400 mt-0.5">
+              {best_strategy ? `${best_strategy.win_rate}% Win Rate (${best_strategy.trades_count} trades)` : '0 trades'}
+            </div>
+          </div>
+        </AntigravityCard>
+
+        {/* Lowest Performing Strategy */}
+        <AntigravityCard
+          bloomColor="rose"
+          className="bg-gradient-to-r from-[#29080F]/90 via-[#2E0B12]/80 to-[#0A0E17]/90 border border-rose-500/40 rounded-2xl p-4 sm:p-5 backdrop-blur-2xl flex items-center justify-between shadow-xl"
+        >
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-2xl bg-rose-500/20 border border-rose-400/40 flex items-center justify-center text-rose-300 shadow-md shadow-rose-500/20 shrink-0">
+              <AlertTriangle className="w-5.5 h-5.5 stroke-[2]" />
+            </div>
+            <div>
+              <span className="text-[11px] font-black text-rose-400 uppercase tracking-widest font-mono">
+                LOWEST PERFORMING STRATEGY
+              </span>
+              <h4 className="text-base sm:text-lg font-black text-white mt-0.5 font-mono tracking-wide">
+                {worst_strategy ? worst_strategy.strategy_name : 'N/A'}
+              </h4>
+            </div>
+          </div>
+
+          <div className="text-right font-mono">
+            <div className={`text-lg sm:text-xl font-black ${worst_strategy && worst_strategy.total_net_pnl < 0 ? 'text-rose-400 drop-shadow-[0_0_10px_rgba(244,63,94,0.4)]' : 'text-slate-300'}`}>
+              {worst_strategy ? `${worst_strategy.total_net_pnl >= 0 ? '+' : ''}$${worst_strategy.total_net_pnl.toLocaleString('en-US', { minimumFractionDigits: 2 })}` : '$0.00'}
+            </div>
+            <div className="text-[11px] font-bold text-slate-400 mt-0.5">
+              {worst_strategy ? `${worst_strategy.win_rate}% Win Rate (${worst_strategy.trades_count} trades)` : '0 trades'}
+            </div>
+          </div>
+        </AntigravityCard>
+
+        {/* Best Performing Asset Class */}
+        <AntigravityCard
+          bloomColor="teal"
+          className="bg-gradient-to-r from-[#071C1E]/90 via-[#0A261D]/80 to-[#0A0E17]/90 border border-teal-500/40 rounded-2xl p-4 sm:p-5 backdrop-blur-2xl flex items-center justify-between shadow-xl"
+        >
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-2xl bg-teal-500/20 border border-teal-400/40 flex items-center justify-center text-teal-300 shadow-md shadow-teal-500/20 shrink-0">
+              <Trophy className="w-5.5 h-5.5 stroke-[2]" />
+            </div>
+            <div>
+              <span className="text-[11px] font-black text-teal-400 uppercase tracking-widest font-mono">
+                BEST PERFORMING ASSET
+              </span>
+              <h4 className="text-base sm:text-lg font-black text-white mt-0.5 font-mono tracking-wide">
+                {best_asset ? best_asset.name : 'N/A'}
+              </h4>
+            </div>
+          </div>
+
+          <div className="text-right font-mono">
+            <div className="text-lg sm:text-xl font-black text-teal-300 drop-shadow-[0_0_10px_rgba(45,212,191,0.4)]">
+              {best_asset ? `${best_asset.pnl >= 0 ? '+' : ''}$${best_asset.pnl.toLocaleString('en-US', { minimumFractionDigits: 2 })}` : '$0.00'}
+            </div>
+            <div className="text-[11px] font-bold text-slate-400 mt-0.5">
+              {best_asset ? `${best_asset.winRate}% Win Rate (${best_asset.trades} trades)` : '0 trades'}
+            </div>
+          </div>
+        </AntigravityCard>
+
+        {/* Lowest Performing Asset Class */}
+        <AntigravityCard
+          bloomColor="rose"
+          className="bg-gradient-to-r from-[#29080F]/90 via-[#2E0B12]/80 to-[#0A0E17]/90 border border-rose-500/40 rounded-2xl p-4 sm:p-5 backdrop-blur-2xl flex items-center justify-between shadow-xl"
+        >
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-2xl bg-rose-500/20 border border-rose-400/40 flex items-center justify-center text-rose-300 shadow-md shadow-rose-500/20 shrink-0">
+              <AlertTriangle className="w-5.5 h-5.5 stroke-[2]" />
+            </div>
+            <div>
+              <span className="text-[11px] font-black text-rose-400 uppercase tracking-widest font-mono">
+                LOWEST PERFORMING ASSET
+              </span>
+              <h4 className="text-base sm:text-lg font-black text-white mt-0.5 font-mono tracking-wide">
+                {worst_asset ? worst_asset.name : 'N/A'}
+              </h4>
+            </div>
+          </div>
+
+          <div className="text-right font-mono">
+            <div className={`text-lg sm:text-xl font-black ${worst_asset && worst_asset.pnl < 0 ? 'text-rose-400 drop-shadow-[0_0_10px_rgba(244,63,94,0.4)]' : 'text-slate-300'}`}>
+              {worst_asset ? `${worst_asset.pnl >= 0 ? '+' : ''}$${worst_asset.pnl.toLocaleString('en-US', { minimumFractionDigits: 2 })}` : '$0.00'}
+            </div>
+            <div className="text-[11px] font-bold text-slate-400 mt-0.5">
+              {worst_asset ? `${worst_asset.winRate}% Win Rate (${worst_asset.trades} trades)` : '0 trades'}
+            </div>
+          </div>
+        </AntigravityCard>
+
+      </div>
 
       {/* 2. Cumulative P&L Dynamic Area Chart + Semicircle Win Rate Speedometer */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
