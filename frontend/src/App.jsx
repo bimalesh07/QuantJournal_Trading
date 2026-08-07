@@ -300,7 +300,9 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col transition-colors">
+    <div className={`min-h-screen flex flex-col transition-colors ${
+      theme === 'light' ? 'light-theme bg-[#F1F5F9] text-slate-900' : 'bg-[#030508] text-slate-100'
+    }`}>
       
       {/* Top Header Navbar */}
       <Navbar
@@ -315,7 +317,7 @@ export default function App() {
       />
 
       {/* Live Market Ticker Tape */}
-      <MarketTicker />
+      <MarketTicker theme={theme} />
 
       {/* Notification Toast */}
       {notification && (
@@ -340,9 +342,9 @@ export default function App() {
             {/* View Tab 1: Dashboard Overview */}
             {activeTab === 'dashboard' && (
               <div className="space-y-6 animate-fadeIn">
-                <DashboardOverview analytics={analytics} trades={trades} />
-                <AnalyticsCharts analytics={analytics} trades={trades} />
-                <TraderMilestones analytics={analytics} trades={trades} />
+                <DashboardOverview analytics={analytics} trades={trades} theme={theme} />
+                <AnalyticsCharts analytics={analytics} trades={trades} theme={theme} />
+                <TraderMilestones analytics={analytics} trades={trades} theme={theme} />
                 <TradeTable
                   trades={trades}
                   strategies={strategies}
@@ -353,6 +355,7 @@ export default function App() {
                   filters={filters}
                   setFilters={setFilters}
                   onResetFilters={handleResetFilters}
+                  theme={theme}
                 />
               </div>
             )}
@@ -361,7 +364,7 @@ export default function App() {
             {activeTab === 'trades' && (
               <div className="space-y-6 animate-fadeIn">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1">
-                  <h2 className="text-lg sm:text-xl font-bold font-mono text-white tracking-wide">Execution Log & Retrospective</h2>
+                  <h2 className="text-lg sm:text-xl font-bold font-mono tracking-wide">Execution Log & Retrospective</h2>
                   <span className="text-xs text-slate-400 font-mono">Showing {trades.length} trades</span>
                 </div>
                 <TradeTable
@@ -374,6 +377,7 @@ export default function App() {
                   filters={filters}
                   setFilters={setFilters}
                   onResetFilters={handleResetFilters}
+                  theme={theme}
                 />
               </div>
             )}
@@ -381,8 +385,8 @@ export default function App() {
             {/* View Tab 3: Analytics Engine */}
             {activeTab === 'analytics' && (
               <div className="space-y-6 animate-fadeIn">
-                <DashboardOverview analytics={analytics} trades={trades} />
-                <AnalyticsCharts analytics={analytics} trades={trades} />
+                <DashboardOverview analytics={analytics} trades={trades} theme={theme} />
+                <AnalyticsCharts analytics={analytics} trades={trades} theme={theme} />
               </div>
             )}
 
@@ -392,6 +396,7 @@ export default function App() {
                 <PnLCalendar
                   analytics={analytics}
                   onSelectDateFilter={handleSelectCalendarDate}
+                  theme={theme}
                 />
               </div>
             )}
@@ -399,7 +404,7 @@ export default function App() {
             {/* View Tab 5: Trader Playbook & Notes Dock */}
             {activeTab === 'playbook' && (
               <div className="space-y-6 animate-fadeIn">
-                <TraderPlaybook />
+                <TraderPlaybook theme={theme} />
               </div>
             )}
           </>
