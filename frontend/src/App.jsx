@@ -333,8 +333,8 @@ export default function App() {
             {/* View Tab 2: Trade Log */}
             {activeTab === 'trades' && (
               <div className="space-y-6 animate-fadeIn">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-bold font-mono text-white">Execution Log & Retrospective</h2>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1">
+                  <h2 className="text-lg sm:text-xl font-bold font-mono text-white tracking-wide">Execution Log & Retrospective</h2>
                   <span className="text-xs text-slate-400 font-mono">Showing {trades.length} trades</span>
                 </div>
                 <TradeTable
@@ -396,8 +396,14 @@ export default function App() {
         onDeleteStrategy={handleDeleteStrategy}
       />
 
-      <footer className="border-t border-slate-800/80 py-6 text-center text-xs text-slate-400 font-mono">
-        TradeTrack PRO System • Built & Owned by <span className="text-emerald-400 font-bold">Bimalesh Yadav</span> • Quantitative Trading & Analytics Engine
+      <footer className="border-t border-slate-800/80 py-6 px-4 text-center text-xs text-slate-400 font-mono">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 leading-relaxed">
+          <span>TradeTrack PRO System</span>
+          <span className="hidden sm:inline">•</span>
+          <span>Built & Owned by <span className="text-emerald-400 font-bold">Bimalesh Yadav</span></span>
+          <span className="hidden sm:inline">•</span>
+          <span className="text-[11px] text-slate-500">Quantitative Trading & Analytics Engine</span>
+        </div>
       </footer>
 
     </div>

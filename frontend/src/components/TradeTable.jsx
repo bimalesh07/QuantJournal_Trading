@@ -347,7 +347,7 @@ export default function TradeTable({
               <th className="py-3.5 px-4 text-right">Net PnL</th>
               <th className="py-3.5 px-3 text-center">RRR</th>
               <th className="py-3.5 px-3 text-center">Mindset & Rating</th>
-              <th className="py-3.5 px-4 text-right sticky right-0 bg-[#141926] z-10 border-l border-slate-800 shadow-[-8px_0_12px_-4px_rgba(0,0,0,0.5)]">Actions</th>
+              <th className="py-3.5 px-4 text-right sm:sticky sm:right-0 bg-[#141926] z-10 border-l border-slate-800 shadow-[-8px_0_12px_-4px_rgba(0,0,0,0.5)]">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800/50 text-xs sm:text-sm">
@@ -458,7 +458,7 @@ export default function TradeTable({
                     </td>
 
                     {/* Actions (with Chart Lightbox Trigger) */}
-                    <td className="py-3.5 px-4 text-right whitespace-nowrap sticky right-0 bg-[#10141D] group-hover:bg-[#161F2E] z-10 border-l border-slate-800/80 shadow-[-8px_0_12px_-4px_rgba(0,0,0,0.5)] transition-colors">
+                    <td className="py-3.5 px-4 text-right whitespace-nowrap sm:sticky sm:right-0 bg-[#10141D] group-hover:bg-[#161F2E] z-10 border-l border-slate-800/80 shadow-[-8px_0_12px_-4px_rgba(0,0,0,0.5)] transition-colors">
                       <div className="flex items-center justify-end gap-1">
                         {(t.chart_entry || t.chart_exit) && (
                           <button
