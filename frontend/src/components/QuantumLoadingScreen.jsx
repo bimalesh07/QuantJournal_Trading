@@ -33,10 +33,26 @@ export default function QuantumLoadingScreen() {
       {/* Cybernetic Telemetry Badge */}
       <div className="relative z-10 flex flex-col items-center space-y-4 text-center">
         
-        {/* Pulsing Orb Icon */}
-        <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500/20 via-cyan-500/20 to-teal-400/20 p-[1.5px] shadow-xl shadow-cyan-500/20 relative group animate-pulse">
-          <div className="w-full h-full bg-[#080C16] rounded-2xl flex items-center justify-center border border-cyan-500/30">
-            <Zap className="w-7 h-7 text-cyan-400 stroke-[2.5]" />
+        {/* Animated Japanese Candlestick Pulsing Orb */}
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-500/25 via-cyan-500/25 to-teal-400/25 p-[1.5px] shadow-xl shadow-cyan-500/30 relative group">
+          <div className="w-full h-full bg-[#080C16] rounded-2xl flex items-center justify-center gap-1.5 px-2 border border-cyan-500/40 overflow-hidden">
+            {/* Candle 1: Red Dip */}
+            <div className="flex flex-col items-center animate-pulse">
+              <div className="w-0.5 h-2 bg-rose-500 opacity-70"></div>
+              <div className="w-2.5 h-5 bg-rose-500 rounded-xs shadow-sm"></div>
+            </div>
+
+            {/* Candle 2: Green Bullish Surge */}
+            <div className="flex flex-col items-center animate-bounce" style={{ animationDuration: '0.9s' }}>
+              <div className="w-0.5 h-3 bg-emerald-400 opacity-90"></div>
+              <div className="w-3 h-7 bg-gradient-to-t from-emerald-500 to-teal-300 rounded-xs shadow-lg shadow-emerald-500/50"></div>
+            </div>
+
+            {/* Candle 3: Cyan Push */}
+            <div className="flex flex-col items-center animate-pulse">
+              <div className="w-0.5 h-2 bg-cyan-400 opacity-70"></div>
+              <div className="w-2.5 h-6 bg-cyan-400 rounded-xs shadow-sm"></div>
+            </div>
           </div>
         </div>
 
