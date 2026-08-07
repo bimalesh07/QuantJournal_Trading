@@ -25,7 +25,11 @@ import {
   ShieldCheck,
   Calendar,
   Layers,
-  Activity
+  Activity,
+  Award,
+  BarChart2,
+  Clock,
+  Sparkles
 } from 'lucide-react';
 
 // 3D Antigravity Tilt Card Component
@@ -43,8 +47,8 @@ const AntigravityCard = ({ children, className = '', bloomColor = 'emerald' }) =
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
 
-    const rX = ((y - centerY) / centerY) * -6;
-    const rY = ((x - centerX) / centerX) * 6;
+    const rX = ((y - centerY) / centerY) * -5;
+    const rY = ((x - centerX) / centerX) * 5;
 
     setRotateX(rX);
     setRotateY(rY);
@@ -58,24 +62,24 @@ const AntigravityCard = ({ children, className = '', bloomColor = 'emerald' }) =
 
   const getBloomShadow = () => {
     if (!isHovered) {
-      return 'box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.12), 0 12px 30px -10px rgba(0,0,0,0.8)';
+      return 'box-shadow: 0 10px 30px -10px rgba(0,0,0,0.6)';
     }
 
     switch (bloomColor) {
       case 'emerald':
-        return '0 25px 50px -12px rgba(16, 185, 129, 0.35), inset 0 1px 1px 0 rgba(255, 255, 255, 0.3)';
+        return '0 20px 40px -10px rgba(16, 185, 129, 0.3)';
       case 'teal':
-        return '0 25px 50px -12px rgba(20, 184, 166, 0.35), inset 0 1px 1px 0 rgba(255, 255, 255, 0.3)';
+        return '0 20px 40px -10px rgba(20, 184, 166, 0.3)';
       case 'purple':
-        return '0 25px 50px -12px rgba(168, 85, 247, 0.35), inset 0 1px 1px 0 rgba(255, 255, 255, 0.3)';
+        return '0 20px 40px -10px rgba(168, 85, 247, 0.3)';
       case 'sky':
-        return '0 25px 50px -12px rgba(56, 189, 248, 0.35), inset 0 1px 1px 0 rgba(255, 255, 255, 0.3)';
+        return '0 20px 40px -10px rgba(56, 189, 248, 0.3)';
       case 'amber':
-        return '0 25px 50px -12px rgba(245, 158, 11, 0.35), inset 0 1px 1px 0 rgba(255, 255, 255, 0.3)';
+        return '0 20px 40px -10px rgba(245, 158, 11, 0.3)';
       case 'rose':
-        return '0 25px 50px -12px rgba(244, 63, 94, 0.35), inset 0 1px 1px 0 rgba(255, 255, 255, 0.3)';
+        return '0 20px 40px -10px rgba(244, 63, 94, 0.3)';
       default:
-        return '0 25px 50px -12px rgba(16, 185, 129, 0.35), inset 0 1px 1px 0 rgba(255, 255, 255, 0.3)';
+        return '0 20px 40px -10px rgba(16, 185, 129, 0.3)';
     }
   };
 
@@ -87,8 +91,8 @@ const AntigravityCard = ({ children, className = '', bloomColor = 'emerald' }) =
       onMouseLeave={handleMouseLeave}
       style={{
         transform: isHovered
-          ? `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(10px) translateY(-4px)`
-          : 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px) translateY(0px)',
+          ? `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-3px)`
+          : 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)',
         boxShadow: getBloomShadow(),
         transition: isHovered
           ? 'transform 0.08s ease-out, box-shadow 0.2s ease'
@@ -96,6 +100,7 @@ const AntigravityCard = ({ children, className = '', bloomColor = 'emerald' }) =
       }}
       className={`relative overflow-hidden group cursor-pointer ${className}`}
     >
+      {/* Subtle Shimmer Edge */}
       <div className="shimmer-edge"></div>
       {children}
     </div>
@@ -103,12 +108,11 @@ const AntigravityCard = ({ children, className = '', bloomColor = 'emerald' }) =
 };
 
 export default function DashboardOverview({ analytics, trades = [] }) {
-  const [capitalTimeframe, setCapitalTimeframe] = useState('Yearly');
-
   if (!analytics || !analytics.overview) {
     return (
-      <div className="p-8 text-center text-slate-400 font-mono text-sm">
-        Loading quantitative analytics engine...
+      <div className="p-12 text-center text-slate-400 font-mono text-sm space-y-3">
+        <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+        <p>Synchronizing quantitative analytics engine...</p>
       </div>
     );
   }
@@ -189,11 +193,11 @@ export default function DashboardOverview({ analytics, trades = [] }) {
     doc.save(`TradeTrack_Performance_Report_${new Date().toISOString().slice(0, 10)}.pdf`);
   };
 
-  // Dynamic Speedometer Arc calculation
+  // Speedometer Arc calculation
   const winRateVal = Number(overview.win_rate) || 0;
   const radius = 65;
-  const strokeWidth = 14;
-  const circumference = Math.PI * radius; // Half circle
+  const strokeWidth = 12;
+  const circumference = Math.PI * radius;
   const strokeDashoffset = circumference - (winRateVal / 100) * circumference;
 
   // Format Date Short for X-Axis
@@ -204,10 +208,10 @@ export default function DashboardOverview({ analytics, trades = [] }) {
     return d.toLocaleDateString('en-US', { month: 'short', day: '2-digit' });
   };
 
-  // Recent 5 Trades from real trade list
+  // Recent 5 Trades
   const recentTrades = trades.slice(0, 5);
 
-  // Dynamic Strategy Max PnL calculation for bar widths
+  // Strategy Max PnL calculation
   const maxStratPnl = strategy_performance.length > 0
     ? Math.max(...strategy_performance.map(s => Math.abs(s.total_net_pnl)))
     : 1;
@@ -215,167 +219,203 @@ export default function DashboardOverview({ analytics, trades = [] }) {
   return (
     <div className="space-y-6 font-sans">
 
-      {/* 1. 4 Primary Executive KPI Cards Grid (Fixed RRR formatting & Clean Padding) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 font-mono">
+      {/* Top Section Header with Title & PDF Export Action */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1">
+        <div>
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl sm:text-2xl font-black font-mono text-white tracking-wide">
+              Quantitative Executive Overview
+            </h2>
+            <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+              LIVE TELEMETRY
+            </span>
+          </div>
+          <p className="text-xs text-slate-400 font-sans mt-1">
+            Real-time execution analytics, win rate accuracy, risk expectancy & performance breakdown.
+          </p>
+        </div>
 
-        {/* Card 1: Total Net Portfolio PnL */}
+        <button
+          onClick={generatePDFReport}
+          className="self-start sm:self-auto px-5 py-2.5 text-xs font-mono font-black text-slate-950 bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 hover:scale-105 rounded-xl shadow-lg shadow-cyan-500/25 transition-all flex items-center gap-2 cursor-pointer border border-cyan-300/40"
+        >
+          <FileText className="w-4 h-4 text-slate-950 stroke-[2.2]" />
+          <span>Export PDF Report</span>
+        </button>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 1. TOP 4 EXECUTIVE FINANCIAL KPI CARDS (ULTRA-CLEAN ALIGNMENT) */}
+      {/* ========================================================================= */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 font-mono">
+
+        {/* Card 1: Portfolio Net PnL */}
         <AntigravityCard
           bloomColor={isNetPositive ? 'emerald' : 'rose'}
-          className={`bg-gradient-to-r ${isNetPositive ? 'from-[#071F17]/90 via-[#0A261D]/80 to-[#0A0E17]/90 border-emerald-500/40' : 'from-[#29080F]/90 via-[#2E0B12]/80 to-[#0A0E17]/90 border-rose-500/40'} border rounded-2xl p-4.5 backdrop-blur-2xl flex items-center justify-between shadow-xl`}
+          className={`bg-gradient-to-br ${isNetPositive ? 'from-[#061B15] via-[#09261E]/90 to-[#070A12] border-emerald-500/40' : 'from-[#22070D] via-[#2A0B11]/90 to-[#070A12] border-rose-500/40'} border rounded-2xl p-5 backdrop-blur-2xl flex flex-col justify-between shadow-xl min-h-[125px]`}
         >
-          <div className="flex items-center gap-3.5">
-            <div className={`w-11 h-11 rounded-2xl border flex items-center justify-center shadow-md shrink-0 ${isNetPositive ? 'bg-emerald-500/20 border-emerald-400/40 text-emerald-300 shadow-emerald-500/20' : 'bg-rose-500/20 border-rose-400/40 text-rose-300 shadow-rose-500/20'}`}>
-              <DollarSign className="w-5.5 h-5.5 stroke-[2.2]" />
-            </div>
-            <div>
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">
-                PORTFOLIO NET P&L
-              </span>
-              <h3 className={`text-xl sm:text-2xl font-black tracking-tight mt-0.5 ${isNetPositive ? 'text-emerald-400 drop-shadow-[0_0_15px_rgba(52,211,153,0.5)]' : 'text-rose-400 drop-shadow-[0_0_15px_rgba(244,63,94,0.5)]'}`}>
-                {isNetPositive ? '+' : ''}${overview.total_net_pnl.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-              </h3>
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+              <span>PORTFOLIO NET P&L</span>
+            </span>
+            <div className={`w-8 h-8 rounded-xl border flex items-center justify-center shrink-0 ${isNetPositive ? 'bg-emerald-500/20 border-emerald-400/40 text-emerald-300' : 'bg-rose-500/20 border-rose-400/40 text-rose-300'}`}>
+              <DollarSign className="w-4 h-4 stroke-[2.5]" />
             </div>
           </div>
 
-          <div className="text-right font-mono text-[11px] text-slate-400 space-y-0.5">
-            <div className="text-emerald-400 font-bold">Gross: +${overview.total_gross_pnl.toLocaleString()}</div>
-            <div className="text-slate-500">Fees: ${overview.total_fees.toLocaleString()}</div>
+          <div className="mt-2">
+            <h3 className={`text-2xl sm:text-3xl font-black tracking-tight ${isNetPositive ? 'text-emerald-400 drop-shadow-[0_0_15px_rgba(52,211,153,0.4)]' : 'text-rose-400 drop-shadow-[0_0_15px_rgba(244,63,94,0.4)]'}`}>
+              {isNetPositive ? '+' : ''}${overview.total_net_pnl.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+            </h3>
+          </div>
+
+          <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+            <span className="text-emerald-400 font-bold">Gross: +${overview.total_gross_pnl.toLocaleString()}</span>
+            <span className="text-slate-500">Fees: ${overview.total_fees.toLocaleString()}</span>
           </div>
         </AntigravityCard>
 
-        {/* Card 2: Average Risk to Reward Ratio (Fixed decimal format) */}
+        {/* Card 2: Average Risk to Reward Ratio */}
         <AntigravityCard
           bloomColor="sky"
-          className="bg-gradient-to-r from-[#081829]/90 via-[#0C223A]/80 to-[#0A0E17]/90 border border-sky-500/40 rounded-2xl p-4.5 backdrop-blur-2xl flex items-center justify-between shadow-xl"
+          className="bg-gradient-to-br from-[#061524] via-[#0A2036]/90 to-[#070A12] border border-sky-500/40 rounded-2xl p-5 backdrop-blur-2xl flex flex-col justify-between shadow-xl min-h-[125px]"
         >
-          <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-2xl bg-sky-500/20 border border-sky-400/40 flex items-center justify-center text-sky-300 shadow-md shadow-sky-500/20 shrink-0">
-              <Target className="w-5.5 h-5.5 stroke-[2.2]" />
-            </div>
-            <div>
-              <span className="text-[10px] font-black text-sky-400 uppercase tracking-widest block">
-                AVG RISK : REWARD
-              </span>
-              <h3 className="text-xl sm:text-2xl font-black text-sky-300 tracking-tight mt-0.5 drop-shadow-[0_0_15px_rgba(56,189,248,0.5)]">
-                1 : {Number(overview.avg_rrr || 1.5).toFixed(2)}
-              </h3>
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-black text-sky-400 uppercase tracking-widest flex items-center gap-1.5">
+              <span>AVG RISK : REWARD</span>
+            </span>
+            <div className="w-8 h-8 rounded-xl bg-sky-500/20 border border-sky-400/40 flex items-center justify-center text-sky-300 shrink-0">
+              <Target className="w-4 h-4 stroke-[2.5]" />
             </div>
           </div>
 
-          <div className="text-right font-mono text-[11px] text-slate-400 space-y-0.5">
-            <div className="text-sky-300 font-bold">Expectancy: ${overview.expectancy}</div>
-            <div className="text-slate-400">{overview.win_rate}% Win Rate</div>
+          <div className="mt-2">
+            <h3 className="text-2xl sm:text-3xl font-black text-sky-300 tracking-tight drop-shadow-[0_0_15px_rgba(56,189,248,0.4)]">
+              1 : {Number(overview.avg_rrr || 1.5).toFixed(2)}
+            </h3>
+          </div>
+
+          <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] font-mono">
+            <span className="text-sky-300 font-bold">Expectancy: ${overview.expectancy}</span>
+            <span className="text-slate-400">{overview.win_rate}% Win Rate</span>
           </div>
         </AntigravityCard>
 
         {/* Card 3: Profit Factor */}
         <AntigravityCard
           bloomColor="purple"
-          className="bg-gradient-to-r from-[#140A24]/90 via-[#1F1038]/80 to-[#0A0E17]/90 border border-purple-500/40 rounded-2xl p-4.5 backdrop-blur-2xl flex items-center justify-between shadow-xl"
+          className="bg-gradient-to-br from-[#120821] via-[#1A0C30]/90 to-[#070A12] border border-purple-500/40 rounded-2xl p-5 backdrop-blur-2xl flex flex-col justify-between shadow-xl min-h-[125px]"
         >
-          <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-2xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-purple-300 shadow-md shadow-purple-500/20 shrink-0">
-              <Scale className="w-5.5 h-5.5 stroke-[2.2]" />
-            </div>
-            <div>
-              <span className="text-[10px] font-black text-purple-400 uppercase tracking-widest block">
-                PROFIT FACTOR
-              </span>
-              <h3 className="text-xl sm:text-2xl font-black text-purple-300 tracking-tight mt-0.5 drop-shadow-[0_0_15px_rgba(192,132,252,0.5)]">
-                {Number(overview.profit_factor || 0).toFixed(2)}
-              </h3>
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-black text-purple-400 uppercase tracking-widest flex items-center gap-1.5">
+              <span>PROFIT FACTOR</span>
+            </span>
+            <div className="w-8 h-8 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-purple-300 shrink-0">
+              <Scale className="w-4 h-4 stroke-[2.5]" />
             </div>
           </div>
 
-          <div className="text-right font-mono text-[11px] text-slate-400 space-y-0.5">
-            <div className="text-emerald-400 font-bold">+${overview.total_profit.toLocaleString()}</div>
-            <div className="text-rose-400">-${overview.total_loss.toLocaleString()}</div>
+          <div className="mt-2">
+            <h3 className="text-2xl sm:text-3xl font-black text-purple-300 tracking-tight drop-shadow-[0_0_15px_rgba(192,132,252,0.4)]">
+              {Number(overview.profit_factor || 0).toFixed(2)}
+            </h3>
+          </div>
+
+          <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] font-mono">
+            <span className="text-emerald-400 font-bold">+${overview.total_profit.toLocaleString()}</span>
+            <span className="text-rose-400">-${overview.total_loss.toLocaleString()}</span>
           </div>
         </AntigravityCard>
 
-        {/* Card 4: Total Executed Trades */}
+        {/* Card 4: Total Executions */}
         <AntigravityCard
           bloomColor="amber"
-          className="bg-gradient-to-r from-[#1C1307]/90 via-[#2B1D0B]/80 to-[#0A0E17]/90 border border-amber-500/40 rounded-2xl p-4.5 backdrop-blur-2xl flex items-center justify-between shadow-xl"
+          className="bg-gradient-to-br from-[#1A1005] via-[#261807]/90 to-[#070A12] border border-amber-500/40 rounded-2xl p-5 backdrop-blur-2xl flex flex-col justify-between shadow-xl min-h-[125px]"
         >
-          <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-2xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-300 shadow-md shadow-amber-500/20 shrink-0">
-              <Hash className="w-5.5 h-5.5 stroke-[2.2]" />
-            </div>
-            <div>
-              <span className="text-[10px] font-black text-amber-400 uppercase tracking-widest block">
-                TOTAL EXECUTIONS
-              </span>
-              <h3 className="text-xl sm:text-2xl font-black text-amber-300 tracking-tight mt-0.5 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]">
-                {overview.closed_trades} Trades
-              </h3>
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-black text-amber-400 uppercase tracking-widest flex items-center gap-1.5">
+              <span>TOTAL EXECUTIONS</span>
+            </span>
+            <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-300 shrink-0">
+              <Hash className="w-4 h-4 stroke-[2.5]" />
             </div>
           </div>
 
-          <div className="text-right font-mono text-[11px] text-slate-400 space-y-0.5">
-            <div className="text-emerald-400 font-bold">{overview.win_count} Wins</div>
-            <div className="text-rose-400">{overview.loss_count} Losses</div>
+          <div className="mt-2">
+            <h3 className="text-2xl sm:text-3xl font-black text-amber-300 tracking-tight drop-shadow-[0_0_15px_rgba(251,191,36,0.4)]">
+              {overview.closed_trades} Trades
+            </h3>
+          </div>
+
+          <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] font-mono">
+            <span className="text-emerald-400 font-bold">{overview.win_count} Wins</span>
+            <span className="text-rose-400">{overview.loss_count} Losses</span>
           </div>
         </AntigravityCard>
 
       </div>
 
-      {/* 2. 6 Secondary Quantitative Metrics Strip */}
+      {/* ========================================================================= */}
+      {/* 2. 6 SECONDARY METRICS EXECUTION TRAY (100% PRESERVED, ULTRA-CLEAN) */}
+      {/* ========================================================================= */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 font-mono">
         
         {/* Avg Trades/Day */}
-        <div className="p-3.5 rounded-2xl bg-[#090E18] border border-white/10 flex flex-col justify-between space-y-1 shadow-lg hover:border-white/20 transition-all">
-          <span className="text-[10px] font-bold text-slate-400 uppercase">Avg. Trades/Day</span>
-          <p className="text-base font-black text-cyan-400">{overview.avg_trades_per_day || 1.0}</p>
+        <div className="p-3.5 rounded-2xl bg-[#090D18]/90 border border-white/10 flex flex-col justify-between space-y-1.5 shadow-md hover:border-cyan-500/40 transition-all backdrop-blur-xl">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Avg. Trades/Day</span>
+          <p className="text-lg font-black text-cyan-400">{overview.avg_trades_per_day || 1.0}</p>
           <span className="text-[9px] text-slate-400">Per trading day</span>
         </div>
 
         {/* Avg PnL per Trade */}
-        <div className="p-3.5 rounded-2xl bg-[#090E18] border border-white/10 flex flex-col justify-between space-y-1 shadow-lg hover:border-white/20 transition-all">
-          <span className="text-[10px] font-bold text-slate-400 uppercase">Avg. P&L / Trade</span>
-          <p className={`text-base font-black ${overview.avg_pnl_per_trade >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+        <div className="p-3.5 rounded-2xl bg-[#090D18]/90 border border-white/10 flex flex-col justify-between space-y-1.5 shadow-md hover:border-emerald-500/40 transition-all backdrop-blur-xl">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Avg. P&L / Trade</span>
+          <p className={`text-lg font-black ${overview.avg_pnl_per_trade >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
             {overview.avg_pnl_per_trade >= 0 ? '+' : ''}${overview.avg_pnl_per_trade || 0}
           </p>
-          <span className="text-[9px] text-emerald-400">Per trade</span>
+          <span className="text-[9px] text-emerald-400/80">Per trade</span>
         </div>
 
         {/* Highest Win */}
-        <div className="p-3.5 rounded-2xl bg-[#090E18] border border-emerald-500/20 flex flex-col justify-between space-y-1 shadow-lg hover:border-emerald-500/40 transition-all">
-          <span className="text-[10px] font-bold text-slate-400 uppercase">Highest Win</span>
-          <p className="text-base font-black text-emerald-400">+${overview.highest_win || 0}</p>
+        <div className="p-3.5 rounded-2xl bg-[#090D18]/90 border border-emerald-500/30 flex flex-col justify-between space-y-1.5 shadow-md hover:border-emerald-500/50 transition-all backdrop-blur-xl">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Highest Win 🏆</span>
+          <p className="text-lg font-black text-emerald-400">+${overview.highest_win || 0}</p>
           <span className="text-[9px] text-emerald-400/80">Best trade</span>
         </div>
 
         {/* Highest Loss */}
-        <div className="p-3.5 rounded-2xl bg-[#090E18] border border-rose-500/20 flex flex-col justify-between space-y-1 shadow-lg hover:border-rose-500/40 transition-all">
-          <span className="text-[10px] font-bold text-slate-400 uppercase">Highest Loss</span>
-          <p className="text-base font-black text-rose-400">-${overview.highest_loss || 0}</p>
+        <div className="p-3.5 rounded-2xl bg-[#090D18]/90 border border-rose-500/30 flex flex-col justify-between space-y-1.5 shadow-md hover:border-rose-500/50 transition-all backdrop-blur-xl">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Highest Loss ⚠️</span>
+          <p className="text-lg font-black text-rose-400">-${overview.highest_loss || 0}</p>
           <span className="text-[9px] text-rose-400/80">Worst trade</span>
         </div>
 
         {/* Win Days */}
-        <div className="p-3.5 rounded-2xl bg-[#090E18] border border-emerald-500/20 flex flex-col justify-between space-y-1 shadow-lg hover:border-emerald-500/40 transition-all">
-          <span className="text-[10px] font-bold text-slate-400 uppercase">Win Days</span>
-          <p className="text-base font-black text-emerald-400">{overview.win_days || 0}</p>
-          <span className="text-[9px] text-emerald-400">Profitable days</span>
+        <div className="p-3.5 rounded-2xl bg-[#090D18]/90 border border-emerald-500/30 flex flex-col justify-between space-y-1.5 shadow-md hover:border-emerald-500/50 transition-all backdrop-blur-xl">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Win Days 🟢</span>
+          <p className="text-lg font-black text-emerald-400">{overview.win_days || 0}</p>
+          <span className="text-[9px] text-emerald-400/80">Profitable days</span>
         </div>
 
         {/* Loss Days */}
-        <div className="p-3.5 rounded-2xl bg-[#090E18] border border-rose-500/20 flex flex-col justify-between space-y-1 shadow-lg hover:border-rose-500/40 transition-all">
-          <span className="text-[10px] font-bold text-slate-400 uppercase">Loss Days</span>
-          <p className="text-base font-black text-rose-400">{overview.loss_days || 0}</p>
-          <span className="text-[9px] text-rose-400">Loss making days</span>
+        <div className="p-3.5 rounded-2xl bg-[#090D18]/90 border border-rose-500/30 flex flex-col justify-between space-y-1.5 shadow-md hover:border-rose-500/50 transition-all backdrop-blur-xl">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Loss Days 🔴</span>
+          <p className="text-lg font-black text-rose-400">{overview.loss_days || 0}</p>
+          <span className="text-[9px] text-rose-400/80">Loss making days</span>
         </div>
 
       </div>
 
-      {/* 3. Ultra-Clean Side-by-Side Leaderboard Matrix (2x2 Grid) */}
+      {/* ========================================================================= */}
+      {/* 3. STRATEGY & ASSET LEADERBOARD MATRIX (2x2 GRID, 100% PRESERVED) */}
+      {/* ========================================================================= */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono">
 
         {/* Top Performing Strategy */}
         <AntigravityCard
           bloomColor="emerald"
-          className="bg-gradient-to-r from-[#071F17]/90 via-[#0A261D]/80 to-[#0A0E17]/90 border border-emerald-500/40 rounded-2xl p-4 sm:p-5 backdrop-blur-2xl flex items-center justify-between shadow-xl"
+          className="bg-gradient-to-r from-[#061B15]/90 via-[#0A261D]/80 to-[#070A12]/90 border border-emerald-500/40 rounded-2xl p-5 backdrop-blur-2xl flex items-center justify-between shadow-xl"
         >
           <div className="flex items-center gap-3.5">
             <div className="w-11 h-11 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-300 shadow-md shadow-emerald-500/20 shrink-0">
@@ -404,7 +444,7 @@ export default function DashboardOverview({ analytics, trades = [] }) {
         {/* Lowest Performing Strategy */}
         <AntigravityCard
           bloomColor="rose"
-          className="bg-gradient-to-r from-[#29080F]/90 via-[#2E0B12]/80 to-[#0A0E17]/90 border border-rose-500/40 rounded-2xl p-4 sm:p-5 backdrop-blur-2xl flex items-center justify-between shadow-xl"
+          className="bg-gradient-to-r from-[#22070D]/90 via-[#2A0B11]/80 to-[#070A12]/90 border border-rose-500/40 rounded-2xl p-5 backdrop-blur-2xl flex items-center justify-between shadow-xl"
         >
           <div className="flex items-center gap-3.5">
             <div className="w-11 h-11 rounded-2xl bg-rose-500/20 border border-rose-400/40 flex items-center justify-center text-rose-300 shadow-md shadow-rose-500/20 shrink-0">
@@ -433,11 +473,11 @@ export default function DashboardOverview({ analytics, trades = [] }) {
         {/* Best Performing Asset Class / Symbol */}
         <AntigravityCard
           bloomColor="teal"
-          className="bg-gradient-to-r from-[#071C1E]/90 via-[#0A261D]/80 to-[#0A0E17]/90 border border-teal-500/40 rounded-2xl p-4 sm:p-5 backdrop-blur-2xl flex items-center justify-between shadow-xl"
+          className="bg-gradient-to-r from-[#06181B]/90 via-[#0A261D]/80 to-[#070A12]/90 border border-teal-500/40 rounded-2xl p-5 backdrop-blur-2xl flex items-center justify-between shadow-xl"
         >
           <div className="flex items-center gap-3.5">
             <div className="w-11 h-11 rounded-2xl bg-teal-500/20 border border-teal-400/40 flex items-center justify-center text-teal-300 shadow-md shadow-teal-500/20 shrink-0">
-              <Trophy className="w-5.5 h-5.5 stroke-[2]" />
+              <Award className="w-5.5 h-5.5 stroke-[2]" />
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -469,7 +509,7 @@ export default function DashboardOverview({ analytics, trades = [] }) {
         {/* Lowest Performing Asset Class / Symbol */}
         <AntigravityCard
           bloomColor="rose"
-          className="bg-gradient-to-r from-[#29080F]/90 via-[#2E0B12]/80 to-[#0A0E17]/90 border border-rose-500/40 rounded-2xl p-4 sm:p-5 backdrop-blur-2xl flex items-center justify-between shadow-xl"
+          className="bg-gradient-to-r from-[#22070D]/90 via-[#2A0B11]/80 to-[#070A12]/90 border border-rose-500/40 rounded-2xl p-5 backdrop-blur-2xl flex items-center justify-between shadow-xl"
         >
           <div className="flex items-center gap-3.5">
             <div className="w-11 h-11 rounded-2xl bg-rose-500/20 border border-rose-400/40 flex items-center justify-center text-rose-300 shadow-md shadow-rose-500/20 shrink-0">
@@ -504,33 +544,36 @@ export default function DashboardOverview({ analytics, trades = [] }) {
 
       </div>
 
-      {/* 2. Cumulative P&L Dynamic Area Chart + Semicircle Win Rate Speedometer */}
+      {/* ========================================================================= */}
+      {/* 4. CUMULATIVE P&L DYNAMIC AREA CHART + SPEEDOMETER GAUGE */}
+      {/* ========================================================================= */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         {/* Dynamic Cumulative P&L Area Chart */}
-        <div className="lg:col-span-2 bg-[#090E18] border border-white/10 rounded-2xl p-5 shadow-xl flex flex-col justify-between relative overflow-hidden">
-          <div className="flex items-center justify-between pb-4">
+        <div className="lg:col-span-2 bg-[#080C16] border border-white/10 rounded-2xl p-5 shadow-xl flex flex-col justify-between relative overflow-hidden">
+          <div className="flex items-center justify-between pb-4 border-b border-white/10">
             <div>
-              <h3 className="text-lg sm:text-xl font-bold font-mono text-white tracking-wide">
-                Cumulative P&L
+              <h3 className="text-lg sm:text-xl font-bold font-mono text-white tracking-wide flex items-center gap-2">
+                <BarChart2 className="w-5 h-5 text-cyan-400" />
+                <span>Cumulative Portfolio Equity Growth</span>
               </h3>
-              <p className="text-xs text-slate-400 mt-0.5">Real-time equity growth trajectory</p>
+              <p className="text-xs text-slate-400 mt-0.5 font-sans">Real-time equity growth trajectory across executed trades</p>
             </div>
             <div className={`px-3 py-1 rounded-full border text-xs font-mono font-bold ${
               isNetPositive ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
             }`}>
-              {overview.win_rate}% Edge
+              {overview.win_rate}% Winning Edge
             </div>
           </div>
 
           {/* Dynamic Recharts Cumulative Equity Curve */}
-          <div className="w-full h-56 pt-2">
+          <div className="w-full h-60 pt-4">
             {equity_curve.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={equity_curve} margin={{ top: 10, right: 15, left: 10, bottom: 5 }}>
                   <defs>
                     <linearGradient id="dynamicPnlCurveGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#10B981" stopOpacity={0.4} />
+                      <stop offset="0%" stopColor="#10B981" stopOpacity={0.45} />
                       <stop offset="100%" stopColor="#06B6D4" stopOpacity={0.0} />
                     </linearGradient>
                   </defs>
@@ -562,16 +605,16 @@ export default function DashboardOverview({ analytics, trades = [] }) {
         </div>
 
         {/* Dynamic Semicircle Speedometer Gauge */}
-        <div className="bg-[#090E18] border border-white/10 rounded-2xl p-5 shadow-xl flex flex-col justify-between text-center relative overflow-hidden">
-          <div className="flex items-center justify-between pb-2">
+        <div className="bg-[#080C16] border border-white/10 rounded-2xl p-5 shadow-xl flex flex-col justify-between text-center relative overflow-hidden">
+          <div className="flex items-center justify-between pb-3 border-b border-white/10">
             <h3 className="text-lg font-bold font-mono text-white tracking-wide">
-              Win Rate
+              Win Rate Accuracy
             </h3>
-            <span className="text-xs font-mono text-emerald-400 font-bold">Accuracy</span>
+            <span className="text-xs font-mono text-emerald-400 font-bold">Speedometer</span>
           </div>
 
           {/* Semicircle Speedometer SVG */}
-          <div className="relative py-4 flex flex-col items-center justify-center">
+          <div className="relative py-4 flex flex-col items-center justify-center my-auto">
             <svg width="200" height="110" viewBox="0 0 160 90" className="overflow-visible">
               <path
                 d="M 15 80 A 65 65 0 0 1 145 80"
@@ -592,17 +635,17 @@ export default function DashboardOverview({ analytics, trades = [] }) {
               />
             </svg>
 
-            <div className="absolute top-[52px] flex flex-col items-center">
+            <div className="absolute top-[50px] flex flex-col items-center">
               <span className="text-3xl font-black font-mono text-cyan-400 tracking-tight">
                 {overview.win_rate}%
               </span>
               <span className="text-xs font-mono text-slate-400 font-semibold uppercase mt-0.5">
-                SUCCESS
+                EXECUTION EDGE
               </span>
             </div>
           </div>
 
-          <div className="pt-2 border-t border-white/10 flex items-center justify-center gap-1.5 text-xs font-mono font-bold text-emerald-400">
+          <div className="pt-3 border-t border-white/10 flex items-center justify-center gap-1.5 text-xs font-mono font-bold text-emerald-400">
             <ArrowUpRight className="w-4 h-4 stroke-[2.5]" />
             <span>{overview.win_count} Wins • {overview.loss_count} Losses</span>
           </div>
@@ -610,32 +653,35 @@ export default function DashboardOverview({ analytics, trades = [] }) {
 
       </div>
 
-      {/* 3. Dynamic Strategy Performance & Real Recent Trades Feed */}
+      {/* ========================================================================= */}
+      {/* 5. STRATEGY RANKINGS & LIVE RECENT EXECUTIONS FEED (100% PRESERVED) */}
+      {/* ========================================================================= */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
         {/* Dynamic Strategy Performance Bar Chart */}
-        <div className="bg-[#090E18] border border-white/10 rounded-2xl p-5 shadow-xl space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-white/10">
-            <h3 className="text-lg font-bold font-mono text-white tracking-wide">
-              Strategy Performance
+        <div className="bg-[#080C16] border border-white/10 rounded-2xl p-5 shadow-xl space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-white/10">
+            <h3 className="text-lg font-bold font-mono text-white tracking-wide flex items-center gap-2">
+              <Layers className="w-5 h-5 text-purple-400" />
+              <span>Strategy Performance Rankings</span>
             </h3>
-            <span className="text-xs font-mono text-emerald-400 font-bold">Real Strategy Rankings</span>
+            <span className="text-xs font-mono text-emerald-400 font-bold">Strategy Breakdown</span>
           </div>
 
-          <div className="space-y-3.5 pt-2">
+          <div className="space-y-3.5 pt-1">
             {strategy_performance.length > 0 ? (
               strategy_performance.map((strat, idx) => {
                 const isProfitable = strat.total_net_pnl >= 0;
                 const barPct = Math.min(100, Math.max(15, (Math.abs(strat.total_net_pnl) / maxStratPnl) * 100));
                 return (
-                  <div key={idx} className="space-y-1 font-mono">
+                  <div key={idx} className="space-y-1.5 font-mono">
                     <div className="flex justify-between text-xs font-semibold text-slate-300">
                       <span>{strat.strategy_name} ({strat.trades_count} trades)</span>
                       <span className={isProfitable ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
                         {isProfitable ? '+' : ''}${strat.total_net_pnl.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                       </span>
                     </div>
-                    <div className="w-full h-7 rounded-xl bg-[#0F1422] p-1 border border-white/5 overflow-hidden">
+                    <div className="w-full h-6 rounded-xl bg-[#0D1220] p-1 border border-white/5 overflow-hidden">
                       <div
                         className={`h-full rounded-lg transition-all duration-700 shadow-md ${
                           isProfitable
@@ -657,12 +703,13 @@ export default function DashboardOverview({ analytics, trades = [] }) {
         </div>
 
         {/* Dynamic Recent Trades Stream Feed */}
-        <div className="bg-[#090E18] border border-white/10 rounded-2xl p-5 shadow-xl space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-white/10">
-            <h3 className="text-lg font-bold font-mono text-white tracking-wide">
-              Recent Executions
+        <div className="bg-[#080C16] border border-white/10 rounded-2xl p-5 shadow-xl space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-white/10">
+            <h3 className="text-lg font-bold font-mono text-white tracking-wide flex items-center gap-2">
+              <Clock className="w-5 h-5 text-amber-400" />
+              <span>Recent Executions Log</span>
             </h3>
-            <span className="text-xs font-mono text-slate-400 font-medium">Live Trade Feed</span>
+            <span className="text-xs font-mono text-slate-400 font-medium">Live Feed</span>
           </div>
 
           <div className="space-y-2.5 pt-1 font-mono">
@@ -674,7 +721,7 @@ export default function DashboardOverview({ analytics, trades = [] }) {
                 return (
                   <div
                     key={t.id}
-                    className="p-3 rounded-xl bg-[#0E1320] border border-white/10 hover:border-emerald-500/30 flex items-center justify-between transition-all"
+                    className="p-3 rounded-xl bg-[#0D1220] border border-white/10 hover:border-emerald-500/30 flex items-center justify-between transition-all"
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-8 h-8 rounded-lg border flex items-center justify-center shrink-0 ${
@@ -711,17 +758,7 @@ export default function DashboardOverview({ analytics, trades = [] }) {
 
       </div>
 
-      {/* PDF Export Floating Bar */}
-      <div className="pt-2 flex justify-end">
-        <button
-          onClick={generatePDFReport}
-          className="px-6 py-3 text-xs font-black font-mono tracking-wider text-slate-950 bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 hover:scale-105 rounded-xl shadow-xl shadow-cyan-500/30 transition-all flex items-center gap-2 cursor-pointer border border-cyan-300/40"
-        >
-          <FileText className="w-4 h-4 text-slate-950 stroke-[2.2]" />
-          <span>Export PDF Report</span>
-        </button>
-      </div>
-
     </div>
   );
 }
+
