@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { loginUser, registerUser } from '../services/api';
 
-export default function AuthScreen({ onAuthSuccess }) {
+export default function AuthScreen({ onAuthSuccess, onBackToHome }) {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -76,6 +76,16 @@ export default function AuthScreen({ onAuthSuccess }) {
   return (
     <div className="min-h-screen bg-[#0B0E14] flex flex-col justify-center items-center p-4 relative overflow-hidden">
       
+      {/* Top Left Back to Home Button */}
+      {onBackToHome && (
+        <button
+          onClick={onBackToHome}
+          className="absolute top-6 left-6 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#121824] hover:bg-slate-800 text-xs font-mono font-bold text-slate-300 hover:text-white border border-white/10 transition-all cursor-pointer shadow-md"
+        >
+          <span>← Back to Landing Page</span>
+        </button>
+      )}
+
       {/* Background Decorative Gradients */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-1/4 left-1/3 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>

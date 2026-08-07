@@ -107,6 +107,7 @@ export default function App() {
   const handleLogout = () => {
     setAuthToken(null);
     setCurrentUser(null);
+    setShowLandingPage(true);
     localStorage.removeItem('quant_journal_token');
     localStorage.removeItem('quant_journal_user');
     showNotification('System locked. Session ended.', 'error');
@@ -275,13 +276,22 @@ export default function App() {
       <LandingPage
         onEnterApp={() => setShowLandingPage(false)}
         onLoginClick={() => setShowLandingPage(false)}
+        isLoggedIn={!!authToken && !!currentUser}
       />
     );
   }
 
   // If unauthenticated, present AuthScreen lock screen
   if (!authToken || !currentUser) {
-    return <AuthScreen onAuthSuccess={handleAuthSuccess} />;
+    return (
+      <AuthScreen 
+        onAuthSuccess={(data) => {
+          handleAuthSuccess(data);
+          setShowLandingPage(false);
+        }}
+        onBackToHome={() => setShowLandingPage(true)}
+      />
+    );
   }
 
   return (

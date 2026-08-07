@@ -18,7 +18,7 @@ import {
   Play
 } from 'lucide-react';
 
-export default function LandingPage({ onEnterApp, onLoginClick }) {
+export default function LandingPage({ onEnterApp, onLoginClick, isLoggedIn }) {
   const [openFaq, setOpenFaq] = useState(null);
 
   const toggleFaq = (index) => {
@@ -73,19 +73,30 @@ export default function LandingPage({ onEnterApp, onLoginClick }) {
             <a href="#pricing" className="hidden sm:inline text-xs font-mono font-semibold text-slate-400 hover:text-white transition-colors">Pricing</a>
             <a href="#faq" className="hidden sm:inline text-xs font-mono font-semibold text-slate-400 hover:text-white transition-colors">FAQ</a>
 
-            <button
-              onClick={onLoginClick}
-              className="px-4 py-2 text-xs font-mono font-bold text-slate-200 hover:text-white bg-slate-900 hover:bg-slate-800 rounded-xl border border-white/15 transition-all cursor-pointer"
-            >
-              Login
-            </button>
+            {isLoggedIn ? (
+              <button
+                onClick={onEnterApp}
+                className="px-5 py-2 text-xs font-mono font-black text-slate-950 bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 hover:scale-105 shadow-lg shadow-cyan-500/25 rounded-xl transition-all cursor-pointer border border-cyan-300/40"
+              >
+                Go to Dashboard →
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={onLoginClick}
+                  className="px-4 py-2 text-xs font-mono font-bold text-slate-200 hover:text-white bg-slate-900 hover:bg-slate-800 rounded-xl border border-white/15 transition-all cursor-pointer"
+                >
+                  Login
+                </button>
 
-            <button
-              onClick={onEnterApp}
-              className="px-5 py-2 text-xs font-mono font-black text-slate-950 bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 hover:scale-105 shadow-lg shadow-cyan-500/25 rounded-xl transition-all cursor-pointer border border-cyan-300/40"
-            >
-              Sign Up
-            </button>
+                <button
+                  onClick={onEnterApp}
+                  className="px-5 py-2 text-xs font-mono font-black text-slate-950 bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 hover:scale-105 shadow-lg shadow-cyan-500/25 rounded-xl transition-all cursor-pointer border border-cyan-300/40"
+                >
+                  Sign Up
+                </button>
+              </>
+            )}
           </div>
 
         </div>
