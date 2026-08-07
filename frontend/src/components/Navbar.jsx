@@ -15,7 +15,8 @@ import {
   Menu,
   X,
   ChevronRight,
-  ShieldCheck
+  ShieldCheck,
+  BookOpen
 } from 'lucide-react';
 
 export default function Navbar({ 
@@ -33,6 +34,7 @@ export default function Navbar({
     { id: 'trades', label: 'Trade Log', icon: ListFilter },
     { id: 'analytics', label: 'Analytics Engine', icon: BarChart3 },
     { id: 'calendar', label: 'PnL Calendar', icon: Calendar },
+    { id: 'playbook', label: 'Playbook & Notes', icon: BookOpen },
   ];
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

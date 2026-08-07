@@ -12,6 +12,7 @@ import LandingPage from './components/LandingPage';
 import QuantumLoadingScreen from './components/QuantumLoadingScreen';
 import MarketTicker from './components/MarketTicker';
 import TraderMilestones from './components/TraderMilestones';
+import TraderPlaybook from './components/TraderPlaybook';
 
 import { 
   getTrades, 
@@ -392,6 +393,13 @@ export default function App() {
                   analytics={analytics}
                   onSelectDateFilter={handleSelectCalendarDate}
                 />
+              </div>
+            )}
+
+            {/* View Tab 5: Trader Playbook & Notes Dock */}
+            {activeTab === 'playbook' && (
+              <div className="space-y-6 animate-fadeIn">
+                <TraderPlaybook />
               </div>
             )}
           </>

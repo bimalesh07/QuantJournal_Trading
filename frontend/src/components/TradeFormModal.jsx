@@ -261,9 +261,11 @@ export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData 
                 onChange={handleChange}
                 className="w-full bg-[#161B27] text-xs sm:text-sm text-white px-3 py-2 rounded-xl border border-slate-700/70 focus:border-emerald-400 focus:outline-none transition-all font-medium cursor-pointer"
               >
+                <option value="INDIAN_FNO" className="bg-[#10141D] text-white">🇮🇳 Indian F&O (NIFTY / BankNifty / Sensex)</option>
+                <option value="INDIAN_STOCKS" className="bg-[#10141D] text-white">🇮🇳 Indian Stocks (NSE / BSE)</option>
                 <option value="CRYPTO" className="bg-[#10141D] text-white">🪙 Crypto</option>
-                <option value="STOCKS" className="bg-[#10141D] text-white">📈 Stocks</option>
-                <option value="FOREX" className="bg-[#10141D] text-white">💱 Forex</option>
+                <option value="STOCKS" className="bg-[#10141D] text-white">📈 US Stocks</option>
+                <option value="FOREX" className="bg-[#10141D] text-white">💱 Forex & Gold/Commodities</option>
                 <option value="OPTIONS" className="bg-[#10141D] text-white">📊 Options</option>
                 <option value="FUTURES" className="bg-[#10141D] text-white">⚡ Futures</option>
               </select>
@@ -278,6 +280,7 @@ export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData 
                 onChange={handleChange}
                 className="w-full bg-[#161B27] text-xs sm:text-sm text-white px-3 py-2 rounded-xl border border-slate-700/70 focus:border-emerald-400 focus:outline-none transition-all font-medium cursor-pointer"
               >
+                <option value="INDIAN" className="bg-[#10141D] text-white">🇮🇳 Indian Session (9:15 AM - 3:30 PM IST)</option>
                 <option value="NEW_YORK" className="bg-[#10141D] text-white">🗽 New York Session</option>
                 <option value="LONDON" className="bg-[#10141D] text-white">🏛️ London Session</option>
                 <option value="ASIAN" className="bg-[#10141D] text-white">🌏 Asian Session</option>
