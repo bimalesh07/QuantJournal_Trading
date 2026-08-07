@@ -118,13 +118,30 @@ if os.getenv('CLOUDINARY_CLOUD_NAME'):
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# CORS Settings for Vercel & cross-origin deployment
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS Settings: Strict origin security
+# Only allow requests from Localhost and Vercel frontend domains
 CORS_ALLOW_CREDENTIALS = True
+
+DEFAULT_ALLOWED_ORIGINS = [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:3000',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+]
 
 _cors_origins_env = os.getenv('CORS_ALLOWED_ORIGINS', '')
 if _cors_origins_env:
-    CORS_ALLOWED_ORIGINS = [origin.strip() for origin in _cors_origins_env.split(',') if origin.strip()]
+    env_origins = [origin.strip() for origin in _cors_origins_env.split(',') if origin.strip()]
+    CORS_ALLOWED_ORIGINS = list(set(DEFAULT_ALLOWED_ORIGINS + env_origins))
+    CORS_ALLOW_ALL_ORIGINS = False
+else:
+    CORS_ALLOWED_ORIGINS = DEFAULT_ALLOWED_ORIGINS
+    CORS_ALLOWED_ORIGIN_REGEXES = [
+        r"^https://.*\.vercel\.app$",
+    ]
+    CORS_ALLOW_ALL_ORIGINS = False
 
 CORS_ALLOW_HEADERS = [
     'accept',
