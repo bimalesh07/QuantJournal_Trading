@@ -617,33 +617,79 @@ export default function DashboardOverview({ analytics, trades = [] }) {
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={equity_curve} margin={{ top: 15, right: 15, left: 10, bottom: 5 }}>
                   <defs>
-                    <linearGradient id="dynamicPnlCurveGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#22D3EE" stopOpacity={0.45} />
-                      <stop offset="50%" stopColor="#10B981" stopOpacity={0.2} />
-                      <stop offset="100%" stopColor="#06B6D4" stopOpacity={0.0} />
+                    {/* Positive Net PnL Gradients */}
+                    <linearGradient id="emeraldAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#10B981" stopOpacity={0.45} />
+                      <stop offset="50%" stopColor="#06B6D4" stopOpacity={0.2} />
+                      <stop offset="100%" stopColor="#080C16" stopOpacity={0.0} />
                     </linearGradient>
-                    <linearGradient id="equityLineGrad" x1="0" y1="0" x2="1" y2="0">
+                    <linearGradient id="emeraldLineGrad" x1="0" y1="0" x2="1" y2="0">
                       <stop offset="0%" stopColor="#38BDF8" />
                       <stop offset="50%" stopColor="#22D3EE" />
                       <stop offset="100%" stopColor="#34D399" />
+                    </linearGradient>
+
+                    {/* Negative Net PnL Gradients (Red Highlight for Loss) */}
+                    <linearGradient id="roseAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#FB7185" stopOpacity={0.5} />
+                      <stop offset="50%" stopColor="#E11D48" stopOpacity={0.2} />
+                      <stop offset="100%" stopColor="#080C16" stopOpacity={0.0} />
+                    </linearGradient>
+                    <linearGradient id="roseLineGrad" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stopColor="#F43F5E" />
+                      <stop offset="50%" stopColor="#E11D48" />
+                      <stop offset="100%" stopColor="#FB7185" />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
                   <XAxis dataKey="date" stroke="#64748B" fontSize={10} tickFormatter={formatShortDate} />
                   <YAxis stroke="#64748B" fontSize={10} width={65} tickFormatter={(val) => `$${val}`} />
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#0F1422', borderColor: '#334155', borderRadius: '12px', fontSize: '12px', fontFamily: 'JetBrains Mono' }}
-                    formatter={(val) => [`$${Number(val).toLocaleString()}`, 'Cumulative PnL']}
+                    contentStyle={{ backgroundColor: '#0F1422', borderColor: 'rgba(255,255,255,0.15)', borderRadius: '14px', fontSize: '12px', fontFamily: 'JetBrains Mono', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.5)' }}
+                    formatter={(val, name, item) => {
+                      const tradePnl = item?.payload?.trade_pnl;
+                      const formattedPnl = `$${Number(val).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+                      if (tradePnl !== undefined) {
+                        const tradePnlStr = `${tradePnl >= 0 ? '+' : ''}$${Number(tradePnl).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+                        return [`${formattedPnl} (Trade P&L: ${tradePnlStr})`, 'Cumulative Equity'];
+                      }
+                      return [formattedPnl, 'Cumulative Equity'];
+                    }}
                   />
                   <Area
                     type="monotone"
                     dataKey="cumulative_pnl"
-                    stroke="url(#equityLineGrad)"
+                    stroke={isNetPositive ? "url(#emeraldLineGrad)" : "url(#roseLineGrad)"}
                     strokeWidth={3.5}
                     fillOpacity={1}
-                    fill="url(#dynamicPnlCurveGrad)"
-                    dot={{ r: 4, fill: '#22D3EE', stroke: '#0F1422', strokeWidth: 2 }}
-                    activeDot={{ r: 7, fill: '#34D399', stroke: '#22D3EE', strokeWidth: 3 }}
+                    fill={isNetPositive ? "url(#emeraldAreaGrad)" : "url(#roseAreaGrad)"}
+                    dot={(props) => {
+                      const { cx, cy, payload } = props;
+                      if (!cx || !cy) return null;
+                      const tradePnl = payload?.trade_pnl !== undefined ? payload.trade_pnl : (payload?.cumulative_pnl || 0);
+                      const isLossDot = tradePnl < 0;
+                      return (
+                        <g key={`dot-${cx}-${cy}`}>
+                          <circle
+                            cx={cx}
+                            cy={cy}
+                            r={7}
+                            fill={isLossDot ? '#FB7185' : '#34D399'}
+                            fillOpacity={0.4}
+                            className="animate-pulse"
+                          />
+                          <circle
+                            cx={cx}
+                            cy={cy}
+                            r={4}
+                            fill={isLossDot ? '#E11D48' : '#10B981'}
+                            stroke="#080C16"
+                            strokeWidth={2}
+                          />
+                        </g>
+                      );
+                    }}
+                    activeDot={{ r: 8, strokeWidth: 3, fill: isNetPositive ? '#34D399' : '#FB7185' }}
                   />
                 </AreaChart>
               </ResponsiveContainer>
