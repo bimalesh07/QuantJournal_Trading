@@ -2,16 +2,17 @@ import React from 'react';
 import { TrendingUp, TrendingDown, Activity, Sparkles } from 'lucide-react';
 
 const tickerData = [
+  { symbol: '🇮🇳 NIFTY 50', name: 'NSE Nifty 50', price: '24,560.80', change: '+0.65%', isProfit: true },
+  { symbol: '🇮🇳 BANK NIFTY', name: 'Nifty Bank', price: '52,340.50', change: '+0.85%', isProfit: true },
+  { symbol: '🇮🇳 SENSEX', name: 'BSE Sensex', price: '80,420.15', change: '+0.52%', isProfit: true },
+  { symbol: '🇮🇳 RELIANCE', name: 'Reliance Industries', price: '₹3,025.00', change: '+1.15%', isProfit: true },
+  { symbol: '🇮🇳 TATA MOTORS', name: 'Tata Motors', price: '₹1,045.50', change: '+2.10%', isProfit: true },
+  { symbol: '🇮🇳 HDFC BANK', name: 'HDFC Bank', price: '₹1,640.20', change: '+0.40%', isProfit: true },
   { symbol: 'BTC/USD', name: 'Bitcoin', price: '$68,450.00', change: '+2.45%', isProfit: true },
   { symbol: 'XAU/USD', name: 'Gold', price: '$2,418.50', change: '+0.82%', isProfit: true },
   { symbol: 'ETH/USD', name: 'Ethereum', price: '$3,520.10', change: '-0.45%', isProfit: false },
-  { symbol: 'EUR/USD', name: 'Euro / US Dollar', price: '1.0892', change: '+0.18%', isProfit: true },
   { symbol: 'NDX', name: 'Nasdaq 100', price: '19,865.00', change: '+1.12%', isProfit: true },
-  { symbol: 'GBP/USD', name: 'British Pound', price: '1.2785', change: '+0.25%', isProfit: true },
-  { symbol: 'SOL/USD', name: 'Solana', price: '$178.40', change: '+4.10%', isProfit: true },
-  { symbol: 'SPX', name: 'S&P 500', price: '5,540.20', change: '+0.75%', isProfit: true },
   { symbol: 'XAG/USD', name: 'Silver', price: '$28.65', change: '+1.35%', isProfit: true },
-  { symbol: 'WTI', name: 'Crude Oil', price: '$76.80', change: '-1.10%', isProfit: false },
 ];
 
 export default function MarketTicker() {
