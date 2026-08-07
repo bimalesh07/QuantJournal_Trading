@@ -97,7 +97,7 @@ export default function TraderPlaybook() {
     }
   });
 
-  const [activeSubTab, setActiveSubTab] = useState('daily'); // 'daily' | 'setups' | 'concepts'
+  const [activeSubTab, setActiveSubTab] = useState('concepts'); // 'concepts' | 'daily' | 'setups'
 
   // Form state for creating a new Setup rule
   const [isAddingSetup, setIsAddingSetup] = useState(false);
