@@ -227,10 +227,10 @@ export default function TradeTable({
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
           <input
             type="text"
-            placeholder="Search by Symbol, Strategy, Tags..."
+            placeholder=""
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-[#161F2E] text-xs sm:text-sm text-slate-100 pl-10 pr-4 py-2 rounded-xl border border-slate-700/80 focus:border-emerald-400 focus:outline-none transition-all placeholder:text-slate-500"
+            className="w-full bg-[#161F2E] text-xs sm:text-sm text-slate-100 pl-10 pr-4 py-2 rounded-xl border border-slate-700/80 focus:border-emerald-400 focus:outline-none transition-all"
           />
           {searchTerm && (
             <button 

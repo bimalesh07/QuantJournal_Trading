@@ -214,7 +214,7 @@ export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData 
                 type="text"
                 name="symbol"
                 required
-                placeholder="e.g. BTC/USDT, AAPL"
+                placeholder=""
                 value={formData.symbol}
                 onChange={handleChange}
                 className="w-full bg-[#161B27] text-xs sm:text-sm text-white px-3 py-2 rounded-xl border border-slate-700/70 focus:border-emerald-400 focus:outline-none transition-all font-mono font-medium"
@@ -539,7 +539,7 @@ export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData 
                 <input
                   type="text"
                   name="tags"
-                  placeholder="#FVG, #LiquiditySweep, #Breakout"
+                  placeholder=""
                   value={formData.tags}
                   onChange={handleChange}
                   className="w-full bg-[#161B27] text-xs sm:text-sm text-white pl-8 pr-3 py-2 rounded-xl border border-slate-700/70 focus:border-emerald-400 focus:outline-none font-medium"
@@ -556,7 +556,7 @@ export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData 
               <textarea
                 name="notes"
                 rows="2"
-                placeholder="Key setup thesis, entry confirmation trigger, and execution review..."
+                placeholder=""
                 value={formData.notes}
                 onChange={handleChange}
                 className="w-full bg-[#161B27] text-xs sm:text-sm text-white px-3.5 py-2.5 rounded-xl border border-slate-700/70 focus:border-emerald-400 focus:outline-none font-medium resize-y"

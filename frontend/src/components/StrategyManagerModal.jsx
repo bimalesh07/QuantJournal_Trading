@@ -54,14 +54,14 @@ export default function StrategyManagerModal({ isOpen, onClose, strategies = [],
               <input
                 type="text"
                 required
-                placeholder="Strategy Name (e.g., Fair Value Gap, ICT, S/R Bounce)"
+                placeholder=""
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full bg-[#0B0E14] text-xs sm:text-sm text-white px-3.5 py-2.5 rounded-lg border border-slate-700 focus:border-purple-500 focus:outline-none font-medium"
               />
               <input
                 type="text"
-                placeholder="Brief Strategy Description (Optional)..."
+                placeholder=""
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 className="w-full bg-[#0B0E14] text-xs sm:text-sm text-white px-3.5 py-2.5 rounded-lg border border-slate-700 focus:border-purple-500 focus:outline-none font-medium"

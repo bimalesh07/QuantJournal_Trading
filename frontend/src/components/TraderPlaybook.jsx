@@ -472,7 +472,7 @@ export default function TraderPlaybook({ theme = 'dark' }) {
                   <label className="text-slate-400 block mb-1.5 font-mono font-bold">Morning Market Bias & Key Levels (NIFTY, BankNifty, Gold, Crypto)</label>
                   <textarea
                     rows={4}
-                    placeholder="e.g. NIFTY bullish above 24,500. Watching Gold 15m FVG at $2410. News: US CPI data at 6:00 PM IST."
+                    placeholder=""
                     value={currentNote.morningBias || ''}
                     onChange={(e) => handleUpdateCurrentNote('morningBias', e.target.value)}
                     className={`w-full border rounded-xl p-3.5 text-sm font-mono focus:border-cyan-400 outline-none resize-y leading-relaxed ${
@@ -485,7 +485,7 @@ export default function TraderPlaybook({ theme = 'dark' }) {
                   <label className="text-slate-400 block mb-1.5 font-mono font-bold">Economic News Calendar Events & Risk Warnings</label>
                   <input
                     type="text"
-                    placeholder="e.g. High impact FED speech at 8:00 PM. No new position 15 mins before news."
+                    placeholder=""
                     value={currentNote.newsEvents || ''}
                     onChange={(e) => handleUpdateCurrentNote('newsEvents', e.target.value)}
                     className={`w-full border rounded-xl p-3 text-sm font-mono focus:border-cyan-400 outline-none ${
@@ -511,7 +511,7 @@ export default function TraderPlaybook({ theme = 'dark' }) {
                 <label className="text-slate-400 block font-mono font-bold">Trading Performance Retrospective & Psychological Lessons</label>
                 <textarea
                   rows={4}
-                  placeholder="e.g. Executed 2 clean Breakout trades on Gold. Maintained strict 1:2 Risk to Reward. Didn't overtrade."
+                  placeholder=""
                   value={currentNote.eveningReview || ''}
                   onChange={(e) => handleUpdateCurrentNote('eveningReview', e.target.value)}
                   className={`w-full border rounded-xl p-3.5 text-sm font-mono focus:border-emerald-400 outline-none resize-y leading-relaxed ${
@@ -632,11 +632,11 @@ export default function TraderPlaybook({ theme = 'dark' }) {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs text-slate-400 block mb-1">Concept Title (e.g. What is IDM & When is it Valid?)</label>
+                  <label className="text-xs text-slate-400 block mb-1">Concept Title</label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Inducement (IDM) Liquidity Sweep Rules"
+                    placeholder=""
                     value={newConcept.title}
                     onChange={(e) => setNewConcept(prev => ({ ...prev, title: e.target.value }))}
                     className={`w-full border rounded-xl p-3 text-xs outline-none focus:border-cyan-400 ${
@@ -678,7 +678,7 @@ export default function TraderPlaybook({ theme = 'dark' }) {
 
                   <input
                     type="url"
-                    placeholder="Or paste TradingView Image URL (https://...)"
+                    placeholder=""
                     value={newConcept.imageUrl}
                     onChange={(e) => {
                       setNewConcept(prev => ({ ...prev, imageUrl: e.target.value }));
@@ -700,11 +700,11 @@ export default function TraderPlaybook({ theme = 'dark' }) {
 
               {/* Multi-Line Deep Explanation Note Textarea */}
               <div className="space-y-1">
-                <label className="text-xs text-slate-400 block font-bold">Detailed Logic Explanation & Entry Rules (MS Word Style Multi-Paragraph Note)</label>
+                <label className="text-xs text-slate-400 block font-bold">Detailed Logic Explanation & Entry Rules</label>
                 <textarea
                   rows={8}
                   required
-                  placeholder={`Write your detailed explanation here...\n\n1. What is IDM?\nInducement is the first pullback after a Break of Structure...\n\n2. When is it valid?\n- Must sweep liquidity before entry...\n\n3. Entry Rules:\n- Wait for 5m confirmation...`}
+                  placeholder=""
                   value={newConcept.explanation}
                   onChange={(e) => setNewConcept(prev => ({ ...prev, explanation: e.target.value }))}
                   className={`w-full border rounded-xl p-4 text-sm font-mono focus:border-cyan-400 outline-none leading-relaxed resize-y ${
@@ -909,7 +909,7 @@ export default function TraderPlaybook({ theme = 'dark' }) {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Fair Value Gap (FVG) Retest"
+                    placeholder=""
                     value={newSetup.title}
                     onChange={(e) => setNewSetup(prev => ({ ...prev, title: e.target.value }))}
                     className={`w-full border rounded-xl p-2.5 text-xs outline-none focus:border-cyan-400 ${
@@ -941,7 +941,7 @@ export default function TraderPlaybook({ theme = 'dark' }) {
                 <textarea
                   rows={3}
                   required
-                  placeholder="e.g. Enter on 5m candle closing back inside the gap. Stop loss placed 5 ticks above displacement high."
+                  placeholder=""
                   value={newSetup.description}
                   onChange={(e) => setNewSetup(prev => ({ ...prev, description: e.target.value }))}
                   className={`w-full border rounded-xl p-2.5 text-xs outline-none focus:border-cyan-400 ${
@@ -954,7 +954,7 @@ export default function TraderPlaybook({ theme = 'dark' }) {
                 <label className="text-xs text-slate-400 block mb-1">Pre-Trade Checklist Items (One per line)</label>
                 <textarea
                   rows={3}
-                  placeholder="HTF Alignment&#10;Displacement Volume&#10;Strict 1:2 RRR Target"
+                  placeholder=""
                   value={newSetup.checklistText}
                   onChange={(e) => setNewSetup(prev => ({ ...prev, checklistText: e.target.value }))}
                   className={`w-full border rounded-xl p-2.5 text-xs outline-none focus:border-cyan-400 ${
