@@ -145,6 +145,26 @@ select option:checked {
   animation: borderSpin 4s linear infinite;
 }
 
+/* Recharts Dark Theme Transparent Background Fix */
+.recharts-wrapper,
+.recharts-surface,
+.recharts-cartesian-grid-bg,
+.recharts-bar-rectangles {
+  background-color: transparent !important;
+  fill: transparent !important;
+}
+
+.recharts-cartesian-grid line {
+  stroke: #1E293B !important;
+}
+
+.recharts-default-tooltip {
+  background-color: #0F1422 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5) !important;
+}
+
 /* ========================================================= */
 /* COMPREHENSIVE LIGHT THEME OVERRIDES (Pristine Light Mode) */
 /* ========================================================= */

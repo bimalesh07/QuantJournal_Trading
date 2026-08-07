@@ -11,21 +11,18 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  CartesianGrid,
-  Legend
+  CartesianGrid
 } from 'recharts';
-import { TrendingUp, BarChart2, PieChart as PieIcon, Brain, AlertTriangle, Clock, Calendar, Target, Layers } from 'lucide-react';
+import { TrendingUp, BarChart2, Brain, Clock, Layers, Target } from 'lucide-react';
 
 export default function AnalyticsCharts({ analytics }) {
   if (!analytics) return null;
 
   const { 
     equity_curve = [], 
-    monthly_pnl = [], 
     overview = {}, 
     pnl_by_emotion = [],
     pnl_by_session = [],
-    pnl_by_day = [],
     pnl_by_asset_class = []
   } = analytics;
 
@@ -41,23 +38,15 @@ export default function AnalyticsCharts({ analytics }) {
     return `${sign}$${absVal}`;
   };
 
-  // Short Date Formatter for X-Axis
-  const formatShortDate = (dateStr) => {
-    if (!dateStr) return '';
-    const d = new Date(dateStr);
-    if (isNaN(d.getTime())) return dateStr;
-    return d.toLocaleDateString('en-US', { month: 'short', day: '2-digit' });
-  };
-
   // Custom Glassmorphism Tooltip for Mouse Hover
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="bg-[#121622] border border-slate-700/80 p-3.5 rounded-2xl shadow-2xl text-xs font-mono backdrop-blur-2xl z-50 pointer-events-none min-w-[160px]">
-          <div className="text-slate-300 font-bold mb-1.5 border-b border-slate-800 pb-1 flex items-center justify-between gap-3">
-            <span>{label || data.date || data.month || data.session || data.day || data.emotion}</span>
-            {data.trades !== undefined && <span className="text-[10px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded-md font-semibold">{data.trades} Trades</span>}
+        <div className="bg-[#0D1220] border border-white/15 p-3.5 rounded-2xl shadow-2xl text-xs font-mono backdrop-blur-2xl z-50 pointer-events-none min-w-[160px]">
+          <div className="text-slate-300 font-bold mb-1.5 border-b border-white/10 pb-1 flex items-center justify-between gap-3">
+            <span>{label || data.date || data.month || data.session || data.day || data.emotion || data.name}</span>
+            {data.trades !== undefined && <span className="text-[10px] text-slate-400 bg-white/10 px-2 py-0.5 rounded-md font-semibold">{data.trades} Trades</span>}
           </div>
           {payload.map((entry, index) => {
             const rawVal = entry.value;
@@ -65,7 +54,7 @@ export default function AnalyticsCharts({ analytics }) {
             const formattedVal = `${valNum >= 0 ? '+' : ''}$${valNum.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
             return (
               <div key={index} className="flex items-center justify-between gap-4 font-black text-sm py-0.5" style={{ color: entry.color || '#34D399' }}>
-                <span>{entry.name}:</span>
+                <span>{entry.name || 'Net PnL'}:</span>
                 <span>{formattedVal}</span>
               </div>
             );
@@ -76,18 +65,12 @@ export default function AnalyticsCharts({ analytics }) {
     return null;
   };
 
-
-
   return (
     <div className="space-y-6 font-sans">
       
       {/* SVG Gradient Definitions */}
       <svg style={{ height: 0, width: 0, position: 'absolute' }}>
         <defs>
-          <linearGradient id="blueSessionGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#60A5FA" stopOpacity={1} />
-            <stop offset="100%" stopColor="#2563EB" stopOpacity={0.8} />
-          </linearGradient>
           <linearGradient id="emeraldBarGrad" x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%" stopColor="#10B981" stopOpacity={1} />
             <stop offset="100%" stopColor="#34D399" stopOpacity={0.85} />
@@ -99,8 +82,8 @@ export default function AnalyticsCharts({ analytics }) {
         </defs>
       </svg>
 
-      {/* 1. Win Rate & P&L by Asset Class Widget (Reference Screenshot 4) */}
-      <div className="bg-[#090E18] border border-white/10 rounded-2xl p-5 sm:p-6 shadow-2xl space-y-6">
+      {/* 1. Win Rate & P&L by Asset Class Widget */}
+      <div className="bg-[#080C16] border border-white/10 rounded-2xl p-5 sm:p-6 shadow-2xl space-y-6">
         <div className="flex items-center justify-between pb-3 border-b border-white/10">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
@@ -110,7 +93,7 @@ export default function AnalyticsCharts({ analytics }) {
               <h3 className="text-lg sm:text-xl font-bold font-mono text-white tracking-wide">
                 Win Rate & P&L by Asset Class
               </h3>
-              <p className="text-xs text-slate-400 mt-0.5">Asset Performance & Accuracy Breakdown</p>
+              <p className="text-xs text-slate-400 mt-0.5 font-sans">Asset Performance & Accuracy Breakdown</p>
             </div>
           </div>
 
@@ -123,14 +106,15 @@ export default function AnalyticsCharts({ analytics }) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           
           {/* Left: Horizontal Bar Chart */}
-          <div className="h-80 w-full font-mono">
+          <div className="h-80 w-full font-mono bg-transparent">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 layout="vertical"
                 data={assetClassData}
                 margin={{ top: 5, right: 20, left: 40, bottom: 5 }}
+                style={{ backgroundColor: 'transparent' }}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="#1E2638" horizontal={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" horizontal={false} />
                 <XAxis type="number" stroke="#64748B" fontSize={10} tickFormatter={formatCurrencyCondensed} />
                 <YAxis type="category" dataKey="name" stroke="#94A3B8" fontSize={11} width={100} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255, 255, 255, 0.04)' }} />
@@ -146,12 +130,12 @@ export default function AnalyticsCharts({ analytics }) {
             </ResponsiveContainer>
           </div>
 
-          {/* Right: Stacked Asset Cards List (Screenshot 4 Right Column) */}
+          {/* Right: Stacked Asset Cards List */}
           <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden font-mono">
             {assetClassData.map((asset, idx) => (
               <div
                 key={idx}
-                className="p-3 rounded-xl bg-[#0F1422] border border-white/10 hover:border-emerald-500/30 flex items-center justify-between transition-all"
+                className="p-3.5 rounded-xl bg-[#0D1220] border border-white/10 hover:border-emerald-500/30 flex items-center justify-between transition-all"
               >
                 <div className="flex items-center gap-3">
                   <span className={`w-2.5 h-2.5 rounded-full ${asset.isProfit ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]' : 'bg-rose-500'}`}></span>
@@ -178,34 +162,37 @@ export default function AnalyticsCharts({ analytics }) {
         </div>
       </div>
 
-      {/* 2. PnL by Trading Session & Day of Week Grid */}
+      {/* 2. PnL by Trading Session & Emotional Mindset Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
         {/* Session Performance */}
-        <div className="bg-[#090E18] border border-white/10 rounded-2xl p-5 shadow-xl space-y-4">
+        <div className="bg-[#080C16] border border-white/10 rounded-2xl p-5 shadow-xl space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-white/10">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-blue-500/20 text-blue-300 border border-blue-500/40">
+              <div className="p-2.5 rounded-xl bg-blue-500/20 text-blue-300 border border-blue-500/40">
                 <Clock className="w-5 h-5 stroke-[2.2]" />
               </div>
               <div>
                 <h3 className="text-base font-bold font-mono text-white">PnL by Trading Session</h3>
-                <p className="text-xs text-slate-400">New York vs London vs Asian</p>
+                <p className="text-xs text-slate-400 font-sans">New York vs London vs Asian</p>
               </div>
             </div>
           </div>
 
-          <div className="h-56 w-full font-mono">
+          <div className="h-60 w-full font-mono bg-transparent">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={pnl_by_session.length > 0 ? pnl_by_session : [
-                { session: 'New York', net_pnl: 14500 },
-                { session: 'London', net_pnl: 8200 },
-                { session: 'Asian', net_pnl: -1200 }
-              ]}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1E2638" />
+              <BarChart 
+                data={pnl_by_session.length > 0 ? pnl_by_session : [
+                  { session: 'New York', net_pnl: 14500 },
+                  { session: 'London', net_pnl: 8200 },
+                  { session: 'Asian', net_pnl: -1200 }
+                ]}
+                style={{ backgroundColor: 'transparent' }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
                 <XAxis dataKey="session" stroke="#94A3B8" fontSize={11} />
                 <YAxis stroke="#94A3B8" fontSize={11} tickFormatter={formatCurrencyCondensed} />
-                <Tooltip content={<CustomTooltip />} />
+                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255, 255, 255, 0.04)' }} />
                 <Bar dataKey="net_pnl" maxBarSize={45} radius={[8, 8, 0, 0]}>
                   {(pnl_by_session.length > 0 ? pnl_by_session : [
                     { session: 'New York', net_pnl: 14500 },
@@ -221,31 +208,34 @@ export default function AnalyticsCharts({ analytics }) {
         </div>
 
         {/* PnL by Emotional Mindset */}
-        <div className="bg-[#090E18] border border-white/10 rounded-2xl p-5 shadow-xl space-y-4">
+        <div className="bg-[#080C16] border border-white/10 rounded-2xl p-5 shadow-xl space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-white/10">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/40">
+              <div className="p-2.5 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/40">
                 <Brain className="w-5 h-5 stroke-[2.2]" />
               </div>
               <div>
                 <h3 className="text-base font-bold font-mono text-white">PnL by Emotional Mindset</h3>
-                <p className="text-xs text-slate-400">Disciplined vs FOMO Leak Analysis</p>
+                <p className="text-xs text-slate-400 font-sans">Disciplined vs FOMO Leak Analysis</p>
               </div>
             </div>
           </div>
 
-          <div className="h-56 w-full font-mono">
+          <div className="h-60 w-full font-mono bg-transparent">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={pnl_by_emotion.length > 0 ? pnl_by_emotion : [
-                { emotion: 'Disciplined', net_pnl: 22400 },
-                { emotion: 'Patient', net_pnl: 12100 },
-                { emotion: 'FOMO', net_pnl: -4500 },
-                { emotion: 'Revenge', net_pnl: -8200 }
-              ]}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1E2638" />
+              <BarChart 
+                data={pnl_by_emotion.length > 0 ? pnl_by_emotion : [
+                  { emotion: 'Disciplined', net_pnl: 22400 },
+                  { emotion: 'Patient', net_pnl: 12100 },
+                  { emotion: 'FOMO', net_pnl: -4500 },
+                  { emotion: 'Revenge', net_pnl: -8200 }
+                ]}
+                style={{ backgroundColor: 'transparent' }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
                 <XAxis dataKey="emotion" stroke="#94A3B8" fontSize={11} />
                 <YAxis stroke="#94A3B8" fontSize={11} tickFormatter={formatCurrencyCondensed} />
-                <Tooltip content={<CustomTooltip />} />
+                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255, 255, 255, 0.04)' }} />
                 <Bar dataKey="net_pnl" maxBarSize={45} radius={[8, 8, 0, 0]}>
                   {(pnl_by_emotion.length > 0 ? pnl_by_emotion : [
                     { emotion: 'Disciplined', net_pnl: 22400 },
@@ -266,3 +256,4 @@ export default function AnalyticsCharts({ analytics }) {
     </div>
   );
 }
+
