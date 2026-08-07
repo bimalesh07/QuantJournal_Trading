@@ -20,10 +20,13 @@ import {
   FileCode,
   Upload,
   ExternalLink,
-  CheckCircle2
+  CheckCircle2,
+  Maximize2
 } from 'lucide-react';
+import ImageLightboxModal from './ImageLightboxModal';
 
 export default function TraderPlaybook() {
+  const [lightboxState, setLightboxState] = useState({ isOpen: false, imageUrl: '', title: '' });
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().slice(0, 10));
   
   // Daily Notes State
@@ -549,10 +552,18 @@ export default function TraderPlaybook() {
                     </button>
                   </div>
 
-                  {/* Chart Screenshot Display */}
+                  {/* Chart Screenshot Display (Click to open Zoom Inspector) */}
                   {concept.imageUrl && (
-                    <div className="rounded-xl overflow-hidden border border-white/15 bg-slate-950 relative group/img max-h-64">
+                    <div
+                      onClick={() => setLightboxState({ isOpen: true, imageUrl: concept.imageUrl, title: concept.title })}
+                      className="rounded-xl overflow-hidden border border-white/15 bg-slate-950 relative group/img max-h-64 cursor-pointer hover:border-cyan-400/60 transition-all shadow-md"
+                      title="Click to Zoom In & Inspect Chart"
+                    >
                       <img src={concept.imageUrl} alt={concept.title} className="w-full h-48 sm:h-56 object-cover transition-transform duration-500 group-hover/img:scale-105" />
+                      <div className="absolute inset-0 bg-slate-950/50 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center gap-2 text-white font-mono text-xs font-bold">
+                        <Maximize2 className="w-4 h-4 text-cyan-400" />
+                        <span>Click to Zoom & Inspect</span>
+                      </div>
                     </div>
                   )}
 
@@ -725,6 +736,14 @@ export default function TraderPlaybook() {
 
         </div>
       )}
+
+      {/* Image Lightbox Zoom Modal */}
+      <ImageLightboxModal
+        isOpen={lightboxState.isOpen}
+        onClose={() => setLightboxState(prev => ({ ...prev, isOpen: false }))}
+        imageUrl={lightboxState.imageUrl}
+        title={lightboxState.title}
+      />
 
     </div>
   );

@@ -197,18 +197,33 @@ html.light-theme,
 .light-theme .aerogel-surface,
 .light-theme .bg-\[\#030508\],
 .light-theme .bg-\[\#05070B\],
+/* Comprehensive Light Theme Class Overrides */
+.light-theme .bg-\[\#030508\],
+.light-theme .bg-\[\#04060C\],
+.light-theme .bg-\[\#05070F\],
+.light-theme .bg-\[\#05070F\]\/90,
 .light-theme .bg-\[\#070A12\],
 .light-theme .bg-\[\#070A12\]\/90,
+.light-theme .bg-\[\#070A14\],
+.light-theme .bg-\[\#070A14\]\/95,
+.light-theme .bg-\[\#080C16\],
+.light-theme .bg-\[\#080C16\]\/60,
 .light-theme .bg-\[\#090D16\],
+.light-theme .bg-\[\#090D16\]\/60,
 .light-theme .bg-\[\#090D16\]\/80,
 .light-theme .bg-\[\#090D16\]\/90,
 .light-theme .bg-\[\#090D16\]\/95,
 .light-theme .bg-\[\#09151A\],
 .light-theme .bg-\[\#0A0E17\],
+.light-theme .bg-\[\#0A0F1D\],
 .light-theme .bg-\[\#0B0E14\],
+.light-theme .bg-\[\#0B0F1A\],
+.light-theme .bg-\[\#0D1220\],
 .light-theme .bg-\[\#0E121B\],
+.light-theme .bg-\[\#0E1320\],
 .light-theme .bg-\[\#0F131C\],
 .light-theme .bg-\[\#0F1420\],
+.light-theme .bg-\[\#0F1422\],
 .light-theme .bg-\[\#10141D\],
 .light-theme .bg-\[\#120D22\],
 .light-theme .bg-\[\#121620\]\/90,
@@ -227,16 +242,18 @@ html.light-theme,
 .light-theme .bg-\[\#161F2E\],
 .light-theme .bg-\[\#181E2C\],
 .light-theme .bg-\[\#1A2130\],
+.light-theme .bg-\[\#070A12\],
 .light-theme .bg-slate-800,
 .light-theme .bg-slate-800\/80,
 .light-theme .bg-slate-800\/60,
 .light-theme .bg-slate-800\/50,
 .light-theme .bg-slate-800\/40,
-.light-theme .bg-slate-900 {
+.light-theme .bg-slate-900,
+.light-theme .bg-slate-950 {
   background-color: #FFFFFF !important;
-  border-color: #E2E8F0 !important;
+  border-color: #CBD5E1 !important;
   color: #0F172A !important;
-  box-shadow: 0 4px 25px -4px rgba(0, 0, 0, 0.05) !important;
+  box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.06) !important;
 }
 
 /* Strategy Banner Gradients in Light Mode */
