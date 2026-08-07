@@ -11,6 +11,7 @@ import AuthScreen from './components/AuthScreen';
 import LandingPage from './components/LandingPage';
 import QuantumLoadingScreen from './components/QuantumLoadingScreen';
 import MarketTicker from './components/MarketTicker';
+import TraderMilestones from './components/TraderMilestones';
 
 import { 
   getTrades, 
@@ -340,6 +341,7 @@ export default function App() {
               <div className="space-y-6 animate-fadeIn">
                 <DashboardOverview analytics={analytics} trades={trades} />
                 <AnalyticsCharts analytics={analytics} trades={trades} />
+                <TraderMilestones analytics={analytics} trades={trades} />
                 <TradeTable
                   trades={trades}
                   strategies={strategies}
