@@ -95,10 +95,11 @@ class AnalyticsService:
         # Calendar Data (Daily Net PnL)
         calendar_data = AnalyticsService._calculate_calendar_data(closed_trades)
 
-        # Asset Class Breakdown & Best/Worst Asset
+        # Asset Class Breakdown & Symbol Level Best/Worst Asset
         pnl_by_asset_class = AnalyticsService._calculate_asset_class_stats(closed_trades)
-        best_asset = max(pnl_by_asset_class, key=lambda a: a['pnl']) if pnl_by_asset_class else None
-        worst_asset = min(pnl_by_asset_class, key=lambda a: a['pnl']) if pnl_by_asset_class else None
+        symbol_stats = AnalyticsService._calculate_symbol_stats(closed_trades)
+        best_asset = max(symbol_stats, key=lambda a: a['pnl']) if symbol_stats else None
+        worst_asset = min(symbol_stats, key=lambda a: a['pnl']) if symbol_stats else None
 
         return {
             'overview': {
@@ -397,6 +398,46 @@ class AnalyticsService:
                 'winRate': win_rate,
                 'pnl': float(round(val['net_pnl'], 2)),
                 'isProfit': val['net_pnl'] >= 0
+            })
+        result.sort(key=lambda x: x['pnl'], reverse=True)
+        return result
+
+    @staticmethod
+    def _calculate_symbol_stats(closed_trades):
+        stats = defaultdict(lambda: {
+            'trades_count': 0,
+            'wins': 0,
+            'losses': 0,
+            'net_pnl': Decimal('0.0000'),
+            'asset_class': 'INDICES',
+            'latest_price': Decimal('0.0000')
+        })
+
+        for t in closed_trades:
+            sym = t.symbol.upper().strip() if t.symbol else 'UNASSIGNED'
+            stats[sym]['trades_count'] += 1
+            stats[sym]['asset_class'] = t.asset_class or 'INDICES'
+            stats[sym]['latest_price'] = t.exit_price or t.entry_price or Decimal('0')
+            if t.net_pnl > 0:
+                stats[sym]['wins'] += 1
+            elif t.net_pnl < 0:
+                stats[sym]['losses'] += 1
+            stats[sym]['net_pnl'] += t.net_pnl
+
+        result = []
+        for sym, s in stats.items():
+            total = s['trades_count']
+            win_rate = round((s['wins'] / total) * 100, 2) if total > 0 else 0.0
+            result.append({
+                'name': sym,
+                'asset_class': s['asset_class'],
+                'trades': total,
+                'wins': s['wins'],
+                'losses': s['losses'],
+                'winRate': win_rate,
+                'pnl': float(round(s['net_pnl'], 2)),
+                'price': float(round(s['latest_price'], 2)),
+                'isProfit': s['net_pnl'] >= 0
             })
         result.sort(key=lambda x: x['pnl'], reverse=True)
         return result

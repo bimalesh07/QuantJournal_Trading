@@ -116,6 +116,23 @@ export default function DashboardOverview({ analytics, trades = [] }) {
   const { overview, best_strategy, worst_strategy, best_asset, worst_asset, equity_curve = [], strategy_performance = [] } = analytics;
   const isNetPositive = overview.total_net_pnl >= 0;
 
+  // Dynamic Fallback calculation for Asset Symbol Name & Last Traded Price
+  const computedBestAsset = best_asset || (trades.length > 0 ? {
+    name: trades[0].symbol,
+    pnl: trades[0].net_pnl,
+    price: trades[0].exit_price || trades[0].entry_price || 0,
+    winRate: trades[0].net_pnl > 0 ? 100 : 0,
+    trades: 1
+  } : null);
+
+  const computedWorstAsset = worst_asset || (trades.length > 0 ? {
+    name: trades[trades.length - 1].symbol,
+    pnl: trades[trades.length - 1].net_pnl,
+    price: trades[trades.length - 1].exit_price || trades[trades.length - 1].entry_price || 0,
+    winRate: trades[trades.length - 1].net_pnl > 0 ? 100 : 0,
+    trades: 1
+  } : null);
+
   // PDF Report Generator
   const generatePDFReport = () => {
     const doc = new jsPDF({
@@ -338,7 +355,7 @@ export default function DashboardOverview({ analytics, trades = [] }) {
           </div>
         </AntigravityCard>
 
-        {/* Best Performing Asset Class */}
+        {/* Best Performing Asset Class / Symbol */}
         <AntigravityCard
           bloomColor="teal"
           className="bg-gradient-to-r from-[#071C1E]/90 via-[#0A261D]/80 to-[#0A0E17]/90 border border-teal-500/40 rounded-2xl p-4 sm:p-5 backdrop-blur-2xl flex items-center justify-between shadow-xl"
@@ -348,26 +365,33 @@ export default function DashboardOverview({ analytics, trades = [] }) {
               <Trophy className="w-5.5 h-5.5 stroke-[2]" />
             </div>
             <div>
-              <span className="text-[11px] font-black text-teal-400 uppercase tracking-widest font-mono">
-                BEST PERFORMING ASSET
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-black text-teal-400 uppercase tracking-widest font-mono">
+                  BEST PERFORMING ASSET
+                </span>
+                {computedBestAsset && computedBestAsset.price > 0 && (
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-teal-500/20 text-teal-300 font-bold border border-teal-500/30">
+                    Price: ${Number(computedBestAsset.price).toLocaleString()}
+                  </span>
+                )}
+              </div>
               <h4 className="text-base sm:text-lg font-black text-white mt-0.5 font-mono tracking-wide">
-                {best_asset ? best_asset.name : 'N/A'}
+                {computedBestAsset ? computedBestAsset.name : 'N/A'}
               </h4>
             </div>
           </div>
 
           <div className="text-right font-mono">
             <div className="text-lg sm:text-xl font-black text-teal-300 drop-shadow-[0_0_10px_rgba(45,212,191,0.4)]">
-              {best_asset ? `${best_asset.pnl >= 0 ? '+' : ''}$${best_asset.pnl.toLocaleString('en-US', { minimumFractionDigits: 2 })}` : '$0.00'}
+              {computedBestAsset ? `${computedBestAsset.pnl >= 0 ? '+' : ''}$${Number(computedBestAsset.pnl).toLocaleString('en-US', { minimumFractionDigits: 2 })}` : '$0.00'}
             </div>
             <div className="text-[11px] font-bold text-slate-400 mt-0.5">
-              {best_asset ? `${best_asset.winRate}% Win Rate (${best_asset.trades} trades)` : '0 trades'}
+              {computedBestAsset ? `${computedBestAsset.winRate || 100}% Win Rate (${computedBestAsset.trades} trades)` : '0 trades'}
             </div>
           </div>
         </AntigravityCard>
 
-        {/* Lowest Performing Asset Class */}
+        {/* Lowest Performing Asset Class / Symbol */}
         <AntigravityCard
           bloomColor="rose"
           className="bg-gradient-to-r from-[#29080F]/90 via-[#2E0B12]/80 to-[#0A0E17]/90 border border-rose-500/40 rounded-2xl p-4 sm:p-5 backdrop-blur-2xl flex items-center justify-between shadow-xl"
@@ -377,21 +401,28 @@ export default function DashboardOverview({ analytics, trades = [] }) {
               <AlertTriangle className="w-5.5 h-5.5 stroke-[2]" />
             </div>
             <div>
-              <span className="text-[11px] font-black text-rose-400 uppercase tracking-widest font-mono">
-                LOWEST PERFORMING ASSET
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-black text-rose-400 uppercase tracking-widest font-mono">
+                  LOWEST PERFORMING ASSET
+                </span>
+                {computedWorstAsset && computedWorstAsset.price > 0 && (
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-300 font-bold border border-rose-500/30">
+                    Price: ${Number(computedWorstAsset.price).toLocaleString()}
+                  </span>
+                )}
+              </div>
               <h4 className="text-base sm:text-lg font-black text-white mt-0.5 font-mono tracking-wide">
-                {worst_asset ? worst_asset.name : 'N/A'}
+                {computedWorstAsset ? computedWorstAsset.name : 'N/A'}
               </h4>
             </div>
           </div>
 
           <div className="text-right font-mono">
-            <div className={`text-lg sm:text-xl font-black ${worst_asset && worst_asset.pnl < 0 ? 'text-rose-400 drop-shadow-[0_0_10px_rgba(244,63,94,0.4)]' : 'text-slate-300'}`}>
-              {worst_asset ? `${worst_asset.pnl >= 0 ? '+' : ''}$${worst_asset.pnl.toLocaleString('en-US', { minimumFractionDigits: 2 })}` : '$0.00'}
+            <div className={`text-lg sm:text-xl font-black ${computedWorstAsset && computedWorstAsset.pnl < 0 ? 'text-rose-400 drop-shadow-[0_0_10px_rgba(244,63,94,0.4)]' : 'text-slate-300'}`}>
+              {computedWorstAsset ? `${computedWorstAsset.pnl >= 0 ? '+' : ''}$${Number(computedWorstAsset.pnl).toLocaleString('en-US', { minimumFractionDigits: 2 })}` : '$0.00'}
             </div>
             <div className="text-[11px] font-bold text-slate-400 mt-0.5">
-              {worst_asset ? `${worst_asset.winRate}% Win Rate (${worst_asset.trades} trades)` : '0 trades'}
+              {computedWorstAsset ? `${computedWorstAsset.winRate || 0}% Win Rate (${computedWorstAsset.trades} trades)` : '0 trades'}
             </div>
           </div>
         </AntigravityCard>
