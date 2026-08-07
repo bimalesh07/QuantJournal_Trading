@@ -831,91 +831,131 @@ export default function DashboardOverview({ analytics, trades = [] }) {
           </div>
         </div>
 
-        {/* Dynamic Recent Trades Stream Feed Card with Running Neon Light Beam Border */}
-        <div className="relative p-[1.5px] rounded-2xl overflow-hidden shadow-2xl shadow-emerald-500/20 group">
-          
-          {/* Continuous Running Thin Laser Light Beam around Card */}
-          <div 
-            className="absolute -inset-[150%] animate-spin-slow opacity-100 pointer-events-none"
-            style={{
-              background: 'conic-gradient(from 0deg at 50% 50%, transparent 0deg, transparent 230deg, #10b981 280deg, #06b6d4 320deg, #f59e0b 360deg)'
-            }}
-          />
+        {/* Dynamic Recent Trades Stream Feed Card */}
+        <div className="bg-[#080C16] border border-white/10 rounded-2xl p-5 shadow-xl space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-white/10">
+            <h3 className="text-lg font-bold font-mono text-white tracking-wide flex items-center gap-2">
+              <Clock className="w-5 h-5 text-amber-400" />
+              <span>Recent Executions Log</span>
+            </h3>
+            <span className="text-xs font-mono text-emerald-400 font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/30">
+              LIVE FEED
+            </span>
+          </div>
 
-          {/* Inner Card Screen */}
-          <div className="relative p-5 rounded-[15px] bg-[#080C16] space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-white/10">
-              <h3 className="text-lg font-bold font-mono text-white tracking-wide flex items-center gap-2">
-                <Clock className="w-5 h-5 text-amber-400" />
-                <span>Recent Executions Log</span>
-              </h3>
-              <span className="text-xs font-mono text-emerald-400 font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/30">
-                LIVE FEED
-              </span>
-            </div>
+          <div className="space-y-3 pt-1 font-mono">
+            {recentTrades.length > 0 ? (
+              recentTrades.map((t, idx) => {
+                const isLatest = idx === 0;
+                const isWin = t.net_pnl > 0;
+                const isLoss = t.net_pnl < 0;
+                const dateFormatted = new Date(t.entry_time).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
-            <div className="space-y-2.5 pt-1 font-mono">
-              {recentTrades.length > 0 ? (
-                recentTrades.map((t, idx) => {
-                  const isLatest = idx === 0;
-                  const isWin = t.net_pnl > 0;
-                  const isLoss = t.net_pnl < 0;
-                  const dateFormatted = new Date(t.entry_time).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                // Dynamic Laser Beam Gradient for Latest Execution: Green if Profit, Red if Loss
+                const laserGradient = isWin
+                  ? 'conic-gradient(from 0deg at 50% 50%, transparent 0deg, transparent 220deg, #10b981 270deg, #34d399 320deg, #059669 360deg)'
+                  : isLoss
+                  ? 'conic-gradient(from 0deg at 50% 50%, transparent 0deg, transparent 220deg, #f43f5e 270deg, #fb7185 320deg, #e11d48 360deg)'
+                  : 'conic-gradient(from 0deg at 50% 50%, transparent 0deg, transparent 220deg, #06b6d4 270deg, #10b981 320deg, #f59e0b 360deg)';
+
+                if (isLatest) {
                   return (
-                    <div
-                      key={t.id || idx}
-                      className={`p-3.5 rounded-xl border transition-all flex items-center justify-between relative overflow-hidden ${
-                        isLatest
-                          ? 'bg-gradient-to-r from-[#08221A]/90 via-[#0C2B22]/80 to-[#0D1220]/90 border-emerald-400/60 shadow-[0_0_20px_rgba(16,185,129,0.25)] ring-1 ring-emerald-400/30'
-                          : 'bg-[#0D1220] border-white/10 hover:border-emerald-500/30'
-                      }`}
-                    >
-                      {/* Latest Execution Floating Badge */}
-                      {isLatest && (
+                    <div key={t.id || idx} className="relative p-[1.5px] rounded-xl overflow-hidden shadow-lg group">
+                      {/* Rotating Laser Light Beam running specifically around Latest Trade Card */}
+                      <div 
+                        className="absolute -inset-[150%] animate-spin-slow opacity-100 pointer-events-none"
+                        style={{ background: laserGradient }}
+                      />
+
+                      {/* Inner Latest Trade Card */}
+                      <div className={`relative p-3.5 rounded-[10px] flex items-center justify-between overflow-hidden ${
+                        isWin
+                          ? 'bg-gradient-to-r from-[#061D16] via-[#09261E] to-[#070A12]'
+                          : isLoss
+                          ? 'bg-gradient-to-r from-[#24080F] via-[#2D0B13] to-[#070A12]'
+                          : 'bg-[#0D1220]'
+                      }`}>
+                        {/* Floating Badge */}
                         <div className="absolute top-0 right-0">
-                          <span className="px-2 py-0.5 text-[8.5px] font-black font-mono tracking-widest bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400 text-slate-950 rounded-bl-lg uppercase flex items-center gap-1 shadow-sm">
+                          <span className={`px-2 py-0.5 text-[8.5px] font-black font-mono tracking-widest rounded-bl-lg uppercase flex items-center gap-1 shadow-sm ${
+                            isWin
+                              ? 'bg-emerald-400 text-slate-950'
+                              : isLoss
+                              ? 'bg-rose-500 text-white'
+                              : 'bg-cyan-400 text-slate-950'
+                          }`}>
                             <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-ping"></span>
                             LATEST EXECUTION
                           </span>
                         </div>
-                      )}
 
-                      <div className="flex items-center gap-3">
-                        <div className={`w-8.5 h-8.5 rounded-lg border flex items-center justify-center shrink-0 ${
-                          isWin
-                            ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
-                            : isLoss
-                            ? 'bg-rose-500/20 border-rose-500/40 text-rose-300'
-                            : 'bg-slate-800 border-slate-700 text-slate-400'
-                        }`}>
-                          {isWin ? <TrendingUp className="w-4 h-4 stroke-[2.5]" /> : <TrendingDown className="w-4 h-4 stroke-[2.5]" />}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-1.5">
-                            <h4 className="text-sm font-bold text-white font-sans">{t.symbol}</h4>
-                            {isLatest && (
-                              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.9)]"></span>
-                            )}
+                        <div className="flex items-center gap-3">
+                          <div className={`w-8.5 h-8.5 rounded-lg border flex items-center justify-center shrink-0 ${
+                            isWin
+                              ? 'bg-emerald-500/20 border-emerald-400/50 text-emerald-300 shadow-md shadow-emerald-500/20'
+                              : isLoss
+                              ? 'bg-rose-500/20 border-rose-400/50 text-rose-300 shadow-md shadow-rose-500/20'
+                              : 'bg-slate-800 border-slate-700 text-slate-400'
+                          }`}>
+                            {isWin ? <TrendingUp className="w-4 h-4 stroke-[2.5]" /> : <TrendingDown className="w-4 h-4 stroke-[2.5]" />}
                           </div>
-                          <span className="text-[11px] text-slate-400 font-sans">{t.strategy_name || t.trade_type}</span>
+                          <div>
+                            <div className="flex items-center gap-1.5">
+                              <h4 className="text-sm font-bold text-white font-sans">{t.symbol}</h4>
+                              <span className={`w-2 h-2 rounded-full animate-pulse ${
+                                isWin ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.9)]' : 'bg-rose-400 shadow-[0_0_8px_rgba(244,63,94,0.9)]'
+                              }`}></span>
+                            </div>
+                            <span className="text-[11px] text-slate-300 font-sans">{t.strategy_name || t.trade_type}</span>
+                          </div>
                         </div>
-                      </div>
 
-                      <div className={`text-right ${isLatest ? 'pt-2' : ''}`}>
-                        <div className={`text-sm font-extrabold ${isWin ? 'text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.4)]' : isLoss ? 'text-rose-400' : 'text-slate-400'}`}>
-                          {isWin ? '+' : ''}${Number(t.net_pnl).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                        <div className="text-right pt-2">
+                          <div className={`text-sm font-extrabold ${isWin ? 'text-emerald-400 drop-shadow-[0_0_10px_rgba(52,211,153,0.5)]' : isLoss ? 'text-rose-400 drop-shadow-[0_0_10px_rgba(244,63,94,0.5)]' : 'text-slate-400'}`}>
+                            {isWin ? '+' : ''}${Number(t.net_pnl).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                          </div>
+                          <span className="text-[10px] text-slate-400 font-sans">{dateFormatted}</span>
                         </div>
-                        <span className="text-[10px] text-slate-400 font-sans">{dateFormatted}</span>
                       </div>
                     </div>
                   );
-                })
-              ) : (
-                <div className="py-8 text-center text-slate-500 text-xs font-mono">
-                  No trades in history. Click "+ Log New Trade" above to add your first execution!
-                </div>
-              )}
-            </div>
+                }
+
+                return (
+                  <div
+                    key={t.id || idx}
+                    className="p-3.5 rounded-xl border bg-[#0D1220] border-white/10 hover:border-emerald-500/30 transition-all flex items-center justify-between"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-8.5 h-8.5 rounded-lg border flex items-center justify-center shrink-0 ${
+                        isWin
+                          ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
+                          : isLoss
+                          ? 'bg-rose-500/20 border-rose-500/40 text-rose-300'
+                          : 'bg-slate-800 border-slate-700 text-slate-400'
+                      }`}>
+                        {isWin ? <TrendingUp className="w-4 h-4 stroke-[2.5]" /> : <TrendingDown className="w-4 h-4 stroke-[2.5]" />}
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-bold text-white font-sans">{t.symbol}</h4>
+                        <span className="text-[11px] text-slate-400 font-sans">{t.strategy_name || t.trade_type}</span>
+                      </div>
+                    </div>
+
+                    <div className="text-right">
+                      <div className={`text-sm font-extrabold ${isWin ? 'text-emerald-400' : isLoss ? 'text-rose-400' : 'text-slate-400'}`}>
+                        {isWin ? '+' : ''}${Number(t.net_pnl).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      </div>
+                      <span className="text-[10px] text-slate-400 font-sans">{dateFormatted}</span>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="py-8 text-center text-slate-500 text-xs font-mono">
+                No trades in history. Click "+ Log New Trade" above to add your first execution!
+              </div>
+            )}
           </div>
         </div>
 
