@@ -215,21 +215,21 @@ export default function DashboardOverview({ analytics, trades = [] }) {
   return (
     <div className="space-y-6 font-sans">
 
-      {/* 1. 4 Large Executive Glassmorphic Banners (Total PnL, RRR, Profit Factor, Execution Health) */}
+      {/* 1. 4 Primary Executive KPI Cards Grid (Fixed RRR formatting & Clean Padding) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 font-mono">
 
-        {/* Total Net PnL Banner (Matching Top Strategy Card Design) */}
+        {/* Card 1: Total Net Portfolio PnL */}
         <AntigravityCard
           bloomColor={isNetPositive ? 'emerald' : 'rose'}
-          className={`bg-gradient-to-r ${isNetPositive ? 'from-[#071F17]/90 via-[#0A261D]/80 to-[#0A0E17]/90 border-emerald-500/40' : 'from-[#29080F]/90 via-[#2E0B12]/80 to-[#0A0E17]/90 border-rose-500/40'} border rounded-2xl p-4 sm:p-5 backdrop-blur-2xl flex items-center justify-between shadow-xl`}
+          className={`bg-gradient-to-r ${isNetPositive ? 'from-[#071F17]/90 via-[#0A261D]/80 to-[#0A0E17]/90 border-emerald-500/40' : 'from-[#29080F]/90 via-[#2E0B12]/80 to-[#0A0E17]/90 border-rose-500/40'} border rounded-2xl p-4.5 backdrop-blur-2xl flex items-center justify-between shadow-xl`}
         >
           <div className="flex items-center gap-3.5">
             <div className={`w-11 h-11 rounded-2xl border flex items-center justify-center shadow-md shrink-0 ${isNetPositive ? 'bg-emerald-500/20 border-emerald-400/40 text-emerald-300 shadow-emerald-500/20' : 'bg-rose-500/20 border-rose-400/40 text-rose-300 shadow-rose-500/20'}`}>
               <DollarSign className="w-5.5 h-5.5 stroke-[2.2]" />
             </div>
             <div>
-              <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest font-mono">
-                TOTAL NET PORTFOLIO P&L
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">
+                PORTFOLIO NET P&L
               </span>
               <h3 className={`text-xl sm:text-2xl font-black tracking-tight mt-0.5 ${isNetPositive ? 'text-emerald-400 drop-shadow-[0_0_15px_rgba(52,211,153,0.5)]' : 'text-rose-400 drop-shadow-[0_0_15px_rgba(244,63,94,0.5)]'}`}>
                 {isNetPositive ? '+' : ''}${overview.total_net_pnl.toLocaleString('en-US', { minimumFractionDigits: 2 })}
@@ -237,74 +237,74 @@ export default function DashboardOverview({ analytics, trades = [] }) {
             </div>
           </div>
 
-          <div className="text-right font-mono text-xs text-slate-400 space-y-0.5">
+          <div className="text-right font-mono text-[11px] text-slate-400 space-y-0.5">
             <div className="text-emerald-400 font-bold">Gross: +${overview.total_gross_pnl.toLocaleString()}</div>
             <div className="text-slate-500">Fees: ${overview.total_fees.toLocaleString()}</div>
           </div>
         </AntigravityCard>
 
-        {/* Average Risk to Reward Ratio (RRR) Large Box */}
+        {/* Card 2: Average Risk to Reward Ratio (Fixed decimal format) */}
         <AntigravityCard
           bloomColor="sky"
-          className="bg-gradient-to-r from-[#081829]/90 via-[#0C223A]/80 to-[#0A0E17]/90 border border-sky-500/40 rounded-2xl p-4 sm:p-5 backdrop-blur-2xl flex items-center justify-between shadow-xl"
+          className="bg-gradient-to-r from-[#081829]/90 via-[#0C223A]/80 to-[#0A0E17]/90 border border-sky-500/40 rounded-2xl p-4.5 backdrop-blur-2xl flex items-center justify-between shadow-xl"
         >
           <div className="flex items-center gap-3.5">
             <div className="w-11 h-11 rounded-2xl bg-sky-500/20 border border-sky-400/40 flex items-center justify-center text-sky-300 shadow-md shadow-sky-500/20 shrink-0">
               <Target className="w-5.5 h-5.5 stroke-[2.2]" />
             </div>
             <div>
-              <span className="text-[11px] font-black text-sky-400 uppercase tracking-widest font-mono">
-                AVG RISK : REWARD (RRR)
+              <span className="text-[10px] font-black text-sky-400 uppercase tracking-widest block">
+                AVG RISK : REWARD
               </span>
               <h3 className="text-xl sm:text-2xl font-black text-sky-300 tracking-tight mt-0.5 drop-shadow-[0_0_15px_rgba(56,189,248,0.5)]">
-                1:{overview.avg_rrr}
+                1 : {Number(overview.avg_rrr || 1.5).toFixed(2)}
               </h3>
             </div>
           </div>
 
-          <div className="text-right font-mono text-xs text-slate-400 space-y-0.5">
+          <div className="text-right font-mono text-[11px] text-slate-400 space-y-0.5">
             <div className="text-sky-300 font-bold">Expectancy: ${overview.expectancy}</div>
             <div className="text-slate-400">{overview.win_rate}% Win Rate</div>
           </div>
         </AntigravityCard>
 
-        {/* Profit Factor Large Box */}
+        {/* Card 3: Profit Factor */}
         <AntigravityCard
           bloomColor="purple"
-          className="bg-gradient-to-r from-[#140A24]/90 via-[#1F1038]/80 to-[#0A0E17]/90 border border-purple-500/40 rounded-2xl p-4 sm:p-5 backdrop-blur-2xl flex items-center justify-between shadow-xl"
+          className="bg-gradient-to-r from-[#140A24]/90 via-[#1F1038]/80 to-[#0A0E17]/90 border border-purple-500/40 rounded-2xl p-4.5 backdrop-blur-2xl flex items-center justify-between shadow-xl"
         >
           <div className="flex items-center gap-3.5">
             <div className="w-11 h-11 rounded-2xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-purple-300 shadow-md shadow-purple-500/20 shrink-0">
               <Scale className="w-5.5 h-5.5 stroke-[2.2]" />
             </div>
             <div>
-              <span className="text-[11px] font-black text-purple-400 uppercase tracking-widest font-mono">
+              <span className="text-[10px] font-black text-purple-400 uppercase tracking-widest block">
                 PROFIT FACTOR
               </span>
               <h3 className="text-xl sm:text-2xl font-black text-purple-300 tracking-tight mt-0.5 drop-shadow-[0_0_15px_rgba(192,132,252,0.5)]">
-                {overview.profit_factor}
+                {Number(overview.profit_factor || 0).toFixed(2)}
               </h3>
             </div>
           </div>
 
-          <div className="text-right font-mono text-xs text-slate-400 space-y-0.5">
+          <div className="text-right font-mono text-[11px] text-slate-400 space-y-0.5">
             <div className="text-emerald-400 font-bold">+${overview.total_profit.toLocaleString()}</div>
             <div className="text-rose-400">-${overview.total_loss.toLocaleString()}</div>
           </div>
         </AntigravityCard>
 
-        {/* Total Executed Trades Large Box */}
+        {/* Card 4: Total Executed Trades */}
         <AntigravityCard
           bloomColor="amber"
-          className="bg-gradient-to-r from-[#1C1307]/90 via-[#2B1D0B]/80 to-[#0A0E17]/90 border border-amber-500/40 rounded-2xl p-4 sm:p-5 backdrop-blur-2xl flex items-center justify-between shadow-xl"
+          className="bg-gradient-to-r from-[#1C1307]/90 via-[#2B1D0B]/80 to-[#0A0E17]/90 border border-amber-500/40 rounded-2xl p-4.5 backdrop-blur-2xl flex items-center justify-between shadow-xl"
         >
           <div className="flex items-center gap-3.5">
             <div className="w-11 h-11 rounded-2xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-300 shadow-md shadow-amber-500/20 shrink-0">
               <Hash className="w-5.5 h-5.5 stroke-[2.2]" />
             </div>
             <div>
-              <span className="text-[11px] font-black text-amber-400 uppercase tracking-widest font-mono">
-                EXECUTED TRADES
+              <span className="text-[10px] font-black text-amber-400 uppercase tracking-widest block">
+                TOTAL EXECUTIONS
               </span>
               <h3 className="text-xl sm:text-2xl font-black text-amber-300 tracking-tight mt-0.5 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]">
                 {overview.closed_trades} Trades
@@ -312,7 +312,7 @@ export default function DashboardOverview({ analytics, trades = [] }) {
             </div>
           </div>
 
-          <div className="text-right font-mono text-xs text-slate-400 space-y-0.5">
+          <div className="text-right font-mono text-[11px] text-slate-400 space-y-0.5">
             <div className="text-emerald-400 font-bold">{overview.win_count} Wins</div>
             <div className="text-rose-400">{overview.loss_count} Losses</div>
           </div>
@@ -369,8 +369,8 @@ export default function DashboardOverview({ analytics, trades = [] }) {
 
       </div>
 
-      {/* Dynamic Side-by-Side Performance Banners (Best & Worst Strategies & Assets) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* 3. Ultra-Clean Side-by-Side Leaderboard Matrix (2x2 Grid) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono">
 
         {/* Top Performing Strategy */}
         <AntigravityCard
@@ -382,16 +382,16 @@ export default function DashboardOverview({ analytics, trades = [] }) {
               <Trophy className="w-5.5 h-5.5 stroke-[2]" />
             </div>
             <div>
-              <span className="text-[11px] font-black text-emerald-400 uppercase tracking-widest font-mono">
+              <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest block">
                 TOP PERFORMING STRATEGY
               </span>
-              <h4 className="text-base sm:text-lg font-black text-white mt-0.5 font-mono tracking-wide">
+              <h4 className="text-base sm:text-lg font-black text-white mt-0.5 tracking-wide">
                 {best_strategy ? best_strategy.strategy_name : 'N/A'}
               </h4>
             </div>
           </div>
 
-          <div className="text-right font-mono">
+          <div className="text-right">
             <div className="text-lg sm:text-xl font-black text-emerald-400 drop-shadow-[0_0_10px_rgba(52,211,153,0.4)]">
               {best_strategy ? `${best_strategy.total_net_pnl >= 0 ? '+' : ''}$${best_strategy.total_net_pnl.toLocaleString('en-US', { minimumFractionDigits: 2 })}` : '$0.00'}
             </div>
@@ -411,16 +411,16 @@ export default function DashboardOverview({ analytics, trades = [] }) {
               <AlertTriangle className="w-5.5 h-5.5 stroke-[2]" />
             </div>
             <div>
-              <span className="text-[11px] font-black text-rose-400 uppercase tracking-widest font-mono">
+              <span className="text-[10px] font-black text-rose-400 uppercase tracking-widest block">
                 LOWEST PERFORMING STRATEGY
               </span>
-              <h4 className="text-base sm:text-lg font-black text-white mt-0.5 font-mono tracking-wide">
+              <h4 className="text-base sm:text-lg font-black text-white mt-0.5 tracking-wide">
                 {worst_strategy ? worst_strategy.strategy_name : 'N/A'}
               </h4>
             </div>
           </div>
 
-          <div className="text-right font-mono">
+          <div className="text-right">
             <div className={`text-lg sm:text-xl font-black ${worst_strategy && worst_strategy.total_net_pnl < 0 ? 'text-rose-400 drop-shadow-[0_0_10px_rgba(244,63,94,0.4)]' : 'text-slate-300'}`}>
               {worst_strategy ? `${worst_strategy.total_net_pnl >= 0 ? '+' : ''}$${worst_strategy.total_net_pnl.toLocaleString('en-US', { minimumFractionDigits: 2 })}` : '$0.00'}
             </div>
@@ -441,22 +441,22 @@ export default function DashboardOverview({ analytics, trades = [] }) {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[11px] font-black text-teal-400 uppercase tracking-widest font-mono">
+                <span className="text-[10px] font-black text-teal-400 uppercase tracking-widest block">
                   BEST PERFORMING ASSET
                 </span>
                 {computedBestAsset && computedBestAsset.price > 0 && (
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-teal-500/20 text-teal-300 font-bold border border-teal-500/30">
-                    Price: ${Number(computedBestAsset.price).toLocaleString()}
+                    ${Number(computedBestAsset.price).toLocaleString()}
                   </span>
                 )}
               </div>
-              <h4 className="text-base sm:text-lg font-black text-white mt-0.5 font-mono tracking-wide">
+              <h4 className="text-base sm:text-lg font-black text-white mt-0.5 tracking-wide">
                 {computedBestAsset ? computedBestAsset.name : 'N/A'}
               </h4>
             </div>
           </div>
 
-          <div className="text-right font-mono">
+          <div className="text-right">
             <div className="text-lg sm:text-xl font-black text-teal-300 drop-shadow-[0_0_10px_rgba(45,212,191,0.4)]">
               {computedBestAsset ? `${computedBestAsset.pnl >= 0 ? '+' : ''}$${Number(computedBestAsset.pnl).toLocaleString('en-US', { minimumFractionDigits: 2 })}` : '$0.00'}
             </div>
@@ -477,22 +477,22 @@ export default function DashboardOverview({ analytics, trades = [] }) {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[11px] font-black text-rose-400 uppercase tracking-widest font-mono">
+                <span className="text-[10px] font-black text-rose-400 uppercase tracking-widest block">
                   LOWEST PERFORMING ASSET
                 </span>
                 {computedWorstAsset && computedWorstAsset.price > 0 && (
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-300 font-bold border border-rose-500/30">
-                    Price: ${Number(computedWorstAsset.price).toLocaleString()}
+                    ${Number(computedWorstAsset.price).toLocaleString()}
                   </span>
                 )}
               </div>
-              <h4 className="text-base sm:text-lg font-black text-white mt-0.5 font-mono tracking-wide">
+              <h4 className="text-base sm:text-lg font-black text-white mt-0.5 tracking-wide">
                 {computedWorstAsset ? computedWorstAsset.name : 'N/A'}
               </h4>
             </div>
           </div>
 
-          <div className="text-right font-mono">
+          <div className="text-right">
             <div className={`text-lg sm:text-xl font-black ${computedWorstAsset && computedWorstAsset.pnl < 0 ? 'text-rose-400 drop-shadow-[0_0_10px_rgba(244,63,94,0.4)]' : 'text-slate-300'}`}>
               {computedWorstAsset ? `${computedWorstAsset.pnl >= 0 ? '+' : ''}$${Number(computedWorstAsset.pnl).toLocaleString('en-US', { minimumFractionDigits: 2 })}` : '$0.00'}
             </div>
