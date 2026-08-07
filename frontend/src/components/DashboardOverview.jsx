@@ -709,15 +709,15 @@ export default function DashboardOverview({ analytics, trades = [] }) {
         {/* Dynamic Semicircle Speedometer Gauge */}
         <div className="bg-[#080C16] border border-white/10 rounded-2xl p-5 shadow-xl flex flex-col justify-between text-center relative overflow-hidden">
           <div className="flex items-center justify-between pb-3 border-b border-white/10">
-            <h3 className="text-lg font-bold font-mono text-white tracking-wide">
+            <h3 className="text-base font-bold font-mono text-white tracking-wide">
               Win Rate Accuracy
             </h3>
-            <span className="text-xs font-mono text-emerald-400 font-bold">Speedometer</span>
+            <span className="text-xs font-mono text-emerald-400 font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30">Speedometer</span>
           </div>
 
           {/* Semicircle Speedometer SVG */}
           <div className="relative py-4 flex flex-col items-center justify-center my-auto">
-            <svg width="200" height="110" viewBox="0 0 160 90" className="overflow-visible">
+            <svg width="210" height="115" viewBox="0 0 160 90" className="overflow-visible">
               <path
                 d="M 15 80 A 65 65 0 0 1 145 80"
                 fill="none"
@@ -728,21 +728,28 @@ export default function DashboardOverview({ analytics, trades = [] }) {
               <path
                 d="M 15 80 A 65 65 0 0 1 145 80"
                 fill="none"
-                stroke="#10B981"
+                stroke="url(#speedometerGrad)"
                 strokeWidth={strokeWidth}
                 strokeLinecap="round"
                 strokeDasharray={circumference}
                 strokeDashoffset={strokeDashoffset}
-                className="transition-all duration-1000 ease-out"
+                className="transition-all duration-1000 ease-out drop-shadow-[0_0_12px_rgba(16,185,129,0.6)]"
               />
+              <defs>
+                <linearGradient id="speedometerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#10b981" />
+                  <stop offset="50%" stopColor="#22d3ee" />
+                  <stop offset="100%" stopColor="#38bdf8" />
+                </linearGradient>
+              </defs>
             </svg>
 
-            <div className="absolute top-[50px] flex flex-col items-center">
-              <span className="text-3xl font-black font-mono text-cyan-400 tracking-tight">
+            <div className="absolute top-[48px] flex flex-col items-center">
+              <span className="text-3xl font-black font-mono text-cyan-300 tracking-tight drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]">
                 {overview.win_rate}%
               </span>
-              <span className="text-xs font-mono text-slate-400 font-semibold uppercase mt-0.5">
-                EXECUTION EDGE
+              <span className="text-[11px] font-sans text-slate-300 font-bold tracking-wide mt-0.5">
+                Execution Edge
               </span>
             </div>
           </div>
@@ -756,7 +763,7 @@ export default function DashboardOverview({ analytics, trades = [] }) {
       </div>
 
       {/* ========================================================================= */}
-      {/* 5. STRATEGY RANKINGS & LIVE RECENT EXECUTIONS FEED (100% PRESERVED) */}
+      {/* 5. STRATEGY RANKINGS & LIVE RECENT EXECUTIONS FEED */}
       {/* ========================================================================= */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
@@ -790,7 +797,7 @@ export default function DashboardOverview({ analytics, trades = [] }) {
                   >
                     <div className="flex justify-between items-center text-xs font-semibold text-slate-300 font-mono mb-1">
                       <div className="flex items-center gap-1.5">
-                        <span>{strat.strategy_name} ({strat.trades_count} trades)</span>
+                        <span className="font-sans font-medium text-slate-200">{strat.strategy_name} ({strat.trades_count} trades)</span>
                         {isLatestStrategy && (
                           <span className="px-1.5 py-0.5 text-[8px] font-black bg-cyan-400 text-slate-950 rounded uppercase tracking-wider flex items-center gap-0.5 shadow-sm">
                             <Sparkles className="w-2.5 h-2.5 text-slate-950" />
@@ -824,77 +831,91 @@ export default function DashboardOverview({ analytics, trades = [] }) {
           </div>
         </div>
 
-        {/* Dynamic Recent Trades Stream Feed */}
-        <div className="bg-[#080C16] border border-white/10 rounded-2xl p-5 shadow-xl space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-white/10">
-            <h3 className="text-lg font-bold font-mono text-white tracking-wide flex items-center gap-2">
-              <Clock className="w-5 h-5 text-amber-400" />
-              <span>Recent Executions Log</span>
-            </h3>
-            <span className="text-xs font-mono text-slate-400 font-medium">Live Feed</span>
-          </div>
+        {/* Dynamic Recent Trades Stream Feed Card with Running Neon Light Beam Border */}
+        <div className="relative p-[1.5px] rounded-2xl overflow-hidden shadow-2xl shadow-emerald-500/20 group">
+          
+          {/* Continuous Running Thin Laser Light Beam around Card */}
+          <div 
+            className="absolute -inset-[150%] animate-spin-slow opacity-100 pointer-events-none"
+            style={{
+              background: 'conic-gradient(from 0deg at 50% 50%, transparent 0deg, transparent 230deg, #10b981 280deg, #06b6d4 320deg, #f59e0b 360deg)'
+            }}
+          />
 
-          <div className="space-y-2.5 pt-1 font-mono">
-            {recentTrades.length > 0 ? (
-              recentTrades.map((t, idx) => {
-                const isLatest = idx === 0;
-                const isWin = t.net_pnl > 0;
-                const isLoss = t.net_pnl < 0;
-                const dateFormatted = new Date(t.entry_time).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                return (
-                  <div
-                    key={t.id || idx}
-                    className={`p-3.5 rounded-xl border transition-all flex items-center justify-between relative overflow-hidden ${
-                      isLatest
-                        ? 'bg-gradient-to-r from-[#08221A]/90 via-[#0C2B22]/80 to-[#0D1220]/90 border-emerald-400/60 shadow-[0_0_20px_rgba(16,185,129,0.25)] ring-1 ring-emerald-400/30'
-                        : 'bg-[#0D1220] border-white/10 hover:border-emerald-500/30'
-                    }`}
-                  >
-                    {/* Latest Execution Floating Badge */}
-                    {isLatest && (
-                      <div className="absolute top-0 right-0">
-                        <span className="px-2 py-0.5 text-[8.5px] font-black font-mono tracking-widest bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400 text-slate-950 rounded-bl-lg uppercase flex items-center gap-1 shadow-sm">
-                          <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-ping"></span>
-                          LATEST EXECUTION
-                        </span>
-                      </div>
-                    )}
+          {/* Inner Card Screen */}
+          <div className="relative p-5 rounded-[15px] bg-[#080C16] space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+              <h3 className="text-lg font-bold font-mono text-white tracking-wide flex items-center gap-2">
+                <Clock className="w-5 h-5 text-amber-400" />
+                <span>Recent Executions Log</span>
+              </h3>
+              <span className="text-xs font-mono text-emerald-400 font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/30">
+                LIVE FEED
+              </span>
+            </div>
 
-                    <div className="flex items-center gap-3">
-                      <div className={`w-8.5 h-8.5 rounded-lg border flex items-center justify-center shrink-0 ${
-                        isWin
-                          ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
-                          : isLoss
-                          ? 'bg-rose-500/20 border-rose-500/40 text-rose-300'
-                          : 'bg-slate-800 border-slate-700 text-slate-400'
-                      }`}>
-                        {isWin ? <TrendingUp className="w-4 h-4 stroke-[2.5]" /> : <TrendingDown className="w-4 h-4 stroke-[2.5]" />}
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-1.5">
-                          <h4 className="text-sm font-bold text-white">{t.symbol}</h4>
-                          {isLatest && (
-                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.9)]"></span>
-                          )}
+            <div className="space-y-2.5 pt-1 font-mono">
+              {recentTrades.length > 0 ? (
+                recentTrades.map((t, idx) => {
+                  const isLatest = idx === 0;
+                  const isWin = t.net_pnl > 0;
+                  const isLoss = t.net_pnl < 0;
+                  const dateFormatted = new Date(t.entry_time).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                  return (
+                    <div
+                      key={t.id || idx}
+                      className={`p-3.5 rounded-xl border transition-all flex items-center justify-between relative overflow-hidden ${
+                        isLatest
+                          ? 'bg-gradient-to-r from-[#08221A]/90 via-[#0C2B22]/80 to-[#0D1220]/90 border-emerald-400/60 shadow-[0_0_20px_rgba(16,185,129,0.25)] ring-1 ring-emerald-400/30'
+                          : 'bg-[#0D1220] border-white/10 hover:border-emerald-500/30'
+                      }`}
+                    >
+                      {/* Latest Execution Floating Badge */}
+                      {isLatest && (
+                        <div className="absolute top-0 right-0">
+                          <span className="px-2 py-0.5 text-[8.5px] font-black font-mono tracking-widest bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400 text-slate-950 rounded-bl-lg uppercase flex items-center gap-1 shadow-sm">
+                            <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-ping"></span>
+                            LATEST EXECUTION
+                          </span>
                         </div>
-                        <span className="text-[11px] text-slate-400">{t.strategy_name || t.trade_type}</span>
-                      </div>
-                    </div>
+                      )}
 
-                    <div className={`text-right ${isLatest ? 'pt-2' : ''}`}>
-                      <div className={`text-sm font-extrabold ${isWin ? 'text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.4)]' : isLoss ? 'text-rose-400' : 'text-slate-400'}`}>
-                        {isWin ? '+' : ''}${Number(t.net_pnl).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      <div className="flex items-center gap-3">
+                        <div className={`w-8.5 h-8.5 rounded-lg border flex items-center justify-center shrink-0 ${
+                          isWin
+                            ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
+                            : isLoss
+                            ? 'bg-rose-500/20 border-rose-500/40 text-rose-300'
+                            : 'bg-slate-800 border-slate-700 text-slate-400'
+                        }`}>
+                          {isWin ? <TrendingUp className="w-4 h-4 stroke-[2.5]" /> : <TrendingDown className="w-4 h-4 stroke-[2.5]" />}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <h4 className="text-sm font-bold text-white font-sans">{t.symbol}</h4>
+                            {isLatest && (
+                              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.9)]"></span>
+                            )}
+                          </div>
+                          <span className="text-[11px] text-slate-400 font-sans">{t.strategy_name || t.trade_type}</span>
+                        </div>
                       </div>
-                      <span className="text-[10px] text-slate-400">{dateFormatted}</span>
+
+                      <div className={`text-right ${isLatest ? 'pt-2' : ''}`}>
+                        <div className={`text-sm font-extrabold ${isWin ? 'text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.4)]' : isLoss ? 'text-rose-400' : 'text-slate-400'}`}>
+                          {isWin ? '+' : ''}${Number(t.net_pnl).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                        </div>
+                        <span className="text-[10px] text-slate-400 font-sans">{dateFormatted}</span>
+                      </div>
                     </div>
-                  </div>
-                );
-              })
-            ) : (
-              <div className="py-8 text-center text-slate-500 text-xs font-mono">
-                No trades in history. Click "+ Log New Trade" above to add your first execution!
-              </div>
-            )}
+                  );
+                })
+              ) : (
+                <div className="py-8 text-center text-slate-500 text-xs font-mono">
+                  No trades in history. Click "+ Log New Trade" above to add your first execution!
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
