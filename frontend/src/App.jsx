@@ -8,6 +8,8 @@ import TradeFormModal from './components/TradeFormModal';
 import TradeDetailModal from './components/TradeDetailModal';
 import StrategyManagerModal from './components/StrategyManagerModal';
 import AuthScreen from './components/AuthScreen';
+import LandingPage from './components/LandingPage';
+import QuantumLoadingScreen from './components/QuantumLoadingScreen';
 
 import { 
   getTrades, 
@@ -326,10 +328,7 @@ export default function App() {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 space-y-6">
         
         {loading && !analytics ? (
-          <div className="py-20 text-center text-slate-500 space-y-2">
-            <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-            <p className="text-xs font-mono text-emerald-400">Connecting to TradeTrack PRO Secure Cloud Server...</p>
-          </div>
+          <QuantumLoadingScreen />
         ) : (
           <>
             {/* View Tab 1: Dashboard Overview */}

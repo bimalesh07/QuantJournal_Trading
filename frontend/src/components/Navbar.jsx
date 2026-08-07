@@ -65,32 +65,31 @@ export default function Navbar({
   };
 
   return (
-    <header className="sticky top-0 z-30 px-2 sm:px-6 lg:px-8 py-2 sm:py-3 transition-all">
+    <header className="sticky top-0 z-40 w-full backdrop-blur-2xl bg-[#070A14]/95 border-b border-white/15 px-4 sm:px-8 py-3 shadow-2xl transition-all relative">
+      {/* Glowing Bottom Border Gradient Accent */}
+      <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent"></div>
+
       <div 
         ref={navRef}
         onMouseMove={handleMouseMove}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={handleMouseLeave}
-        style={{
-          transform: isHovered 
-            ? `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-2px)` 
-            : 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)',
-          transition: isHovered 
-            ? 'transform 0.08s ease-out, box-shadow 0.3s ease' 
-            : 'transform 0.5s ease-out, box-shadow 0.5s ease',
-        }}
-        className="w-full max-w-[1550px] mx-auto aerogel-surface rounded-2xl md:rounded-full p-2.5 sm:px-6 sm:py-2.5 border border-white/10 shadow-2xl backdrop-blur-2xl bg-[#090D16]/90 flex flex-col md:flex-row md:items-center md:justify-between gap-2.5 md:gap-3 relative overflow-hidden group"
+        className="w-full max-w-[1750px] mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-3 relative"
       >
-        {/* Diamond-cut edge shimmer */}
-        <div className="shimmer-edge"></div>
 
         {/* 1. Brand Identity & Action Controls Row on Mobile */}
         <div className="flex items-center justify-between w-full md:w-auto shrink-0 gap-2">
           
-          {/* Brand Logo */}
+          {/* Brand Logo with Rotating Neon Beam */}
           <div className="flex items-center space-x-2 sm:space-x-3 cursor-pointer" onClick={() => setActiveTab('dashboard')}>
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-tr from-emerald-500 via-teal-400 to-cyan-400 p-[1.5px] shadow-lg shadow-emerald-500/30 group/orb relative overflow-hidden shrink-0">
-              <div className="w-full h-full bg-[#070A12] rounded-full flex items-center justify-center group-hover/orb:bg-transparent transition-colors">
+            <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full p-[2px] overflow-hidden shadow-lg shadow-emerald-500/30 group/orb shrink-0">
+              <div 
+                className="absolute -inset-[150%] animate-spin-slow opacity-100 pointer-events-none"
+                style={{
+                  background: 'conic-gradient(from 0deg at 50% 50%, transparent 0deg, transparent 220deg, #06b6d4 270deg, #10b981 320deg, #f59e0b 360deg)'
+                }}
+              />
+              <div className="relative w-full h-full bg-[#070A12] rounded-full flex items-center justify-center group-hover/orb:bg-transparent transition-colors">
                 <TrendingUp className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-emerald-400 group-hover/orb:text-slate-950 font-black transition-colors stroke-[2.2]" />
               </div>
             </div>
@@ -101,9 +100,17 @@ export default function Navbar({
                   Trade<span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">Track</span>
                 </span>
 
-                <span className="px-2 py-0.5 text-[9px] sm:text-[10px] font-black tracking-widest bg-gradient-to-r from-purple-500/20 via-emerald-500/20 to-cyan-500/20 text-emerald-300 border border-emerald-400/40 rounded-full font-mono uppercase shadow-sm">
-                  PRO
-                </span>
+                <div className="relative p-[1px] rounded-full overflow-hidden shadow-sm shadow-emerald-500/20">
+                  <div 
+                    className="absolute -inset-[150%] animate-spin-slow opacity-100 pointer-events-none"
+                    style={{
+                      background: 'conic-gradient(from 0deg at 50% 50%, transparent 0deg, transparent 200deg, #06b6d4 260deg, #10b981 310deg, #f59e0b 360deg)'
+                    }}
+                  />
+                  <span className="relative px-2 py-0.5 text-[9px] sm:text-[10px] font-black tracking-widest bg-[#070A12] text-emerald-300 rounded-full font-mono uppercase block">
+                    PRO
+                  </span>
+                </div>
               </div>
 
               <p className="text-[9.5px] sm:text-[11px] text-slate-400 flex items-center gap-1 mt-0.5 font-mono font-medium whitespace-nowrap">

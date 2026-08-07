@@ -131,6 +131,20 @@ select option:checked {
   animation: shimmerPass 1.2s ease-in-out infinite;
 }
 
+/* Rotating Neon Running Border Beam */
+@keyframes borderSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: borderSpin 4s linear infinite;
+}
+
 /* ========================================================= */
 /* COMPREHENSIVE LIGHT THEME OVERRIDES (Pristine Light Mode) */
 /* ========================================================= */
