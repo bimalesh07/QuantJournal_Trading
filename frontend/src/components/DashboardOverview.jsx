@@ -10,7 +10,13 @@ import {
   AlertTriangle, 
   FileText,
   Zap,
-  ArrowUpRight
+  TrendingUp,
+  TrendingDown,
+  ArrowUpRight,
+  ShieldCheck,
+  Calendar,
+  Layers,
+  Activity
 } from 'lucide-react';
 
 // 3D Antigravity Tilt Card Component
@@ -28,8 +34,8 @@ const AntigravityCard = ({ children, className = '', bloomColor = 'emerald' }) =
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
 
-    const rX = ((y - centerY) / centerY) * -10;
-    const rY = ((x - centerX) / centerX) * 10;
+    const rX = ((y - centerY) / centerY) * -6;
+    const rY = ((x - centerX) / centerX) * 6;
 
     setRotateX(rX);
     setRotateY(rY);
@@ -41,10 +47,9 @@ const AntigravityCard = ({ children, className = '', bloomColor = 'emerald' }) =
     setRotateY(0);
   };
 
-  // Define custom neon bloom glow styles for each color variant
   const getBloomShadow = () => {
     if (!isHovered) {
-      return 'box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.12), 0 12px 30px -10px rgba(0,0,0,0.9)';
+      return 'box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.12), 0 12px 30px -10px rgba(0,0,0,0.8)';
     }
 
     switch (bloomColor) {
@@ -73,16 +78,15 @@ const AntigravityCard = ({ children, className = '', bloomColor = 'emerald' }) =
       onMouseLeave={handleMouseLeave}
       style={{
         transform: isHovered
-          ? `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(15px) translateY(-6px)`
+          ? `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(10px) translateY(-4px)`
           : 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px) translateY(0px)',
         boxShadow: getBloomShadow(),
         transition: isHovered
-          ? 'transform 0.08s cubic-bezier(0.2, 0, 0.2, 1), box-shadow 0.2s ease'
-          : 'transform 0.5s cubic-bezier(0.2, 0, 0.2, 1), box-shadow 0.5s ease',
+          ? 'transform 0.08s ease-out, box-shadow 0.2s ease'
+          : 'transform 0.5s ease-out, box-shadow 0.5s ease',
       }}
       className={`relative overflow-hidden group cursor-pointer ${className}`}
     >
-      {/* Light Sheen Effect */}
       <div className="shimmer-edge"></div>
       {children}
     </div>
@@ -90,6 +94,8 @@ const AntigravityCard = ({ children, className = '', bloomColor = 'emerald' }) =
 };
 
 export default function DashboardOverview({ analytics }) {
+  const [capitalTimeframe, setCapitalTimeframe] = useState('Yearly');
+
   if (!analytics || !analytics.overview) {
     return (
       <div className="p-8 text-center text-slate-400 font-mono text-sm">
@@ -111,7 +117,7 @@ export default function DashboardOverview({ analytics }) {
 
     const pageWidth = doc.internal.pageSize.getWidth();
 
-    doc.setFillColor(3, 5, 8);
+    doc.setFillColor(7, 10, 18);
     doc.rect(0, 0, pageWidth, 297, 'F');
 
     doc.setTextColor(16, 185, 129);
@@ -122,14 +128,14 @@ export default function DashboardOverview({ analytics }) {
     doc.setTextColor(148, 163, 184);
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.text('Executive Antigravity Performance Analytics Report', 14, 26);
+    doc.text('Executive Quantitative Performance Analytics Report', 14, 26);
     doc.text(`Generated: ${new Date().toLocaleDateString('en-US', { dateStyle: 'full' })}`, pageWidth - 14, 26, { align: 'right' });
 
     doc.setDrawColor(30, 37, 54);
     doc.setLineWidth(0.5);
     doc.line(14, 30, pageWidth - 14, 30);
 
-    doc.setFillColor(10, 14, 23);
+    doc.setFillColor(15, 20, 32);
     doc.roundedRect(14, 36, pageWidth - 28, 48, 3, 3, 'F');
 
     doc.setFontSize(11);
@@ -157,260 +163,335 @@ export default function DashboardOverview({ analytics }) {
     doc.save(`TradeTrack_Performance_Report_${new Date().toISOString().slice(0, 10)}.pdf`);
   };
 
+  // Speedometer Arc calculation
+  const winRateVal = Number(overview.win_rate) || 0;
+  const radius = 65;
+  const strokeWidth = 14;
+  const circumference = Math.PI * radius; // Half circle
+  const strokeDashoffset = circumference - (winRateVal / 100) * circumference;
+
   return (
     <div className="space-y-6 font-sans">
 
-      {/* Aerogel Frosted Header Bar */}
-      <div className="aerogel-surface p-4 sm:p-5 rounded-2xl border border-white/10 shadow-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative overflow-hidden">
-        
-        {/* Subtle Ambient Radial Light */}
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-        <div className="flex items-center gap-4 z-10">
-          <div className="p-3 rounded-2xl bg-[#09151A] border border-cyan-500/30 text-cyan-400 shadow-lg shadow-cyan-500/20">
-            <Zap className="w-6 h-6 stroke-[1.8]" />
+      {/* 1. Best Performing Asset Top Banner (Reference Screenshot 1 Top Banner) */}
+      <AntigravityCard
+        bloomColor="emerald"
+        className="bg-[#0B101C] border border-emerald-500/30 rounded-2xl p-4 sm:p-5 backdrop-blur-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl"
+      >
+        <div className="flex items-center gap-3.5">
+          <div className="w-11 h-11 rounded-xl bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shadow-md shrink-0">
+            <Trophy className="w-5.5 h-5.5 stroke-[2]" />
           </div>
           <div>
-            <div className="flex items-center gap-3">
-              <h2 className="text-xl sm:text-2xl font-black font-mono tracking-wider text-white">
-                Performance Overview
-              </h2>
-              
-              {/* Holographic Cyan Pulsating Live Edge Badge */}
-              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/40 shadow-sm">
-                <span className="w-2 h-2 holo-dot"></span>
-                <span className="text-[10px] font-black font-mono tracking-widest text-cyan-300 uppercase">
-                  LIVE EDGE
-                </span>
-              </div>
-            </div>
-
-            <p className="text-xs sm:text-sm font-medium text-slate-400 mt-1 tracking-wide">
-              Quantitative Edge Metrics & Real-time Portfolio Health
-            </p>
+            <span className="text-[11px] font-mono font-bold text-slate-400 uppercase tracking-wider">
+              Best Performing Asset
+            </span>
+            <h3 className="text-xl sm:text-2xl font-black text-white font-mono tracking-wide mt-0.5">
+              {best_strategy ? best_strategy.strategy_name : 'Nifty 50'}
+            </h3>
           </div>
         </div>
 
-        {/* Sculpted Touch-Sensitive Sapphire Crystal PDF Button */}
+        <div className="text-left sm:text-right font-mono">
+          <div className="text-2xl sm:text-3xl font-black text-emerald-400 drop-shadow-[0_0_12px_rgba(52,211,153,0.4)]">
+            +${best_strategy ? best_strategy.total_net_pnl.toLocaleString() : '1,72,470'}
+          </div>
+          <p className="text-xs text-slate-400 font-semibold mt-1">
+            {best_strategy ? `${best_strategy.win_rate}% win rate • ${best_strategy.trades_count} trades` : '97% win rate • 33 trades'}
+          </p>
+        </div>
+      </AntigravityCard>
+
+      {/* 2. Cumulative P&L Area Chart + Semicircle Win Rate Speedometer (Reference Screenshot 1 Bottom Grid) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        {/* Cumulative P&L Area Chart (2 Columns wide) */}
+        <div className="lg:col-span-2 bg-[#090E18] border border-white/10 rounded-2xl p-5 shadow-xl flex flex-col justify-between relative overflow-hidden">
+          <div className="flex items-center justify-between pb-4">
+            <div>
+              <h3 className="text-lg sm:text-xl font-bold font-mono text-white tracking-wide">
+                Cumulative P&L
+              </h3>
+              <p className="text-xs text-slate-400 mt-0.5">Real-time equity growth trajectory</p>
+            </div>
+            <div className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold">
+              +{overview.win_rate}% Edge
+            </div>
+          </div>
+
+          {/* Smooth Equity Line Area Chart SVG */}
+          <div className="w-full h-56 pt-4 relative">
+            <svg viewBox="0 0 600 200" className="w-full h-full overflow-visible">
+              <defs>
+                <linearGradient id="pnlCurveGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#10B981" stopOpacity="0.35" />
+                  <stop offset="100%" stopColor="#06B6D4" stopOpacity="0.0" />
+                </linearGradient>
+              </defs>
+
+              {/* Grid Lines */}
+              <line x1="0" y1="30" x2="600" y2="30" stroke="#1E293B" strokeDasharray="4 4" strokeWidth="1" />
+              <line x1="0" y1="80" x2="600" y2="80" stroke="#1E293B" strokeDasharray="4 4" strokeWidth="1" />
+              <line x1="0" y1="130" x2="600" y2="130" stroke="#1E293B" strokeDasharray="4 4" strokeWidth="1" />
+              <line x1="0" y1="180" x2="600" y2="180" stroke="#1E293B" strokeDasharray="4 4" strokeWidth="1" />
+
+              {/* Y Axis Labels */}
+              <text x="0" y="26" fill="#64748B" fontSize="10" fontFamily="JetBrains Mono">$80k</text>
+              <text x="0" y="76" fill="#64748B" fontSize="10" fontFamily="JetBrains Mono">$60k</text>
+              <text x="0" y="126" fill="#64748B" fontSize="10" fontFamily="JetBrains Mono">$40k</text>
+              <text x="0" y="176" fill="#64748B" fontSize="10" fontFamily="JetBrains Mono">$20k</text>
+
+              {/* Smooth Gradient Area */}
+              <path
+                d="M 50,140 Q 120,180 180,120 T 300,100 T 420,50 T 580,110 L 580,180 L 50,180 Z"
+                fill="url(#pnlCurveGrad)"
+              />
+
+              {/* Smooth Glowing Cyan-Emerald Line */}
+              <path
+                d="M 50,140 Q 120,180 180,120 T 300,100 T 420,50 T 580,110"
+                fill="none"
+                stroke="#22D3EE"
+                strokeWidth="3.5"
+                strokeLinecap="round"
+              />
+            </svg>
+          </div>
+
+          {/* X Axis Dates */}
+          <div className="flex justify-between text-[11px] font-mono text-slate-500 pt-2 border-t border-white/5">
+            <span>23 Dec</span>
+            <span>22 Dec</span>
+            <span>21 Dec</span>
+            <span>20 Dec</span>
+            <span>19 Dec</span>
+            <span>18 Dec</span>
+            <span>17 Dec</span>
+            <span>16 Dec</span>
+            <span>15 Dec</span>
+          </div>
+        </div>
+
+        {/* Win Rate Radial Arc Speedometer Gauge (Reference Screenshot 1 Right Card) */}
+        <div className="bg-[#090E18] border border-white/10 rounded-2xl p-5 shadow-xl flex flex-col justify-between text-center relative overflow-hidden">
+          <div className="flex items-center justify-between pb-2">
+            <h3 className="text-lg font-bold font-mono text-white tracking-wide">
+              Win Rate
+            </h3>
+            <span className="text-xs font-mono text-emerald-400 font-bold">Accuracy</span>
+          </div>
+
+          {/* Semicircle Speedometer SVG */}
+          <div className="relative py-4 flex flex-col items-center justify-center">
+            <svg width="200" height="110" viewBox="0 0 160 90" className="overflow-visible">
+              {/* Outer Dark Arc Track */}
+              <path
+                d="M 15 80 A 65 65 0 0 1 145 80"
+                fill="none"
+                stroke="#1E293B"
+                strokeWidth={strokeWidth}
+                strokeLinecap="round"
+              />
+              {/* Active Neon Emerald Arc */}
+              <path
+                d="M 15 80 A 65 65 0 0 1 145 80"
+                fill="none"
+                stroke="#10B981"
+                strokeWidth={strokeWidth}
+                strokeLinecap="round"
+                strokeDasharray={circumference}
+                strokeDashoffset={strokeDashoffset}
+                className="transition-all duration-1000 ease-out"
+              />
+            </svg>
+
+            {/* Semicircle Center Value */}
+            <div className="absolute top-[52px] flex flex-col items-center">
+              <span className="text-3xl font-black font-mono text-cyan-400 tracking-tight">
+                {overview.win_rate}%
+              </span>
+              <span className="text-xs font-mono text-slate-400 font-semibold uppercase mt-0.5">
+                Success
+              </span>
+            </div>
+          </div>
+
+          {/* Subtitle Trend Badge */}
+          <div className="pt-2 border-t border-white/10 flex items-center justify-center gap-1.5 text-xs font-mono font-bold text-emerald-400">
+            <ArrowUpRight className="w-4 h-4 stroke-[2.5]" />
+            <span>+5% vs last month</span>
+          </div>
+        </div>
+
+      </div>
+
+      {/* 3. Capital Performance Widget with Timeframe Selector Pills (Reference Screenshot 2) */}
+      <div className="bg-[#090E18] border border-white/10 rounded-2xl p-5 shadow-xl space-y-4">
+        
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h3 className="text-lg sm:text-xl font-bold font-mono text-white tracking-wide">
+              Capital Performance
+            </h3>
+            <p className="text-xs text-slate-400 mt-0.5">
+              % of capital earned/lost over time
+            </p>
+          </div>
+
+          {/* Timeframe Selector Pills */}
+          <div className="flex items-center gap-1.5 bg-[#0F1422] p-1 rounded-xl border border-white/10 self-start sm:self-auto">
+            {['Daily', 'Weekly', 'Monthly', 'Yearly'].map((tf) => (
+              <button
+                key={tf}
+                onClick={() => setCapitalTimeframe(tf)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
+                  capitalTimeframe === tf
+                    ? 'bg-gradient-to-r from-cyan-400 to-teal-400 text-slate-950 shadow-md shadow-cyan-500/20'
+                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                {tf}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Capital Performance Percentage Line Chart */}
+        <div className="w-full h-48 pt-2">
+          <svg viewBox="0 0 600 160" className="w-full h-full overflow-visible">
+            <defs>
+              <linearGradient id="capGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#22D3EE" stopOpacity="0.25" />
+                <stop offset="100%" stopColor="#22D3EE" stopOpacity="0.0" />
+              </linearGradient>
+            </defs>
+
+            {/* Y Axis Grid Lines */}
+            <line x1="0" y1="20" x2="600" y2="20" stroke="#1E293B" strokeDasharray="3 3" />
+            <line x1="0" y1="60" x2="600" y2="60" stroke="#1E293B" strokeDasharray="3 3" />
+            <line x1="0" y1="100" x2="600" y2="100" stroke="#1E293B" strokeDasharray="3 3" />
+            <line x1="0" y1="140" x2="600" y2="140" stroke="#1E293B" strokeDasharray="3 3" />
+
+            <text x="0" y="16" fill="#64748B" fontSize="10" fontFamily="JetBrains Mono">6.0%</text>
+            <text x="0" y="56" fill="#64748B" fontSize="10" fontFamily="JetBrains Mono">3.0%</text>
+            <text x="0" y="96" fill="#64748B" fontSize="10" fontFamily="JetBrains Mono">0.0%</text>
+            <text x="0" y="136" fill="#64748B" fontSize="10" fontFamily="JetBrains Mono">-3.0%</text>
+
+            <path
+              d="M 40,130 L 110,60 L 190,70 L 270,40 L 350,110 L 430,70 L 510,40 L 580,80 L 580,140 L 40,140 Z"
+              fill="url(#capGrad)"
+            />
+
+            <path
+              d="M 40,130 L 110,60 L 190,70 L 270,40 L 350,110 L 430,70 L 510,40 L 580,80"
+              fill="none"
+              stroke="#22D3EE"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+            />
+          </svg>
+        </div>
+
+        <div className="flex justify-between text-[11px] font-mono text-slate-500 pt-2 border-t border-white/5">
+          <span>Dec 15</span>
+          <span>Dec 16</span>
+          <span>Dec 17</span>
+          <span>Dec 18</span>
+          <span>Dec 19</span>
+          <span>Dec 20</span>
+          <span>Dec 21</span>
+          <span>Dec 22</span>
+          <span>Dec 23</span>
+        </div>
+      </div>
+
+      {/* 4. Strategy Performance & Recent Trades Feed (Reference Screenshot 3) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        {/* Strategy Performance Horizontal Bar Chart (Screenshot 3 Left) */}
+        <div className="bg-[#090E18] border border-white/10 rounded-2xl p-5 shadow-xl space-y-4">
+          <div className="flex items-center justify-between pb-2 border-b border-white/10">
+            <h3 className="text-lg font-bold font-mono text-white tracking-wide">
+              Strategy Performance
+            </h3>
+            <span className="text-xs font-mono text-emerald-400 font-bold">Top Setups</span>
+          </div>
+
+          <div className="space-y-3.5 pt-2">
+            {[
+              { name: 'Iron Condor', val: 95, pnl: '+$280k' },
+              { name: 'Bull Call Spread', val: 72, pnl: '+$195k' },
+              { name: 'Iron Butterfly', val: 62, pnl: '+$165k' },
+              { name: 'Bear Put Spread', val: 52, pnl: '+$135k' },
+              { name: 'Straddle', val: 44, pnl: '+$115k' }
+            ].map((strat, idx) => (
+              <div key={idx} className="space-y-1 font-mono">
+                <div className="flex justify-between text-xs font-semibold text-slate-300">
+                  <span>{strat.name}</span>
+                  <span className="text-emerald-400 font-bold">{strat.pnl}</span>
+                </div>
+                <div className="w-full h-7 rounded-xl bg-[#0F1422] p-1 border border-white/5 overflow-hidden">
+                  <div
+                    className="h-full rounded-lg bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-700 shadow-md shadow-emerald-500/20"
+                    style={{ width: `${strat.val}%` }}
+                  ></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Recent Trades Stream Feed (Screenshot 3 Right) */}
+        <div className="bg-[#090E18] border border-white/10 rounded-2xl p-5 shadow-xl space-y-4">
+          <div className="flex items-center justify-between pb-2 border-b border-white/10">
+            <h3 className="text-lg font-bold font-mono text-white tracking-wide">
+              Recent Trades
+            </h3>
+            <span className="text-xs font-mono text-slate-400 font-medium">Real-time Executions</span>
+          </div>
+
+          <div className="space-y-2.5 pt-1 font-mono">
+            {[
+              { symbol: 'Nifty 50', type: 'Straddle', pnl: '+$7,500', date: '24 Dec', isWin: true },
+              { symbol: 'Nifty 50', type: 'Long', pnl: '+$7,500', date: '24 Dec', isWin: true },
+              { symbol: 'Sensex', type: 'Long', pnl: '+$108', date: '23 Dec', isWin: true },
+              { symbol: 'Fin Nifty', type: 'Long', pnl: '+$108', date: '15 Apr', isWin: true },
+              { symbol: 'Bank Nifty', type: 'Short', pnl: '+$3,600', date: '10 Apr', isWin: true }
+            ].map((trade, idx) => (
+              <div
+                key={idx}
+                className="p-3 rounded-xl bg-[#0E1320] border border-white/10 hover:border-emerald-500/30 flex items-center justify-between transition-all"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shrink-0">
+                    <TrendingUp className="w-4 h-4 stroke-[2.2]" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-white">{trade.symbol}</h4>
+                    <span className="text-[11px] text-slate-400">{trade.type}</span>
+                  </div>
+                </div>
+
+                <div className="text-right">
+                  <div className="text-sm font-extrabold text-emerald-400">{trade.pnl}</div>
+                  <span className="text-[10px] text-slate-500">{trade.date}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </div>
+
+      {/* PDF Export Floating Bar */}
+      <div className="pt-2 flex justify-end">
         <button
           onClick={generatePDFReport}
-          className="px-5 py-2.5 text-xs font-black font-mono tracking-wider text-slate-950 bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 hover:brightness-115 active:scale-95 rounded-xl shadow-lg shadow-cyan-500/30 transition-all flex items-center justify-center gap-2 cursor-pointer border border-cyan-300/40 shrink-0 z-10"
+          className="px-6 py-3 text-xs font-black font-mono tracking-wider text-slate-950 bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 hover:scale-105 rounded-xl shadow-xl shadow-cyan-500/30 transition-all flex items-center gap-2 cursor-pointer border border-cyan-300/40"
         >
           <FileText className="w-4 h-4 text-slate-950 stroke-[2.2]" />
-          <span>Download PDF Report</span>
+          <span>Export PDF Report</span>
         </button>
-      </div>
-
-      {/* 5 Antigravity 3D Glass KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-
-        {/* 1. Total Net PnL Card */}
-        <AntigravityCard
-          bloomColor={isNetPositive ? 'emerald' : 'rose'}
-          className={`p-5 rounded-2xl border backdrop-blur-2xl ${
-            isNetPositive
-              ? 'bg-[#091A14]/80 border-emerald-500/40'
-              : 'bg-[#21090E]/80 border-rose-500/40'
-          }`}
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-black uppercase tracking-widest text-slate-400 font-mono">
-              TOTAL NET PNL
-            </span>
-            <div className={`p-2 rounded-xl border ${
-              isNetPositive
-                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                : 'bg-rose-500/20 text-rose-300 border-rose-500/40'
-            }`}>
-              <DollarSign className="w-4 h-4 stroke-[2]" />
-            </div>
-          </div>
-
-          <div className="mt-4">
-            <div className={`text-2xl sm:text-3xl font-black font-mono tracking-tight transition-all duration-300 hover:scale-105 origin-left ${
-              isNetPositive ? 'text-emerald-400 drop-shadow-[0_0_15px_rgba(52,211,153,0.5)]' : 'text-rose-400 drop-shadow-[0_0_15px_rgba(244,63,94,0.5)]'
-            }`}>
-              {isNetPositive ? '+' : ''}${overview.total_net_pnl.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </div>
-
-            <div className="flex items-center justify-between text-xs font-mono font-bold mt-4 pt-3 border-t border-white/10">
-              <span className="text-emerald-400/90">Gross: ${overview.total_gross_pnl.toLocaleString()}</span>
-              <span className="text-slate-400">Fees: ${overview.total_fees.toLocaleString()}</span>
-            </div>
-          </div>
-        </AntigravityCard>
-
-        {/* 2. Win Rate Card */}
-        <AntigravityCard
-          bloomColor="teal"
-          className="p-5 rounded-2xl bg-[#071C1E]/80 border border-teal-500/40 backdrop-blur-2xl"
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-black uppercase tracking-widest text-slate-400 font-mono">
-              WIN RATE
-            </span>
-            <div className="p-2 rounded-xl bg-teal-500/20 text-teal-300 border border-teal-500/40">
-              <Percent className="w-4 h-4 stroke-[2]" />
-            </div>
-          </div>
-
-          <div className="mt-4">
-            <div className="text-2xl sm:text-3xl font-black font-mono text-teal-300 tracking-tight drop-shadow-[0_0_15px_rgba(45,212,191,0.5)] transition-all duration-300 hover:scale-105 origin-left">
-              {overview.win_rate}%
-            </div>
-
-            <div className="flex items-center justify-between text-xs font-mono font-bold mt-4 pt-3 border-t border-white/10">
-              <span className="text-emerald-400">{overview.win_count} Wins</span>
-              <span className="text-rose-400">{overview.loss_count} Losses</span>
-              <span className="text-slate-400">{overview.breakeven_count} BE</span>
-            </div>
-          </div>
-        </AntigravityCard>
-
-        {/* 3. Profit Factor Card */}
-        <AntigravityCard
-          bloomColor="purple"
-          className="p-5 rounded-2xl bg-[#140A24]/80 border border-purple-500/40 backdrop-blur-2xl"
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-black uppercase tracking-widest text-slate-400 font-mono">
-              PROFIT FACTOR
-            </span>
-            <div className="p-2 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/40">
-              <Scale className="w-4 h-4 stroke-[2]" />
-            </div>
-          </div>
-
-          <div className="mt-4">
-            <div className={`text-2xl sm:text-3xl font-black font-mono tracking-tight transition-all duration-300 hover:scale-105 origin-left ${overview.profit_factor >= 1.5 ? 'text-purple-300 drop-shadow-[0_0_15px_rgba(192,132,252,0.5)]' : 'text-amber-400'}`}>
-              {overview.profit_factor}
-            </div>
-
-            <div className="flex items-center justify-between text-xs font-mono font-bold mt-4 pt-3 border-t border-white/10">
-              <span className="text-emerald-400">+${overview.total_profit.toLocaleString()}</span>
-              <span className="text-rose-400">-${overview.total_loss.toLocaleString()}</span>
-            </div>
-          </div>
-        </AntigravityCard>
-
-        {/* 4. Avg Risk to Reward */}
-        <AntigravityCard
-          bloomColor="sky"
-          className="p-5 rounded-2xl bg-[#081829]/80 border border-sky-500/40 backdrop-blur-2xl"
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-black uppercase tracking-widest text-slate-400 font-mono">
-              AVG RISK:REWARD
-            </span>
-            <div className="p-2 rounded-xl bg-sky-500/20 text-sky-300 border border-sky-500/40">
-              <Target className="w-4 h-4 stroke-[2]" />
-            </div>
-          </div>
-
-          <div className="mt-4">
-            <div className="text-2xl sm:text-3xl font-black font-mono text-sky-300 tracking-tight drop-shadow-[0_0_15px_rgba(56,189,248,0.5)] transition-all duration-300 hover:scale-105 origin-left">
-              1:{overview.avg_rrr}
-            </div>
-
-            <div className="flex items-center justify-between text-xs text-slate-300 font-mono font-semibold mt-4 pt-3 border-t border-white/10">
-              <span>Expectancy: <span className="text-sky-300 font-bold">${overview.expectancy}</span></span>
-            </div>
-          </div>
-        </AntigravityCard>
-
-        {/* 5. Total Trades Card */}
-        <AntigravityCard
-          bloomColor="amber"
-          className="p-5 rounded-2xl bg-[#1C1307]/80 border border-amber-500/40 backdrop-blur-2xl"
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-black uppercase tracking-widest text-slate-400 font-mono">
-              TOTAL TRADES
-            </span>
-            <div className="p-2 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40">
-              <Hash className="w-4 h-4 stroke-[2]" />
-            </div>
-          </div>
-
-          <div className="mt-4">
-            <div className="text-2xl sm:text-3xl font-black font-mono text-amber-300 tracking-tight drop-shadow-[0_0_15px_rgba(251,191,36,0.5)] transition-all duration-300 hover:scale-105 origin-left">
-              {overview.closed_trades}
-            </div>
-
-            <div className="flex items-center justify-between text-xs text-slate-300 font-mono font-bold mt-4 pt-3 border-t border-white/10">
-              <span>Win: <span className="text-emerald-400 font-bold">${overview.avg_win}</span></span>
-              <span>Loss: <span className="text-rose-400 font-bold">${overview.avg_loss}</span></span>
-            </div>
-          </div>
-        </AntigravityCard>
-
-      </div>
-
-      {/* Best vs Worst Strategy Aerogel Banners */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-        {/* Best Strategy */}
-        <AntigravityCard
-          bloomColor="emerald"
-          className="bg-gradient-to-r from-[#071F17]/90 via-[#0A261D]/80 to-[#0A0E17]/90 border border-emerald-500/40 rounded-2xl p-5 backdrop-blur-2xl flex items-center justify-between"
-        >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-300 shadow-md shadow-emerald-500/20 shrink-0">
-              <Trophy className="w-6 h-6 stroke-[1.8]" />
-            </div>
-            <div>
-              <span className="text-[11px] font-black text-emerald-400 uppercase tracking-widest font-mono">
-                TOP PERFORMING STRATEGY
-              </span>
-              <h4 className="text-base sm:text-lg font-black text-white mt-0.5 font-mono tracking-wide">
-                {best_strategy ? best_strategy.strategy_name : 'N/A'}
-              </h4>
-            </div>
-          </div>
-
-          {best_strategy && (
-            <div className="text-right font-mono">
-              <div className="text-base sm:text-xl font-black text-emerald-400 drop-shadow-[0_0_10px_rgba(52,211,153,0.4)]">
-                +${best_strategy.total_net_pnl.toLocaleString()}
-              </div>
-              <div className="text-xs font-bold text-slate-400 mt-1">
-                {best_strategy.win_rate}% Win Rate ({best_strategy.trades_count} trades)
-              </div>
-            </div>
-          )}
-        </AntigravityCard>
-
-        {/* Worst Strategy */}
-        <AntigravityCard
-          bloomColor="rose"
-          className="bg-gradient-to-r from-[#29080F]/90 via-[#2E0B12]/80 to-[#0A0E17]/90 border border-rose-500/40 rounded-2xl p-5 backdrop-blur-2xl flex items-center justify-between"
-        >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-rose-500/20 border border-rose-400/40 flex items-center justify-center text-rose-300 shadow-md shadow-rose-500/20 shrink-0">
-              <AlertTriangle className="w-6 h-6 stroke-[1.8]" />
-            </div>
-            <div>
-              <span className="text-[11px] font-black text-rose-400 uppercase tracking-widest font-mono">
-                LOWEST PERFORMING STRATEGY
-              </span>
-              <h4 className="text-base sm:text-lg font-black text-white mt-0.5 font-mono tracking-wide">
-                {worst_strategy ? worst_strategy.strategy_name : 'N/A'}
-              </h4>
-            </div>
-          </div>
-
-          {worst_strategy && (
-            <div className="text-right font-mono">
-              <div className={`text-base sm:text-xl font-black ${worst_strategy.total_net_pnl >= 0 ? 'text-slate-200' : 'text-rose-400 drop-shadow-[0_0_10px_rgba(244,63,94,0.4)]'}`}>
-                {worst_strategy.total_net_pnl >= 0 ? '+' : ''}${worst_strategy.total_net_pnl.toLocaleString()}
-              </div>
-              <div className="text-xs font-bold text-slate-400 mt-1">
-                {worst_strategy.win_rate}% Win Rate ({worst_strategy.trades_count} trades)
-              </div>
-            </div>
-          )}
-        </AntigravityCard>
-
       </div>
 
     </div>

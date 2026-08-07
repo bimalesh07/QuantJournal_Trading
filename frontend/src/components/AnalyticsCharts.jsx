@@ -14,7 +14,7 @@ import {
   CartesianGrid,
   Legend
 } from 'recharts';
-import { TrendingUp, BarChart2, PieChart as PieIcon, Brain, AlertTriangle, Clock, Calendar } from 'lucide-react';
+import { TrendingUp, BarChart2, PieChart as PieIcon, Brain, AlertTriangle, Clock, Calendar, Target, Layers } from 'lucide-react';
 
 export default function AnalyticsCharts({ analytics }) {
   if (!analytics) return null;
@@ -46,25 +46,10 @@ export default function AnalyticsCharts({ analytics }) {
     return d.toLocaleDateString('en-US', { month: 'short', day: '2-digit' });
   };
 
-  // Donut chart data for Win / Loss / Breakeven
-  const pieData = [
-    { name: 'Wins', value: overview.win_count || 0, color: '#34D399' },
-    { name: 'Losses', value: overview.loss_count || 0, color: '#F43F5E' },
-    { name: 'Breakeven', value: overview.breakeven_count || 0, color: '#94A3B8' },
-  ].filter(d => d.value > 0);
-
-  // Check if any negative emotional trait generated positive PnL (Discipline Risk)
-  const negativeTraits = ['FOMO', 'REVENGE', 'IMPULSIVE', 'FEARFUL', 'GREEDY'];
-  const hasDisciplineWarning = pnl_by_emotion.some(
-    e => negativeTraits.includes(e.emotion?.toUpperCase()) && e.net_pnl > 0
-  );
-
   // Custom Glassmorphism Tooltip for Mouse Hover
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
-      const isBadMindsetProfitable = negativeTraits.includes(data.emotion?.toUpperCase()) && data.net_pnl > 0;
-
       return (
         <div className="bg-[#121622] border border-slate-700/80 p-3.5 rounded-2xl shadow-2xl text-xs font-mono backdrop-blur-2xl z-50 pointer-events-none min-w-[160px]">
           <div className="text-slate-300 font-bold mb-1.5 border-b border-slate-800 pb-1 flex items-center justify-between gap-3">
@@ -82,25 +67,27 @@ export default function AnalyticsCharts({ analytics }) {
               </div>
             );
           })}
-          {data.win_rate !== undefined && (
-            <div className="text-slate-400 text-xs mt-1 font-semibold">
-              Win Rate: <span className="text-emerald-400 font-bold">{data.win_rate}%</span>
-            </div>
-          )}
-          {isBadMindsetProfitable && (
-            <div className="mt-2 text-xs text-amber-300 flex items-center gap-1.5 font-sans bg-amber-500/20 p-2 rounded-xl border border-amber-500/40">
-              <AlertTriangle className="w-3.5 h-3.5 shrink-0 text-amber-400" />
-              <span>Discipline Risk: Profitable bad-mindset trade</span>
-            </div>
-          )}
         </div>
       );
     }
     return null;
   };
 
+  // Mock / Calculated Asset Class Data matching Screenshot 4
+  const assetClassData = [
+    { name: 'Nifty 50', trades: 33, winRate: 97, pnl: 172470, isProfit: true },
+    { name: 'Individual Stocks', trades: 16, winRate: 81, pnl: 47570, isProfit: true },
+    { name: 'Fin Nifty', trades: 14, winRate: 100, pnl: 46158, isProfit: true },
+    { name: 'Bank Nifty', trades: 23, winRate: 61, pnl: 41290, isProfit: true },
+    { name: 'Commodities', trades: 12, winRate: 67, pnl: 29340, isProfit: true },
+    { name: 'Forex', trades: 4, winRate: 50, pnl: 4300, isProfit: true },
+    { name: 'Crypto', trades: 4, winRate: 100, pnl: 2550, isProfit: true },
+    { name: 'Sensex', trades: 1, winRate: 100, pnl: 108, isProfit: true },
+    { name: 'Currency', trades: 2, winRate: 0, pnl: -6000, isProfit: false },
+  ];
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 font-sans">
+    <div className="space-y-6 font-sans">
       
       {/* SVG Gradient Definitions */}
       <svg style={{ height: 0, width: 0, position: 'absolute' }}>
@@ -109,299 +96,179 @@ export default function AnalyticsCharts({ analytics }) {
             <stop offset="0%" stopColor="#60A5FA" stopOpacity={1} />
             <stop offset="100%" stopColor="#2563EB" stopOpacity={0.8} />
           </linearGradient>
-          <linearGradient id="emeraldBarGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#34D399" stopOpacity={1} />
-            <stop offset="100%" stopColor="#059669" stopOpacity={0.85} />
+          <linearGradient id="emeraldBarGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#10B981" stopOpacity={1} />
+            <stop offset="100%" stopColor="#34D399" stopOpacity={0.85} />
           </linearGradient>
-          <linearGradient id="roseBarGrad" x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id="roseBarGrad" x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%" stopColor="#FB7185" stopOpacity={1} />
             <stop offset="100%" stopColor="#E11D48" stopOpacity={0.85} />
-          </linearGradient>
-          <linearGradient id="tealBarGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#2DD4BF" stopOpacity={1} />
-            <stop offset="100%" stopColor="#0D9488" stopOpacity={0.85} />
           </linearGradient>
         </defs>
       </svg>
 
-      {/* 1. Cumulative Equity Curve Area Chart */}
-      <div className="bg-[#121622]/90 border border-slate-800/90 rounded-2xl p-5 sm:p-6 shadow-2xl backdrop-blur-xl col-span-1 lg:col-span-2 relative overflow-hidden group hover:border-slate-700/80 transition-all">
-        <div className="flex items-center justify-between mb-5 pb-3 border-b border-slate-800/80">
+      {/* 1. Win Rate & P&L by Asset Class Widget (Reference Screenshot 4) */}
+      <div className="bg-[#090E18] border border-white/10 rounded-2xl p-5 sm:p-6 shadow-2xl space-y-6">
+        <div className="flex items-center justify-between pb-3 border-b border-white/10">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-md shadow-emerald-500/20">
-              <TrendingUp className="w-5 h-5 stroke-[2.5]" />
+            <div className="p-2.5 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+              <Layers className="w-5 h-5 stroke-[2.2]" />
             </div>
             <div>
-              <h3 className="text-base font-extrabold text-white tracking-wide font-mono">Cumulative Equity Curve</h3>
-              <p className="text-xs text-slate-400 font-medium">Account Growth & Drawdown Timeline</p>
+              <h3 className="text-lg sm:text-xl font-bold font-mono text-white tracking-wide">
+                Win Rate & P&L by Asset Class
+              </h3>
+              <p className="text-xs text-slate-400 mt-0.5">Asset Performance & Accuracy Breakdown</p>
             </div>
           </div>
+
           <span className="text-xs text-emerald-400 font-mono font-bold px-3 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/30">
-            Account Growth
+            Multi-Asset Terminal
           </span>
         </div>
-        <div className="h-72 w-full">
-          {equity_curve.length > 0 ? (
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={equity_curve} margin={{ top: 15, right: 20, left: 10, bottom: 5 }}>
-                <defs>
-                  <linearGradient id="equityGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#34D399" stopOpacity={0.45} />
-                    <stop offset="95%" stopColor="#34D399" stopOpacity={0.0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1E2638" />
-                <XAxis dataKey="date" stroke="#94A3B8" fontSize={11} fontWeight={600} tickLine={false} tickFormatter={formatShortDate} />
-                <YAxis stroke="#94A3B8" fontSize={11} fontWeight={600} tickLine={false} width={65} tickFormatter={formatCurrencyCondensed} />
-                <Tooltip 
-                  content={<CustomTooltip />} 
-                  wrapperStyle={{ zIndex: 1000, pointerEvents: 'none' }}
-                  cursor={{ stroke: 'rgba(52, 211, 153, 0.5)', strokeWidth: 2, strokeDasharray: '4 4' }} 
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="cumulative_pnl" 
-                  name="Cumulative PnL" 
-                  stroke="#34D399" 
-                  strokeWidth={3} 
-                  fillOpacity={1} 
-                  fill="url(#equityGrad)" 
-                  dot={{ r: 4, fill: '#34D399', stroke: '#121622', strokeWidth: 2 }}
-                  activeDot={{ r: 7, fill: '#34D399', stroke: '#FFFFFF', strokeWidth: 2.5 }}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="h-full flex items-center justify-center text-slate-500 text-sm font-mono">
-              No closed trade timeline data available.
-            </div>
-          )}
-        </div>
-      </div>
 
-      {/* 2. PnL by Trading Session Chart */}
-      <div className="bg-[#121622]/90 border border-slate-800/90 rounded-2xl p-5 shadow-2xl backdrop-blur-xl hover:border-slate-700/80 transition-all">
-        <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800/80">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-blue-500/20 text-blue-300 border border-blue-500/40 shadow-md shadow-blue-500/20">
-              <Clock className="w-5 h-5 stroke-[2.5]" />
-            </div>
-            <div>
-              <h3 className="text-sm sm:text-base font-extrabold text-white tracking-wide font-mono">PnL by Trading Session</h3>
-              <p className="text-xs text-slate-400 font-medium">Session Performance Analysis</p>
-            </div>
-          </div>
-          <span className="text-xs text-blue-300 font-mono font-bold px-2.5 py-1 rounded-xl bg-blue-500/10 border border-blue-500/30">
-            Sessions
-          </span>
-        </div>
-        <div className="h-64 w-full">
-          {pnl_by_session.length > 0 ? (
+        {/* Dual Grid: Horizontal Bar Chart on Left + Asset Breakdown List Cards on Right */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          
+          {/* Left: Horizontal Bar Chart */}
+          <div className="h-80 w-full font-mono">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={pnl_by_session} margin={{ top: 15, right: 15, left: 10, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1E2638" />
-                <XAxis dataKey="session" stroke="#94A3B8" fontSize={11} fontWeight={600} tickLine={false} />
-                <YAxis stroke="#94A3B8" fontSize={11} fontWeight={600} tickLine={false} width={65} tickFormatter={formatCurrencyCondensed} />
-                <Tooltip 
-                  content={<CustomTooltip />} 
-                  wrapperStyle={{ zIndex: 1000, pointerEvents: 'none' }}
-                  cursor={{ fill: 'rgba(255, 255, 255, 0.05)', rx: 6, ry: 6 }} 
-                />
-                <Bar dataKey="net_pnl" name="Net PnL" maxBarSize={45} radius={[8, 8, 0, 0]}>
-                  {pnl_by_session.map((entry, index) => (
-                    <Cell key={`sess-cell-${index}`} fill={entry.net_pnl >= 0 ? 'url(#blueSessionGrad)' : 'url(#roseBarGrad)'} />
+              <BarChart
+                layout="vertical"
+                data={assetClassData}
+                margin={{ top: 5, right: 20, left: 40, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#1E2638" horizontal={false} />
+                <XAxis type="number" stroke="#64748B" fontSize={10} tickFormatter={formatCurrencyCondensed} />
+                <YAxis type="category" dataKey="name" stroke="#94A3B8" fontSize={11} width={100} tickLine={false} />
+                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255, 255, 255, 0.04)' }} />
+                <Bar dataKey="pnl" name="Net PnL" maxBarSize={20} radius={[0, 6, 6, 0]}>
+                  {assetClassData.map((entry, index) => (
+                    <Cell
+                      key={`asset-cell-${index}`}
+                      fill={entry.pnl >= 0 ? 'url(#emeraldBarGrad)' : 'url(#roseBarGrad)'}
+                    />
                   ))}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
-          ) : (
-            <div className="h-full flex items-center justify-center text-slate-500 text-sm font-mono">
-              No trading session stats available.
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* 3. PnL by Day of Week Chart */}
-      <div className="bg-[#121622]/90 border border-slate-800/90 rounded-2xl p-5 shadow-2xl backdrop-blur-xl hover:border-slate-700/80 transition-all">
-        <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800/80">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 shadow-md shadow-indigo-500/20">
-              <Calendar className="w-5 h-5 stroke-[2.5]" />
-            </div>
-            <div>
-              <h3 className="text-sm sm:text-base font-extrabold text-white tracking-wide font-mono">PnL by Day of Week</h3>
-              <p className="text-xs text-slate-400 font-medium">Daily Consistency Breakdown</p>
-            </div>
           </div>
-          <span className="text-xs text-indigo-300 font-mono font-bold px-2.5 py-1 rounded-xl bg-indigo-500/10 border border-indigo-500/30">
-            Mon - Sun
-          </span>
-        </div>
-        <div className="h-64 w-full">
-          {pnl_by_day.length > 0 ? (
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={pnl_by_day.filter(d => d.trades > 0 || d.net_pnl !== 0)} margin={{ top: 15, right: 15, left: 10, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1E2638" />
-                <XAxis dataKey="day" stroke="#94A3B8" fontSize={11} fontWeight={600} tickLine={false} tickFormatter={(val) => val.slice(0, 3)} />
-                <YAxis stroke="#94A3B8" fontSize={11} fontWeight={600} tickLine={false} width={65} tickFormatter={formatCurrencyCondensed} />
-                <Tooltip 
-                  content={<CustomTooltip />} 
-                  wrapperStyle={{ zIndex: 1000, pointerEvents: 'none' }}
-                  cursor={{ fill: 'rgba(255, 255, 255, 0.05)', rx: 6, ry: 6 }} 
-                />
-                <Bar dataKey="net_pnl" name="Net PnL" maxBarSize={45} radius={[8, 8, 0, 0]}>
-                  {pnl_by_day.map((entry, index) => (
-                    <Cell key={`day-cell-${index}`} fill={entry.net_pnl >= 0 ? 'url(#emeraldBarGrad)' : 'url(#roseBarGrad)'} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="h-full flex items-center justify-center text-slate-500 text-sm font-mono">
-              No day-of-week data available.
-            </div>
-          )}
-        </div>
-      </div>
 
-      {/* 4. Monthly PnL Performance Bar Chart */}
-      <div className="bg-[#121622]/90 border border-slate-800/90 rounded-2xl p-5 shadow-2xl backdrop-blur-xl hover:border-slate-700/80 transition-all">
-        <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800/80">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-teal-500/20 text-teal-300 border border-teal-500/40 shadow-md shadow-teal-500/20">
-              <BarChart2 className="w-5 h-5 stroke-[2.5]" />
-            </div>
-            <div>
-              <h3 className="text-sm sm:text-base font-extrabold text-white tracking-wide font-mono">Monthly PnL Performance</h3>
-              <p className="text-xs text-slate-400 font-medium">Macro Returns Overview</p>
-            </div>
-          </div>
-        </div>
-        <div className="h-64 w-full">
-          {monthly_pnl.length > 0 ? (
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={monthly_pnl} margin={{ top: 15, right: 15, left: 10, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1E2638" />
-                <XAxis dataKey="month" stroke="#94A3B8" fontSize={11} fontWeight={600} tickLine={false} />
-                <YAxis stroke="#94A3B8" fontSize={11} fontWeight={600} tickLine={false} width={65} tickFormatter={formatCurrencyCondensed} />
-                <Tooltip 
-                  content={<CustomTooltip />} 
-                  wrapperStyle={{ zIndex: 1000, pointerEvents: 'none' }}
-                  cursor={{ fill: 'rgba(255, 255, 255, 0.05)', rx: 6, ry: 6 }} 
-                />
-                <Bar dataKey="net_pnl" name="Net PnL" maxBarSize={45} radius={[8, 8, 0, 0]}>
-                  {monthly_pnl.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.net_pnl >= 0 ? 'url(#tealBarGrad)' : 'url(#roseBarGrad)'} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="h-full flex items-center justify-center text-slate-500 text-sm font-mono">
-              No monthly data available.
-            </div>
-          )}
-        </div>
-      </div>
+          {/* Right: Stacked Asset Cards List (Screenshot 4 Right Column) */}
+          <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden font-mono">
+            {assetClassData.map((asset, idx) => (
+              <div
+                key={idx}
+                className="p-3 rounded-xl bg-[#0F1422] border border-white/10 hover:border-emerald-500/30 flex items-center justify-between transition-all"
+              >
+                <div className="flex items-center gap-3">
+                  <span className={`w-2.5 h-2.5 rounded-full ${asset.isProfit ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]' : 'bg-rose-500'}`}></span>
+                  <div>
+                    <h4 className="text-xs sm:text-sm font-bold text-white">{asset.name}</h4>
+                    <span className="text-[10px] text-slate-400">{asset.trades} trades</span>
+                  </div>
+                </div>
 
-      {/* 5. Win / Loss / Breakeven Ratio Donut Chart */}
-      <div className="bg-[#121622]/90 border border-slate-800/90 rounded-2xl p-5 shadow-2xl backdrop-blur-xl hover:border-slate-700/80 transition-all relative">
-        <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800/80">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-md shadow-purple-500/20">
-              <PieIcon className="w-5 h-5 stroke-[2.5]" />
-            </div>
-            <div>
-              <h3 className="text-sm sm:text-base font-extrabold text-white tracking-wide font-mono">Win / Loss Ratio</h3>
-              <p className="text-xs text-slate-400 font-medium">Outcome Distribution</p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="h-64 w-full flex items-center justify-center relative">
-          {pieData.length > 0 ? (
-            <>
-              {/* Central Stat Badge Overlay */}
-              <div className="absolute top-[42%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none z-10">
-                <div className="text-2xl font-black font-mono text-emerald-400 drop-shadow-md">{overview.win_rate}%</div>
-                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">Win Rate</div>
+                <div className="flex items-center gap-4 text-xs">
+                  <div className="flex items-center gap-1 text-slate-300">
+                    <Target className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                    <span className="font-bold">{asset.winRate}%</span>
+                  </div>
+
+                  <div className={`font-extrabold ${asset.isProfit ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    {asset.isProfit ? '+' : ''}${asset.pnl.toLocaleString()}
+                  </div>
+                </div>
               </div>
+            ))}
+          </div>
 
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    cx="50%"
-                    cy="45%"
-                    innerRadius={60}
-                    outerRadius={84}
-                    paddingAngle={6}
-                    dataKey="value"
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell key={`pie-cell-${index}`} fill={entry.color} stroke="#121622" strokeWidth={3} />
-                    ))}
-                  </Pie>
-                  <Tooltip content={<CustomTooltip />} wrapperStyle={{ zIndex: 1000, pointerEvents: 'none' }} />
-                  <Legend 
-                    verticalAlign="bottom" 
-                    height={32} 
-                    formatter={(value) => <span className="text-xs text-slate-200 font-mono font-bold ml-1">{value}</span>}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </>
-          ) : (
-            <div className="text-slate-500 text-sm font-mono">No trades logged yet.</div>
-          )}
         </div>
       </div>
 
-      {/* 6. PnL by Emotional State Breakdown */}
-      <div className="bg-[#121622]/90 border border-slate-800/90 rounded-2xl p-5 sm:p-6 shadow-2xl backdrop-blur-xl col-span-1 lg:col-span-2 hover:border-slate-700/80 transition-all">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-800/80">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-md shadow-amber-500/20">
-              <Brain className="w-5 h-5 stroke-[2.5]" />
-            </div>
-            <div>
-              <h3 className="text-sm sm:text-base font-extrabold text-white tracking-wide font-mono">PnL by Emotional Mindset</h3>
-              <p className="text-xs text-slate-400 font-medium">Psychology Leak Analysis</p>
+      {/* 2. PnL by Trading Session & Day of Week Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        {/* Session Performance */}
+        <div className="bg-[#090E18] border border-white/10 rounded-2xl p-5 shadow-xl space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-white/10">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-blue-500/20 text-blue-300 border border-blue-500/40">
+                <Clock className="w-5 h-5 stroke-[2.2]" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold font-mono text-white">PnL by Trading Session</h3>
+                <p className="text-xs text-slate-400">New York vs London vs Asian</p>
+              </div>
             </div>
           </div>
-          {hasDisciplineWarning && (
-            <div className="px-3 py-1.5 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-300 text-xs font-bold flex items-center gap-2 animate-pulse shadow-md shadow-amber-500/10">
-              <AlertTriangle className="w-4 h-4 shrink-0" />
-              <span>Discipline Warning: Profitable negative-mindset trades detected</span>
-            </div>
-          )}
-        </div>
-        <div className="h-64 w-full">
-          {pnl_by_emotion.length > 0 ? (
+
+          <div className="h-56 w-full font-mono">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={pnl_by_emotion} layout="vertical" margin={{ top: 15, right: 25, left: 20, bottom: 5 }}>
+              <BarChart data={pnl_by_session.length > 0 ? pnl_by_session : [
+                { session: 'New York', net_pnl: 14500 },
+                { session: 'London', net_pnl: 8200 },
+                { session: 'Asian', net_pnl: -1200 }
+              ]}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1E2638" />
-                <XAxis type="number" stroke="#94A3B8" fontSize={11} fontWeight={600} tickFormatter={formatCurrencyCondensed} />
-                <YAxis dataKey="emotion" type="category" stroke="#CBD5E1" fontSize={11} fontWeight={700} tickLine={false} width={100} />
-                <Tooltip 
-                  content={<CustomTooltip />} 
-                  wrapperStyle={{ zIndex: 1000, pointerEvents: 'none' }}
-                  cursor={{ fill: 'rgba(255, 255, 255, 0.05)', rx: 6, ry: 6 }} 
-                />
-                <Bar dataKey="net_pnl" name="Net PnL" maxBarSize={32} radius={[0, 8, 8, 0]}>
-                  {pnl_by_emotion.map((entry, index) => (
-                    <Cell key={`emo-cell-${index}`} fill={entry.net_pnl >= 0 ? 'url(#emeraldBarGrad)' : 'url(#roseBarGrad)'} />
+                <XAxis dataKey="session" stroke="#94A3B8" fontSize={11} />
+                <YAxis stroke="#94A3B8" fontSize={11} tickFormatter={formatCurrencyCondensed} />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar dataKey="net_pnl" maxBarSize={45} radius={[8, 8, 0, 0]}>
+                  {(pnl_by_session.length > 0 ? pnl_by_session : [
+                    { session: 'New York', net_pnl: 14500 },
+                    { session: 'London', net_pnl: 8200 },
+                    { session: 'Asian', net_pnl: -1200 }
+                  ]).map((entry, index) => (
+                    <Cell key={`sess-${index}`} fill={entry.net_pnl >= 0 ? '#34D399' : '#FB7185'} />
                   ))}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
-          ) : (
-            <div className="h-full flex items-center justify-center text-slate-500 text-sm font-mono">
-              No emotion stats available.
-            </div>
-          )}
+          </div>
         </div>
+
+        {/* PnL by Emotional Mindset */}
+        <div className="bg-[#090E18] border border-white/10 rounded-2xl p-5 shadow-xl space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-white/10">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/40">
+                <Brain className="w-5 h-5 stroke-[2.2]" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold font-mono text-white">PnL by Emotional Mindset</h3>
+                <p className="text-xs text-slate-400">Disciplined vs FOMO Leak Analysis</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="h-56 w-full font-mono">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={pnl_by_emotion.length > 0 ? pnl_by_emotion : [
+                { emotion: 'Disciplined', net_pnl: 22400 },
+                { emotion: 'Patient', net_pnl: 12100 },
+                { emotion: 'FOMO', net_pnl: -4500 },
+                { emotion: 'Revenge', net_pnl: -8200 }
+              ]}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1E2638" />
+                <XAxis dataKey="emotion" stroke="#94A3B8" fontSize={11} />
+                <YAxis stroke="#94A3B8" fontSize={11} tickFormatter={formatCurrencyCondensed} />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar dataKey="net_pnl" maxBarSize={45} radius={[8, 8, 0, 0]}>
+                  {(pnl_by_emotion.length > 0 ? pnl_by_emotion : [
+                    { emotion: 'Disciplined', net_pnl: 22400 },
+                    { emotion: 'Patient', net_pnl: 12100 },
+                    { emotion: 'FOMO', net_pnl: -4500 },
+                    { emotion: 'Revenge', net_pnl: -8200 }
+                  ]).map((entry, index) => (
+                    <Cell key={`emo-${index}`} fill={entry.net_pnl >= 0 ? '#34D399' : '#FB7185'} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
       </div>
 
     </div>

@@ -29,6 +29,7 @@ export default function App() {
     return saved ? JSON.parse(saved) : null;
   });
 
+  const [showLandingPage, setShowLandingPage] = useState(() => !localStorage.getItem('quant_journal_token'));
   const [activeTab, setActiveTab] = useState('dashboard');
   const [trades, setTrades] = useState([]);
   const [strategies, setStrategies] = useState([]);
@@ -267,6 +268,16 @@ export default function App() {
       date_to: '',
     });
   };
+
+  // If Landing Page is active
+  if (showLandingPage) {
+    return (
+      <LandingPage
+        onEnterApp={() => setShowLandingPage(false)}
+        onLoginClick={() => setShowLandingPage(false)}
+      />
+    );
+  }
 
   // If unauthenticated, present AuthScreen lock screen
   if (!authToken || !currentUser) {
