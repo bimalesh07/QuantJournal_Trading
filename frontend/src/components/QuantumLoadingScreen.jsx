@@ -47,20 +47,28 @@ export default function QuantumLoadingScreen() {
         />
       </div>
 
-      {/* Pure Candlesticks Forming Left to Right (No Box, No Circle, No Text!) */}
+      {/* Pure Candlesticks Forming Left to Right with Continuous Infinite Up-Down Motion */}
       <div className="flex items-end justify-center gap-4.5 sm:gap-6 h-36">
-        {candlesData.slice(0, visibleCount).map((c, idx) => (
-          <div key={idx} className="flex flex-col items-center group transition-all duration-200 animate-fadeIn">
-            {/* Top Wick */}
-            <div className={`w-0.5 ${c.wickTop} ${c.isGreen ? 'bg-emerald-400' : 'bg-rose-400'} opacity-80 mb-0.5`}></div>
-            
-            {/* Candle Body */}
-            <div className={`w-3.5 sm:w-5 ${c.body} ${c.color} rounded-xs transition-all duration-300`}></div>
-            
-            {/* Bottom Wick */}
-            <div className={`w-0.5 ${c.wickBottom} ${c.isGreen ? 'bg-emerald-400' : 'bg-rose-400'} opacity-80 mt-0.5`}></div>
-          </div>
-        ))}
+        {candlesData.slice(0, visibleCount).map((c, idx) => {
+          // Staggered bounce speeds for continuous live up-down market motion
+          const bounceDuration = `${0.7 + (idx % 4) * 0.25}s`;
+          return (
+            <div 
+              key={idx} 
+              className="flex flex-col items-center group transition-all duration-200 animate-bounce"
+              style={{ animationDuration: bounceDuration }}
+            >
+              {/* Top Wick */}
+              <div className={`w-0.5 ${c.wickTop} ${c.isGreen ? 'bg-emerald-400' : 'bg-rose-400'} opacity-80 mb-0.5`}></div>
+              
+              {/* Candle Body */}
+              <div className={`w-3.5 sm:w-5 ${c.body} ${c.color} rounded-xs transition-all duration-300`}></div>
+              
+              {/* Bottom Wick */}
+              <div className={`w-0.5 ${c.wickBottom} ${c.isGreen ? 'bg-emerald-400' : 'bg-rose-400'} opacity-80 mt-0.5`}></div>
+            </div>
+          );
+        })}
       </div>
 
     </div>
