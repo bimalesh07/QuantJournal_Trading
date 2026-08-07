@@ -25,8 +25,11 @@ export default function AnalyticsCharts({ analytics }) {
     overview = {}, 
     pnl_by_emotion = [],
     pnl_by_session = [],
-    pnl_by_day = []
+    pnl_by_day = [],
+    pnl_by_asset_class = []
   } = analytics;
+
+  const assetClassData = pnl_by_asset_class;
 
   // Condensed Currency Formatter
   const formatCurrencyCondensed = (val) => {
@@ -73,18 +76,7 @@ export default function AnalyticsCharts({ analytics }) {
     return null;
   };
 
-  // Mock / Calculated Asset Class Data matching Screenshot 4
-  const assetClassData = [
-    { name: 'Nifty 50', trades: 33, winRate: 97, pnl: 172470, isProfit: true },
-    { name: 'Individual Stocks', trades: 16, winRate: 81, pnl: 47570, isProfit: true },
-    { name: 'Fin Nifty', trades: 14, winRate: 100, pnl: 46158, isProfit: true },
-    { name: 'Bank Nifty', trades: 23, winRate: 61, pnl: 41290, isProfit: true },
-    { name: 'Commodities', trades: 12, winRate: 67, pnl: 29340, isProfit: true },
-    { name: 'Forex', trades: 4, winRate: 50, pnl: 4300, isProfit: true },
-    { name: 'Crypto', trades: 4, winRate: 100, pnl: 2550, isProfit: true },
-    { name: 'Sensex', trades: 1, winRate: 100, pnl: 108, isProfit: true },
-    { name: 'Currency', trades: 2, winRate: 0, pnl: -6000, isProfit: false },
-  ];
+
 
   return (
     <div className="space-y-6 font-sans">

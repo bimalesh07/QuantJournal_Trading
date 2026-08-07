@@ -325,7 +325,7 @@ export default function App() {
             {/* View Tab 1: Dashboard Overview */}
             {activeTab === 'dashboard' && (
               <div className="space-y-6 animate-fadeIn">
-                <DashboardOverview analytics={analytics} />
+                <DashboardOverview analytics={analytics} trades={trades} />
                 <AnalyticsCharts analytics={analytics} />
                 <TradeTable
                   trades={trades}

@@ -76,6 +76,9 @@ class AnalyticsService:
         # Calendar Data (Daily Net PnL)
         calendar_data = AnalyticsService._calculate_calendar_data(closed_trades)
 
+        # Asset Class Breakdown
+        pnl_by_asset_class = AnalyticsService._calculate_asset_class_stats(closed_trades)
+
         return {
             'overview': {
                 'total_trades': total_trades,
@@ -104,6 +107,7 @@ class AnalyticsService:
             'equity_curve': equity_curve,
             'monthly_pnl': monthly_pnl,
             'calendar_data': calendar_data,
+            'pnl_by_asset_class': pnl_by_asset_class,
         }
 
     @staticmethod
@@ -337,4 +341,33 @@ class AnalyticsService:
                     'win_rate': win_rate,
                     'net_pnl': float(round(item['net_pnl'], 2))
                 })
+        return result
+
+    @staticmethod
+    def _calculate_asset_class_stats(closed_trades):
+        asset_map = defaultdict(lambda: {'trades': 0, 'wins': 0, 'losses': 0, 'net_pnl': Decimal('0')})
+
+        for t in closed_trades:
+            asset = t.asset_class or 'UNASSIGNED'
+            asset_map[asset]['trades'] += 1
+            asset_map[asset]['net_pnl'] += t.net_pnl
+            if t.net_pnl > 0:
+                asset_map[asset]['wins'] += 1
+            elif t.net_pnl < 0:
+                asset_map[asset]['losses'] += 1
+
+        result = []
+        for asset, val in asset_map.items():
+            total = val['trades']
+            win_rate = round((val['wins'] / total) * 100, 2) if total > 0 else 0.0
+            result.append({
+                'name': asset,
+                'trades': total,
+                'wins': val['wins'],
+                'losses': val['losses'],
+                'winRate': win_rate,
+                'pnl': float(round(val['net_pnl'], 2)),
+                'isProfit': val['net_pnl'] >= 0
+            })
+        result.sort(key=lambda x: x['pnl'], reverse=True)
         return result
