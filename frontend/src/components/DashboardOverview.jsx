@@ -253,7 +253,7 @@ export default function DashboardOverview({ analytics, trades = [] }) {
       </div>
 
       {/* ========================================================================= */}
-      {/* 1. TOP 4 EXECUTIVE FINANCIAL KPI CARDS (ULTRA-CLEAN ALIGNMENT) */}
+      {/* 1. TOP 4 EXECUTIVE FINANCIAL KPI CARDS */}
       {/* ========================================================================= */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 font-mono">
 
@@ -263,8 +263,8 @@ export default function DashboardOverview({ analytics, trades = [] }) {
           className={`bg-gradient-to-br ${isNetPositive ? 'from-[#061B15] via-[#09261E]/90 to-[#070A12] border-emerald-500/40' : 'from-[#22070D] via-[#2A0B11]/90 to-[#070A12] border-rose-500/40'} border rounded-2xl p-5 backdrop-blur-2xl flex flex-col justify-between shadow-xl min-h-[125px]`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-              <span>PORTFOLIO NET P&L</span>
+            <span className="text-xs font-bold text-slate-300 font-sans tracking-wide flex items-center gap-1.5">
+              <span>Portfolio Net P&L</span>
             </span>
             <div className={`w-8 h-8 rounded-xl border flex items-center justify-center shrink-0 ${isNetPositive ? 'bg-emerald-500/20 border-emerald-400/40 text-emerald-300' : 'bg-rose-500/20 border-rose-400/40 text-rose-300'}`}>
               <DollarSign className="w-4 h-4 stroke-[2.5]" />
@@ -279,7 +279,7 @@ export default function DashboardOverview({ analytics, trades = [] }) {
 
           <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-400 font-mono">
             <span className="text-emerald-400 font-bold">Gross: +${overview.total_gross_pnl.toLocaleString()}</span>
-            <span className="text-slate-500">Fees: ${overview.total_fees.toLocaleString()}</span>
+            <span className="text-slate-400">Fees: ${overview.total_fees.toLocaleString()}</span>
           </div>
         </AntigravityCard>
 
@@ -289,8 +289,8 @@ export default function DashboardOverview({ analytics, trades = [] }) {
           className="bg-gradient-to-br from-[#061524] via-[#0A2036]/90 to-[#070A12] border border-sky-500/40 rounded-2xl p-5 backdrop-blur-2xl flex flex-col justify-between shadow-xl min-h-[125px]"
         >
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-black text-sky-400 uppercase tracking-widest flex items-center gap-1.5">
-              <span>AVG RISK : REWARD</span>
+            <span className="text-xs font-bold text-sky-400 font-sans tracking-wide flex items-center gap-1.5">
+              <span>Avg. Risk to Reward</span>
             </span>
             <div className="w-8 h-8 rounded-xl bg-sky-500/20 border border-sky-400/40 flex items-center justify-center text-sky-300 shrink-0">
               <Target className="w-4 h-4 stroke-[2.5]" />
@@ -315,8 +315,8 @@ export default function DashboardOverview({ analytics, trades = [] }) {
           className="bg-gradient-to-br from-[#120821] via-[#1A0C30]/90 to-[#070A12] border border-purple-500/40 rounded-2xl p-5 backdrop-blur-2xl flex flex-col justify-between shadow-xl min-h-[125px]"
         >
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-black text-purple-400 uppercase tracking-widest flex items-center gap-1.5">
-              <span>PROFIT FACTOR</span>
+            <span className="text-xs font-bold text-purple-300 font-sans tracking-wide flex items-center gap-1.5">
+              <span>Profit Factor</span>
             </span>
             <div className="w-8 h-8 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-purple-300 shrink-0">
               <Scale className="w-4 h-4 stroke-[2.5]" />
@@ -341,8 +341,8 @@ export default function DashboardOverview({ analytics, trades = [] }) {
           className="bg-gradient-to-br from-[#1A1005] via-[#261807]/90 to-[#070A12] border border-amber-500/40 rounded-2xl p-5 backdrop-blur-2xl flex flex-col justify-between shadow-xl min-h-[125px]"
         >
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-black text-amber-400 uppercase tracking-widest flex items-center gap-1.5">
-              <span>TOTAL EXECUTIONS</span>
+            <span className="text-xs font-bold text-amber-300 font-sans tracking-wide flex items-center gap-1.5">
+              <span>Total Executions</span>
             </span>
             <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-300 shrink-0">
               <Hash className="w-4 h-4 stroke-[2.5]" />
@@ -364,58 +364,62 @@ export default function DashboardOverview({ analytics, trades = [] }) {
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. 6 SECONDARY METRICS EXECUTION TRAY (100% PRESERVED, ULTRA-CLEAN) */}
+      {/* 2. UNIFIED TRADING VELOCITY & CONSISTENCY EXECUTIVE PANEL */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 font-mono">
-        
-        {/* Avg Trades/Day */}
-        <div className="p-3.5 rounded-2xl bg-[#090D18]/90 border border-white/10 flex flex-col justify-between space-y-1.5 shadow-md hover:border-cyan-500/40 transition-all backdrop-blur-xl">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Avg. Trades/Day</span>
-          <p className="text-lg font-black text-cyan-400">{overview.avg_trades_per_day || 1.0}</p>
-          <span className="text-[9px] text-slate-400">Per trading day</span>
+      <div className="bg-[#080C16] border border-white/10 rounded-2xl p-5 shadow-xl space-y-4 font-sans">
+        <div className="flex items-center justify-between pb-3 border-b border-white/10">
+          <div className="flex items-center gap-2">
+            <Activity className="w-4.5 h-4.5 text-cyan-400" />
+            <h3 className="text-base font-bold text-white font-mono">Execution Velocity & Consistency Breakdown</h3>
+          </div>
+          <span className="text-xs text-slate-400 font-mono">Quantitative Telemetry</span>
         </div>
 
-        {/* Avg PnL per Trade */}
-        <div className="p-3.5 rounded-2xl bg-[#090D18]/90 border border-white/10 flex flex-col justify-between space-y-1.5 shadow-md hover:border-emerald-500/40 transition-all backdrop-blur-xl">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Avg. P&L / Trade</span>
-          <p className={`text-lg font-black ${overview.avg_pnl_per_trade >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-            {overview.avg_pnl_per_trade >= 0 ? '+' : ''}${overview.avg_pnl_per_trade || 0}
-          </p>
-          <span className="text-[9px] text-emerald-400/80">Per trade</span>
-        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 font-mono">
+          
+          {/* Avg Trades/Day */}
+          <div className="p-3.5 rounded-xl bg-[#0E1320] border border-white/10 space-y-1">
+            <span className="text-[11px] text-slate-400 block font-sans">Avg. Trades / Day</span>
+            <p className="text-base font-black text-cyan-400">{overview.avg_trades_per_day || 1.0}</p>
+          </div>
 
-        {/* Highest Win */}
-        <div className="p-3.5 rounded-2xl bg-[#090D18]/90 border border-emerald-500/30 flex flex-col justify-between space-y-1.5 shadow-md hover:border-emerald-500/50 transition-all backdrop-blur-xl">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Highest Win 🏆</span>
-          <p className="text-lg font-black text-emerald-400">+${overview.highest_win || 0}</p>
-          <span className="text-[9px] text-emerald-400/80">Best trade</span>
-        </div>
+          {/* Avg PnL per Trade */}
+          <div className="p-3.5 rounded-xl bg-[#0E1320] border border-white/10 space-y-1">
+            <span className="text-[11px] text-slate-400 block font-sans">Avg. P&L / Trade</span>
+            <p className={`text-base font-black ${overview.avg_pnl_per_trade >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+              {overview.avg_pnl_per_trade >= 0 ? '+' : ''}${overview.avg_pnl_per_trade || 0}
+            </p>
+          </div>
 
-        {/* Highest Loss */}
-        <div className="p-3.5 rounded-2xl bg-[#090D18]/90 border border-rose-500/30 flex flex-col justify-between space-y-1.5 shadow-md hover:border-rose-500/50 transition-all backdrop-blur-xl">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Highest Loss ⚠️</span>
-          <p className="text-lg font-black text-rose-400">-${overview.highest_loss || 0}</p>
-          <span className="text-[9px] text-rose-400/80">Worst trade</span>
-        </div>
+          {/* Highest Win */}
+          <div className="p-3.5 rounded-xl bg-[#0E1320] border border-emerald-500/30 space-y-1">
+            <span className="text-[11px] text-slate-400 block font-sans">Highest Win 🏆</span>
+            <p className="text-base font-black text-emerald-400">+${overview.highest_win || 0}</p>
+          </div>
 
-        {/* Win Days */}
-        <div className="p-3.5 rounded-2xl bg-[#090D18]/90 border border-emerald-500/30 flex flex-col justify-between space-y-1.5 shadow-md hover:border-emerald-500/50 transition-all backdrop-blur-xl">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Win Days 🟢</span>
-          <p className="text-lg font-black text-emerald-400">{overview.win_days || 0}</p>
-          <span className="text-[9px] text-emerald-400/80">Profitable days</span>
-        </div>
+          {/* Highest Loss */}
+          <div className="p-3.5 rounded-xl bg-[#0E1320] border border-rose-500/30 space-y-1">
+            <span className="text-[11px] text-slate-400 block font-sans">Highest Loss ⚠️</span>
+            <p className="text-base font-black text-rose-400">-${overview.highest_loss || 0}</p>
+          </div>
 
-        {/* Loss Days */}
-        <div className="p-3.5 rounded-2xl bg-[#090D18]/90 border border-rose-500/30 flex flex-col justify-between space-y-1.5 shadow-md hover:border-rose-500/50 transition-all backdrop-blur-xl">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Loss Days 🔴</span>
-          <p className="text-lg font-black text-rose-400">{overview.loss_days || 0}</p>
-          <span className="text-[9px] text-rose-400/80">Loss making days</span>
-        </div>
+          {/* Win Days */}
+          <div className="p-3.5 rounded-xl bg-[#0E1320] border border-emerald-500/30 space-y-1">
+            <span className="text-[11px] text-slate-400 block font-sans">Win Days 🟢</span>
+            <p className="text-base font-black text-emerald-400">{overview.win_days || 0} Days</p>
+          </div>
 
+          {/* Loss Days */}
+          <div className="p-3.5 rounded-xl bg-[#0E1320] border border-rose-500/30 space-y-1">
+            <span className="text-[11px] text-slate-400 block font-sans">Loss Days 🔴</span>
+            <p className="text-base font-black text-rose-400">{overview.loss_days || 0} Days</p>
+          </div>
+
+        </div>
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. STRATEGY & ASSET LEADERBOARD MATRIX (2x2 GRID, 100% PRESERVED) */}
+      {/* 3. STRATEGY & ASSET LEADERBOARD MATRIX */}
       {/* ========================================================================= */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono">
 
@@ -429,8 +433,8 @@ export default function DashboardOverview({ analytics, trades = [] }) {
               <Trophy className="w-5.5 h-5.5 stroke-[2]" />
             </div>
             <div>
-              <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest block">
-                TOP PERFORMING STRATEGY
+              <span className="text-xs font-bold text-emerald-400 font-sans block">
+                Top Performing Strategy
               </span>
               <h4 className="text-base sm:text-lg font-black text-white mt-0.5 tracking-wide">
                 {best_strategy ? best_strategy.strategy_name : 'N/A'}
@@ -458,8 +462,8 @@ export default function DashboardOverview({ analytics, trades = [] }) {
               <AlertTriangle className="w-5.5 h-5.5 stroke-[2]" />
             </div>
             <div>
-              <span className="text-[10px] font-black text-rose-400 uppercase tracking-widest block">
-                LOWEST PERFORMING STRATEGY
+              <span className="text-xs font-bold text-rose-400 font-sans block">
+                Lowest Performing Strategy
               </span>
               <h4 className="text-base sm:text-lg font-black text-white mt-0.5 tracking-wide">
                 {worst_strategy ? worst_strategy.strategy_name : 'N/A'}
@@ -488,8 +492,8 @@ export default function DashboardOverview({ analytics, trades = [] }) {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-black text-teal-400 uppercase tracking-widest block">
-                  BEST PERFORMING ASSET
+                <span className="text-xs font-bold text-teal-400 font-sans block">
+                  Best Performing Asset
                 </span>
                 {computedBestAsset && computedBestAsset.price > 0 && (
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-teal-500/20 text-teal-300 font-bold border border-teal-500/30">
@@ -524,8 +528,8 @@ export default function DashboardOverview({ analytics, trades = [] }) {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-black text-rose-400 uppercase tracking-widest block">
-                  LOWEST PERFORMING ASSET
+                <span className="text-xs font-bold text-rose-400 font-sans block">
+                  Lowest Performing Asset
                 </span>
                 {computedWorstAsset && computedWorstAsset.price > 0 && (
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-300 font-bold border border-rose-500/30">
