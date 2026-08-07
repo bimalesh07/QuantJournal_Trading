@@ -49,22 +49,22 @@ export default function QuantumLoadingScreen() {
       setTerminalLogs(prev => [...prev.slice(-3), logs[Math.floor(Math.random() * logs.length)]]);
     }, 450);
 
-    // 3. Progress Step Progression
+    // 3. Ultra-Fast Lightning Sync Progression (Reaches 100% in ~350ms)
     const progressInterval = setInterval(() => {
       setProgress(prev => {
-        if (prev >= 96) {
+        if (prev >= 100) {
           clearInterval(progressInterval);
-          return 98;
+          return 100;
         }
-        const nextVal = prev + Math.floor(Math.random() * 12) + 8;
+        const nextVal = prev + Math.floor(Math.random() * 25) + 25;
         
-        if (nextVal > 75) setCurrentStepIndex(3);
-        else if (nextVal > 50) setCurrentStepIndex(2);
-        else if (nextVal > 25) setCurrentStepIndex(1);
+        if (nextVal > 75) setCurrentStepIndex(4);
+        else if (nextVal > 50) setCurrentStepIndex(3);
+        else if (nextVal > 25) setCurrentStepIndex(2);
 
-        return nextVal > 95 ? 95 : nextVal;
+        return nextVal >= 100 ? 100 : nextVal;
       });
-    }, 240);
+    }, 45);
 
     return () => {
       clearInterval(tickInterval);
