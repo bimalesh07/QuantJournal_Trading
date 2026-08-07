@@ -135,13 +135,13 @@ _cors_origins_env = os.getenv('CORS_ALLOWED_ORIGINS', '')
 if _cors_origins_env:
     env_origins = [origin.strip() for origin in _cors_origins_env.split(',') if origin.strip()]
     CORS_ALLOWED_ORIGINS = list(set(DEFAULT_ALLOWED_ORIGINS + env_origins))
-    CORS_ALLOW_ALL_ORIGINS = False
 else:
     CORS_ALLOWED_ORIGINS = DEFAULT_ALLOWED_ORIGINS
-    CORS_ALLOWED_ORIGIN_REGEXES = [
-        r"^https://.*\.vercel\.app$",
-    ]
-    CORS_ALLOW_ALL_ORIGINS = False
+
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://.*\.vercel\.app$",
+]
+CORS_ALLOW_ALL_ORIGINS = False
 
 CORS_ALLOW_HEADERS = [
     'accept',
