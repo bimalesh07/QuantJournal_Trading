@@ -10,6 +10,7 @@ import StrategyManagerModal from './components/StrategyManagerModal';
 import AuthScreen from './components/AuthScreen';
 import LandingPage from './components/LandingPage';
 import QuantumLoadingScreen from './components/QuantumLoadingScreen';
+import MarketTicker from './components/MarketTicker';
 
 import { 
   getTrades, 
@@ -310,6 +311,9 @@ export default function App() {
         theme={theme}
         onToggleTheme={handleToggleTheme}
       />
+
+      {/* Live Market Ticker Tape */}
+      <MarketTicker />
 
       {/* Notification Toast */}
       {notification && (

@@ -145,6 +145,15 @@ select option:checked {
   animation: borderSpin 4s linear infinite;
 }
 
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 35s linear infinite;
+}
+
 /* Recharts Dark Theme Transparent Background Fix */
 .recharts-wrapper,
 .recharts-surface,
