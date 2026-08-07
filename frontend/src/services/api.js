@@ -1,9 +1,8 @@
 import axios from 'axios';
 
-// Smart API_BASE_URL selection:
-// If VITE_API_URL is provided in environment, use it.
-// If running on localhost / 127.0.0.1, use local Django backend (http://localhost:8000/api).
-// Otherwise (e.g. deployed on Vercel), fall back to Render production backend (https://quantjournal-trading.onrender.com/api).
+// Dynamic API_BASE_URL selection:
+// Reads VITE_API_URL environment variable (configured in Vercel / .env).
+// Falls back to localhost in local dev mode.
 const getDynamicApiUrl = () => {
   if (import.meta.env.VITE_API_URL) {
     return import.meta.env.VITE_API_URL;

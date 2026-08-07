@@ -10,12 +10,12 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-trading-journal-analytics-
 
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    'trading-track.onrender.com',
-    '.onrender.com',
-]
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+
+# Render automatically injects RENDER_EXTERNAL_HOSTNAME in production
+_render_host = os.getenv('RENDER_EXTERNAL_HOSTNAME')
+if _render_host:
+    ALLOWED_HOSTS.append(_render_host)
 
 _allowed_hosts_env = os.getenv('ALLOWED_HOSTS', '')
 if _allowed_hosts_env:
