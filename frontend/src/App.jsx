@@ -13,6 +13,7 @@ import QuantumLoadingScreen from './components/QuantumLoadingScreen';
 import MarketTicker from './components/MarketTicker';
 import TraderMilestones from './components/TraderMilestones';
 import TraderPlaybook from './components/TraderPlaybook';
+import DeleteConfirmModal from './components/DeleteConfirmModal';
 
 import { 
   getTrades, 
@@ -191,10 +192,16 @@ export default function App() {
     }
   };
 
-  const handleDeleteTrade = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this trade record?')) return;
+  const [deleteTradeState, setDeleteTradeState] = useState({ isOpen: false, tradeId: null });
+
+  const handleDeleteTrade = (id) => {
+    setDeleteTradeState({ isOpen: true, tradeId: id });
+  };
+
+  const handleConfirmDeleteTrade = async () => {
+    if (!deleteTradeState.tradeId) return;
     try {
-      await deleteTrade(id);
+      await deleteTrade(deleteTradeState.tradeId);
       showNotification('Trade deleted successfully.');
       fetchAllData();
     } catch (err) {
@@ -433,6 +440,15 @@ export default function App() {
         strategies={strategies}
         onCreateStrategy={handleCreateStrategy}
         onDeleteStrategy={handleDeleteStrategy}
+      />
+
+      <DeleteConfirmModal
+        isOpen={deleteTradeState.isOpen}
+        onClose={() => setDeleteTradeState(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={handleConfirmDeleteTrade}
+        title="Delete Trade Execution?"
+        message="Are you sure you want to permanently delete this trade record? This action cannot be undone."
+        theme={theme}
       />
 
       <footer className="border-t border-slate-800/80 py-6 px-4 text-center text-xs text-slate-400 font-mono">

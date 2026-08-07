@@ -23,6 +23,7 @@ import {
   Target,
   Clock
 } from 'lucide-react';
+import TradingCandleBackground from './TradingCandleBackground';
 
 export default function LandingPage({ onEnterApp, onLoginClick, isLoggedIn }) {
   const [openFaq, setOpenFaq] = useState(null);
@@ -159,6 +160,9 @@ export default function LandingPage({ onEnterApp, onLoginClick, isLoggedIn }) {
   return (
     <div className="min-h-screen bg-[#070A12] text-slate-100 font-sans selection:bg-cyan-500/30 selection:text-cyan-300 relative overflow-hidden">
       
+      {/* Animated Moving Candlestick & Grid Canvas Background */}
+      <TradingCandleBackground />
+
       {/* Ambient Glows */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-gradient-to-b from-cyan-500/15 via-emerald-500/10 to-transparent rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute top-1/3 right-10 w-[450px] h-[450px] bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>

@@ -32,10 +32,12 @@ import {
   Filter
 } from 'lucide-react';
 import ImageLightboxModal from './ImageLightboxModal';
+import DeleteConfirmModal from './DeleteConfirmModal';
 
 export default function TraderPlaybook({ theme = 'dark' }) {
   const isLight = theme === 'light';
   const [lightboxState, setLightboxState] = useState({ isOpen: false, imageUrl: '', title: '' });
+  const [deleteModalState, setDeleteModalState] = useState({ isOpen: false, type: 'concept', id: null, title: '' });
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().slice(0, 10));
   
   // Search & Filter & Layout States
@@ -198,11 +200,6 @@ export default function TraderPlaybook({ theme = 'dark' }) {
     setIsAddingSetup(false);
   };
 
-  const handleDeleteSetup = (id) => {
-    if (!window.confirm('Delete this setup rule from your playbook?')) return;
-    setSetups(prev => prev.filter(s => s.id !== id));
-  };
-
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -234,9 +231,30 @@ export default function TraderPlaybook({ theme = 'dark' }) {
     setIsAddingConcept(false);
   };
 
-  const handleDeleteConcept = (id) => {
-    if (!window.confirm('Delete this concept note?')) return;
-    setConceptNotes(prev => prev.filter(c => c.id !== id));
+  const handleDeleteSetup = (id, title = 'setup rule') => {
+    setDeleteModalState({
+      isOpen: true,
+      type: 'setup',
+      id: id,
+      title: `Delete setup "${title}"?`
+    });
+  };
+
+  const handleDeleteConcept = (id, title = 'concept note') => {
+    setDeleteModalState({
+      isOpen: true,
+      type: 'concept',
+      id: id,
+      title: `Delete concept "${title}"?`
+    });
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteModalState.type === 'concept') {
+      setConceptNotes(prev => prev.filter(c => c.id !== deleteModalState.id));
+    } else if (deleteModalState.type === 'setup') {
+      setSetups(prev => prev.filter(s => s.id !== deleteModalState.id));
+    }
   };
 
   // Export Playbook Notes & Images to PDF
@@ -1038,6 +1056,16 @@ export default function TraderPlaybook({ theme = 'dark' }) {
         onClose={() => setLightboxState(prev => ({ ...prev, isOpen: false }))}
         imageUrl={lightboxState.imageUrl}
         title={lightboxState.title}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={deleteModalState.isOpen}
+        onClose={() => setDeleteModalState(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={handleConfirmDelete}
+        title={deleteModalState.title || 'Delete Item?'}
+        message="Are you sure you want to permanently delete this item from your vault? This action cannot be undone."
+        theme={theme}
       />
 
     </div>
