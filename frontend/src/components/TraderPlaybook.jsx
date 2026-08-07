@@ -528,106 +528,90 @@ export default function TraderPlaybook({ theme = 'dark' }) {
 
       {/* VIEW 2: CONCEPTS & LOGIC NOTES (MS WORD / NOTION STYLE WITH ORGANIZED CONTROLS) */}
       {activeSubTab === 'concepts' && (
-        <div className="space-y-6 font-mono">
+        <div className="space-y-5 font-mono">
           
-          {/* Header Action Bar + Search + Filters + View Mode Switcher */}
-          <div className={`border rounded-2xl p-4 sm:p-5 shadow-xl space-y-4 transition-colors ${
+          {/* Streamlined Filter & Action Toolbar */}
+          <div className={`border rounded-2xl p-3.5 sm:p-4 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-3 transition-colors ${
             isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-[#080C16] border-white/10 text-white'
           }`}>
             
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <h3 className="text-lg font-bold flex items-center gap-2">
-                  <span>Trading Concepts & Case Studies Vault</span>
-                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-500 border border-cyan-500/30 font-bold">
-                    {filteredConcepts.length} / {conceptNotes.length} Notes
-                  </span>
-                </h3>
-                <p className={`text-xs font-sans mt-0.5 ${isLight ? 'text-slate-600' : 'text-slate-400'}`}>
-                  Write deep MS Word style trading notes (IDM rules, FVG logic) with attached chart screenshots.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2 shrink-0">
-                {/* View Mode Switcher (Grid vs Compact List) */}
-                <div className={`flex items-center gap-1 p-1 rounded-xl border ${
-                  isLight ? 'bg-slate-100 border-slate-200' : 'bg-[#0E1320] border-white/10'
-                }`}>
-                  <button
-                    onClick={() => setViewMode('grid')}
-                    className={`p-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
-                      viewMode === 'grid'
-                        ? 'bg-cyan-500/20 text-cyan-500 border border-cyan-500/30'
-                        : isLight ? 'text-slate-500 hover:text-slate-900' : 'text-slate-400 hover:text-white'
-                    }`}
-                    title="Grid View (Cards with Screenshots)"
-                  >
-                    <Grid className="w-4 h-4" />
-                  </button>
-
-                  <button
-                    onClick={() => setViewMode('compact')}
-                    className={`p-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
-                      viewMode === 'compact'
-                        ? 'bg-cyan-500/20 text-cyan-500 border border-cyan-500/30'
-                        : isLight ? 'text-slate-500 hover:text-slate-900' : 'text-slate-400 hover:text-white'
-                    }`}
-                    title="Compact List View (Accordion Rows for 15+ Notes)"
-                  >
-                    <List className="w-4 h-4" />
-                  </button>
-                </div>
-
+            {/* Category Filter Pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto [scrollbar-width:none]">
+              <Filter className="w-3.5 h-3.5 text-cyan-500 shrink-0 mr-1" />
+              {[
+                { id: 'ALL', label: 'All Notes' },
+                { id: 'ICT & Smart Money Concepts', label: 'ICT / FVG' },
+                { id: 'Indian F&O Price Action', label: 'Indian F&O' },
+                { id: 'Chart Pattern & Breakout', label: 'Price Action' },
+                { id: 'Risk Management & Psychology', label: 'Risk Rules' },
+              ].map((cat) => (
                 <button
-                  onClick={() => setIsAddingConcept(true)}
-                  className="px-4 py-2 text-xs font-mono font-black text-slate-950 bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 hover:scale-105 rounded-xl shadow-lg shadow-cyan-500/25 transition-all flex items-center gap-2 cursor-pointer border border-cyan-300/40"
+                  key={cat.id}
+                  onClick={() => setCategoryFilter(cat.id)}
+                  className={`px-3 py-1 rounded-full text-[11px] font-mono font-bold transition-all cursor-pointer whitespace-nowrap ${
+                    categoryFilter === cat.id
+                      ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 font-black'
+                      : isLight ? 'bg-slate-100 text-slate-600 border border-slate-200' : 'bg-[#0E1320] text-slate-400 border border-white/10 hover:text-white'
+                  }`}
                 >
-                  <Plus className="w-4 h-4 stroke-[2.5]" />
-                  <span>+ Create Concept Note</span>
+                  {cat.label}
                 </button>
-              </div>
+              ))}
             </div>
 
-            {/* Filter Pills & Search Input Row */}
-            <div className="pt-2 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-3 text-xs">
+            {/* Right Group: Search + View Switcher + Create Note Button */}
+            <div className="flex items-center gap-2.5 shrink-0 flex-wrap md:flex-nowrap">
               
-              {/* Category Filters */}
-              <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto [scrollbar-width:none]">
-                <Filter className="w-3.5 h-3.5 text-cyan-500 shrink-0 mr-1" />
-                {[
-                  { id: 'ALL', label: 'All Notes' },
-                  { id: 'ICT & Smart Money Concepts', label: 'ICT / IDM / FVG' },
-                  { id: 'Indian F&O Price Action', label: 'Indian F&O' },
-                  { id: 'Chart Pattern & Breakout', label: 'Price Action' },
-                  { id: 'Risk Management & Psychology', label: 'Risk Rules' },
-                ].map((cat) => (
-                  <button
-                    key={cat.id}
-                    onClick={() => setCategoryFilter(cat.id)}
-                    className={`px-3 py-1 rounded-full text-[11px] font-mono font-bold transition-all cursor-pointer whitespace-nowrap ${
-                      categoryFilter === cat.id
-                        ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 font-black'
-                        : isLight ? 'bg-slate-100 text-slate-600 border border-slate-200' : 'bg-[#0E1320] text-slate-400 border border-white/10 hover:text-white'
-                    }`}
-                  >
-                    {cat.label}
-                  </button>
-                ))}
-              </div>
-
               {/* Search Bar Input */}
-              <div className="relative w-full md:w-64 shrink-0">
+              <div className="relative w-full md:w-56 shrink-0">
                 <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
                 <input
                   type="text"
-                  placeholder="Search 15+ notes by title/logic..."
+                  placeholder="Search notes..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className={`w-full pl-9 pr-3 py-1.5 rounded-xl border text-xs font-mono outline-none focus:border-cyan-400 ${
+                  className={`w-full pl-8 pr-3 py-1.5 rounded-xl border text-xs font-mono outline-none focus:border-cyan-400 ${
                     isLight ? 'bg-slate-50 border-slate-300 text-slate-900' : 'bg-[#0E1320] border-white/15 text-white'
                   }`}
                 />
               </div>
+
+              {/* View Mode Switcher (Grid vs Compact List) */}
+              <div className={`flex items-center gap-1 p-1 rounded-xl border ${
+                isLight ? 'bg-slate-100 border-slate-200' : 'bg-[#0E1320] border-white/10'
+              }`}>
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`p-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
+                    viewMode === 'grid'
+                      ? 'bg-cyan-500/20 text-cyan-500 border border-cyan-500/30'
+                      : isLight ? 'text-slate-500 hover:text-slate-900' : 'text-slate-400 hover:text-white'
+                  }`}
+                  title="Grid View (Cards)"
+                >
+                  <Grid className="w-3.5 h-3.5" />
+                </button>
+
+                <button
+                  onClick={() => setViewMode('compact')}
+                  className={`p-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
+                    viewMode === 'compact'
+                      ? 'bg-cyan-500/20 text-cyan-500 border border-cyan-500/30'
+                      : isLight ? 'text-slate-500 hover:text-slate-900' : 'text-slate-400 hover:text-white'
+                  }`}
+                  title="Compact List View"
+                >
+                  <List className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              <button
+                onClick={() => setIsAddingConcept(true)}
+                className="px-3.5 py-1.5 text-xs font-mono font-black text-slate-950 bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 hover:scale-105 rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer border border-cyan-300/40 shrink-0"
+              >
+                <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span>+ Create Note</span>
+              </button>
 
             </div>
 
