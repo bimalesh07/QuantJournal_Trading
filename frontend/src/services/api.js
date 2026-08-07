@@ -11,7 +11,7 @@ const getDynamicApiUrl = () => {
   if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
     return 'http://localhost:8000/api';
   }
-  return 'https://trade-track-vsof.onrender.com/api';
+  return 'https://quantjournal-trading.onrender.com/api';
 };
 
 const API_BASE_URL = getDynamicApiUrl();
