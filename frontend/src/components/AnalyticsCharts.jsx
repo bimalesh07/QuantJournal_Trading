@@ -15,7 +15,7 @@ import {
 } from 'recharts';
 import { TrendingUp, BarChart2, Brain, Clock, Layers, Target, Sparkles } from 'lucide-react';
 
-export default function AnalyticsCharts({ analytics, trades = [] }) {
+export default function AnalyticsCharts({ analytics, trades = [], isTransitioning = false }) {
   if (!analytics) return null;
 
   const { 
@@ -66,7 +66,7 @@ export default function AnalyticsCharts({ analytics, trades = [] }) {
   };
 
   return (
-    <div className="space-y-6 font-sans">
+    <div className={`space-y-6 font-sans transition-all duration-200 ${isTransitioning ? 'opacity-25 scale-[0.995]' : 'opacity-100 scale-100'}`}>
       
       {/* SVG Gradient Definitions */}
       <svg style={{ height: 0, width: 0, position: 'absolute' }}>

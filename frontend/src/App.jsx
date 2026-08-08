@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Navbar from './components/Navbar';
 import DashboardOverview from './components/DashboardOverview';
 import AnalyticsCharts from './components/AnalyticsCharts';
@@ -13,7 +13,9 @@ import QuantumLoadingScreen from './components/QuantumLoadingScreen';
 import MarketTicker from './components/MarketTicker';
 import TraderMilestones from './components/TraderMilestones';
 import TraderPlaybook from './components/TraderPlaybook';
+import TradeFilterBar from './components/TradeFilterBar';
 import DeleteConfirmModal from './components/DeleteConfirmModal';
+import { isTradeInTimeframe, calculateAnalyticsFromTrades } from './utils/analyticsUtils';
 
 import { 
   getTrades, 
@@ -41,6 +43,29 @@ export default function App() {
   const [strategies, setStrategies] = useState([]);
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Analytics Timeframe Filter State
+  const [analyticsTimeframe, setAnalyticsTimeframe] = useState('All Time');
+  const [isAnalyticsTransitioning, setIsAnalyticsTransitioning] = useState(false);
+
+  const handleAnalyticsTimeframeChange = (tf) => {
+    if (tf === analyticsTimeframe) return;
+    setIsAnalyticsTransitioning(true);
+    setTimeout(() => {
+      setAnalyticsTimeframe(tf);
+      setTimeout(() => {
+        setIsAnalyticsTransitioning(false);
+      }, 50);
+    }, 150);
+  };
+
+  const filteredAnalyticsTrades = useMemo(() => {
+    return (trades || []).filter((t) => isTradeInTimeframe(t, analyticsTimeframe));
+  }, [trades, analyticsTimeframe]);
+
+  const effectiveAnalytics = useMemo(() => {
+    return calculateAnalyticsFromTrades(filteredAnalyticsTrades, analytics);
+  }, [filteredAnalyticsTrades, analytics]);
 
   // Theme State (Dark / Light)
   const [theme, setTheme] = useState(() => localStorage.getItem('quant_journal_theme') || 'dark');
@@ -349,7 +374,12 @@ export default function App() {
             {/* View Tab 1: Dashboard Overview */}
             {activeTab === 'dashboard' && (
               <div className="space-y-6 animate-fadeIn">
-                <DashboardOverview analytics={analytics} trades={trades} theme={theme} />
+                <DashboardOverview 
+                  analytics={analytics} 
+                  trades={trades} 
+                  theme={theme} 
+                  onOpenTradeModal={handleOpenNewTradeModal}
+                />
                 <AnalyticsCharts analytics={analytics} trades={trades} theme={theme} />
                 <TraderMilestones analytics={analytics} trades={trades} theme={theme} />
                 <TradeTable
@@ -363,6 +393,9 @@ export default function App() {
                   setFilters={setFilters}
                   onResetFilters={handleResetFilters}
                   theme={theme}
+                  maxTrades={5}
+                  title="Recent Executions (Latest 5)"
+                  onViewAll={() => setActiveTab('trades')}
                 />
               </div>
             )}
@@ -392,8 +425,32 @@ export default function App() {
             {/* View Tab 3: Analytics Engine */}
             {activeTab === 'analytics' && (
               <div className="space-y-6 animate-fadeIn">
-                <DashboardOverview analytics={analytics} trades={trades} theme={theme} />
-                <AnalyticsCharts analytics={analytics} trades={trades} theme={theme} />
+                <DashboardOverview
+                  analytics={effectiveAnalytics}
+                  trades={trades}
+                  theme={theme}
+                  activeTimeframe={analyticsTimeframe}
+                  onTimeframeChange={handleAnalyticsTimeframeChange}
+                  isTransitioning={isAnalyticsTransitioning}
+                />
+                <AnalyticsCharts
+                  analytics={effectiveAnalytics}
+                  trades={filteredAnalyticsTrades}
+                  theme={theme}
+                  isTransitioning={isAnalyticsTransitioning}
+                />
+                <TradeTable
+                  trades={filteredAnalyticsTrades}
+                  strategies={strategies}
+                  onViewTrade={handleViewTradeDetail}
+                  onEditTrade={handleOpenEditTradeModal}
+                  onDeleteTrade={handleDeleteTrade}
+                  onImportTrades={handleImportTrades}
+                  filters={filters}
+                  setFilters={setFilters}
+                  onResetFilters={handleResetFilters}
+                  theme={theme}
+                />
               </div>
             )}
 

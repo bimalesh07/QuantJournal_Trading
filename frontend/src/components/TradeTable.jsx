@@ -13,9 +13,12 @@ import {
   Download,
   Upload,
   FileSpreadsheet,
-  Tag
+  Tag,
+  ArrowRight
 } from 'lucide-react';
 import ChartLightboxModal from './ChartLightboxModal';
+import TimeframeDropdown from './TimeframeDropdown';
+import { isTradeInTimeframe } from '../utils/analyticsUtils';
 import { getMediaUrl } from '../services/api';
 
 export default function TradeTable({ 
@@ -27,9 +30,13 @@ export default function TradeTable({
   onImportTrades,
   filters,
   setFilters,
-  onResetFilters
+  onResetFilters,
+  maxTrades,
+  title,
+  onViewAll
 }) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedTimeframe, setSelectedTimeframe] = useState('All Time');
   const [lightboxData, setLightboxData] = useState(null);
   const fileInputRef = useRef(null);
 
@@ -178,6 +185,8 @@ export default function TradeTable({
 
   // Filter Trades
   const filteredTrades = trades.filter(t => {
+    const matchesTimeframe = isTradeInTimeframe(t, selectedTimeframe);
+
     const matchesSearch = 
       t.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (t.strategy_name && t.strategy_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
@@ -193,8 +202,18 @@ export default function TradeTable({
     if (filters.outcome === 'LOSS') matchesOutcome = t.net_pnl < 0;
     if (filters.outcome === 'BREAKEVEN') matchesOutcome = Number(t.net_pnl) === 0;
 
-    return matchesSearch && matchesAsset && matchesType && matchesStrategy && matchesOutcome;
+    return matchesTimeframe && matchesSearch && matchesAsset && matchesType && matchesStrategy && matchesOutcome;
   });
+
+  // Sort trades newest first
+  const sortedTrades = [...filteredTrades].sort((a, b) => {
+    const timeA = new Date(a.entry_time || a.created_at || 0).getTime();
+    const timeB = new Date(b.entry_time || b.created_at || 0).getTime();
+    if (timeB !== timeA) return timeB - timeA;
+    return (b.id || 0) - (a.id || 0);
+  });
+
+  const displayedTrades = maxTrades ? sortedTrades.slice(0, maxTrades) : sortedTrades;
 
   const getEmotionBadge = (emotion) => {
     switch (emotion) {
@@ -209,7 +228,30 @@ export default function TradeTable({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 font-sans">
+      
+      {/* Optional Title & View All Header */}
+      {(title || onViewAll) && (
+        <div className="flex items-center justify-between px-1 pt-1 font-mono">
+          <div className="flex items-center gap-2">
+            <h3 className="text-sm sm:text-base font-bold text-white tracking-wide">{title || 'Recent Executions'}</h3>
+            {maxTrades && sortedTrades.length > maxTrades && (
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 font-semibold">
+                Latest {maxTrades}
+              </span>
+            )}
+          </div>
+          {onViewAll && (
+            <button
+              onClick={onViewAll}
+              className="text-xs font-semibold text-cyan-400 hover:text-cyan-300 transition-colors flex items-center gap-1 cursor-pointer"
+            >
+              <span>View All ({trades.length} Trades)</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+      )}
       
       {/* Chart Lightbox Zoom Modal */}
       <ChartLightboxModal
@@ -219,115 +261,136 @@ export default function TradeTable({
         title={lightboxData?.title}
       />
 
-      {/* Sleek Toolbar Header */}
-      <div className="bg-[#121622] p-4 rounded-2xl border border-slate-800/90 shadow-lg flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 font-sans">
+      {/* Sleek Structured 2-Row Toolbar Header */}
+      <div className="bg-[#121622]/90 p-4 rounded-2xl border border-slate-800/90 shadow-xl backdrop-blur-xl space-y-3 font-sans">
         
-        {/* Search Bar */}
-        <div className="relative flex-1 min-w-[220px]">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-          <input
-            type="text"
-            placeholder=""
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-[#161F2E] text-xs sm:text-sm text-slate-100 pl-10 pr-4 py-2 rounded-xl border border-slate-700/80 focus:border-emerald-400 focus:outline-none transition-all"
-          />
-          {searchTerm && (
-            <button 
-              onClick={() => setSearchTerm('')} 
-              className="absolute right-3 top-3 text-slate-400 hover:text-white"
+        {/* Top Row: Search Bar & Actions */}
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+          
+          {/* Search Input */}
+          <div className="relative flex-1 min-w-[240px]">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+            <input
+              type="text"
+              placeholder="Search symbol, strategy, setup tag, or notes..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full bg-[#161F2E] text-xs sm:text-sm text-slate-100 pl-10 pr-8 py-2 rounded-xl border border-slate-700/80 focus:border-cyan-400 focus:outline-none transition-all placeholder:text-slate-500 font-mono"
+            />
+            {searchTerm && (
+              <button 
+                onClick={() => setSearchTerm('')} 
+                className="absolute right-3 top-3 text-slate-400 hover:text-white"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          {/* Action Buttons: Export & Import CSV */}
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={handleExportCSV}
+              className="px-3 py-2 text-xs font-semibold text-emerald-400 hover:text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 rounded-xl border border-emerald-500/30 transition-all flex items-center gap-1.5 cursor-pointer font-mono"
+              title="Export Trade Log to CSV"
             >
-              <X className="w-3.5 h-3.5" />
+              <Download className="w-3.5 h-3.5" />
+              <span>Export CSV</span>
             </button>
-          )}
+
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleImportFileChange}
+              accept=".csv"
+              className="hidden"
+            />
+            <button
+              onClick={() => fileInputRef.current && fileInputRef.current.click()}
+              className="px-3 py-2 text-xs font-semibold text-cyan-400 hover:text-cyan-300 bg-cyan-500/10 hover:bg-cyan-500/20 rounded-xl border border-cyan-500/30 transition-all flex items-center gap-1.5 cursor-pointer font-mono"
+              title="Import Trades from CSV Backup"
+            >
+              <Upload className="w-3.5 h-3.5" />
+              <span>Import CSV</span>
+            </button>
+          </div>
+
         </div>
 
-        {/* Dropdown Filters & Actions */}
-        <div className="flex flex-wrap items-center gap-2">
+        {/* Bottom Row: Filter Dropdowns Bar */}
+        <div className="pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2.5">
           
-          {/* Asset Class Filter */}
-          <select
-            value={filters.asset_class || ''}
-            onChange={(e) => handleFilterChange('asset_class', e.target.value)}
-            className="bg-[#161F2E] text-xs text-slate-200 px-3 py-2 rounded-xl border border-slate-700/80 focus:border-emerald-400 focus:outline-none font-medium cursor-pointer"
-          >
-            <option value="" className="bg-[#121622] text-white">All Asset Classes</option>
-            <option value="CRYPTO" className="bg-[#121622] text-white">🪙 Crypto</option>
-            <option value="STOCKS" className="bg-[#121622] text-white">📈 Stocks</option>
-            <option value="FOREX" className="bg-[#121622] text-white">💱 Forex</option>
-            <option value="OPTIONS" className="bg-[#121622] text-white">📊 Options</option>
-            <option value="FUTURES" className="bg-[#121622] text-white">⚡ Futures</option>
-          </select>
+          <div className="flex flex-wrap items-center gap-2">
+            
+            {/* Timeframe Dropdown (Today, Week, Month, Year, All Time) */}
+            <TimeframeDropdown
+              activeTimeframe={selectedTimeframe}
+              onSelectTimeframe={setSelectedTimeframe}
+              tradeCount={filteredTrades.length}
+            />
+            
+            {/* Asset Class Filter */}
+            <select
+              value={filters.asset_class || ''}
+              onChange={(e) => handleFilterChange('asset_class', e.target.value)}
+              className="bg-[#161F2E] text-xs text-slate-200 px-3 py-2 rounded-xl border border-slate-700/80 focus:border-cyan-400 focus:outline-none font-medium cursor-pointer"
+            >
+              <option value="" className="bg-[#121622] text-white">All Asset Classes</option>
+              <option value="CRYPTO" className="bg-[#121622] text-white">🪙 Crypto</option>
+              <option value="STOCKS" className="bg-[#121622] text-white">📈 Stocks</option>
+              <option value="FOREX" className="bg-[#121622] text-white">💱 Forex</option>
+              <option value="OPTIONS" className="bg-[#121622] text-white">📊 Options</option>
+              <option value="FUTURES" className="bg-[#121622] text-white">⚡ Futures</option>
+            </select>
 
-          {/* Trade Type Filter */}
-          <select
-            value={filters.trade_type || ''}
-            onChange={(e) => handleFilterChange('trade_type', e.target.value)}
-            className="bg-[#161F2E] text-xs text-slate-200 px-3 py-2 rounded-xl border border-slate-700/80 focus:border-emerald-400 focus:outline-none font-medium cursor-pointer"
-          >
-            <option value="" className="bg-[#121622] text-white">All Types</option>
-            <option value="LONG" className="bg-[#121622] text-white">🟢 Long</option>
-            <option value="SHORT" className="bg-[#121622] text-white">🔴 Short</option>
-          </select>
+            {/* Trade Type Filter */}
+            <select
+              value={filters.trade_type || ''}
+              onChange={(e) => handleFilterChange('trade_type', e.target.value)}
+              className="bg-[#161F2E] text-xs text-slate-200 px-3 py-2 rounded-xl border border-slate-700/80 focus:border-cyan-400 focus:outline-none font-medium cursor-pointer"
+            >
+              <option value="" className="bg-[#121622] text-white">All Types</option>
+              <option value="LONG" className="bg-[#121622] text-white">🟢 Long</option>
+              <option value="SHORT" className="bg-[#121622] text-white">🔴 Short</option>
+            </select>
 
-          {/* Strategy Filter */}
-          <select
-            value={filters.strategy || ''}
-            onChange={(e) => handleFilterChange('strategy', e.target.value)}
-            className="bg-[#161F2E] text-xs text-slate-200 px-3 py-2 rounded-xl border border-slate-700/80 focus:border-emerald-400 focus:outline-none font-medium max-w-[140px] truncate cursor-pointer"
-          >
-            <option value="" className="bg-[#121622] text-white">All Strategies</option>
-            {strategies.map(s => (
-              <option key={s.id} value={s.id} className="bg-[#121622] text-white">{s.name}</option>
-            ))}
-          </select>
+            {/* Strategy Filter */}
+            <select
+              value={filters.strategy || ''}
+              onChange={(e) => handleFilterChange('strategy', e.target.value)}
+              className="bg-[#161F2E] text-xs text-slate-200 px-3 py-2 rounded-xl border border-slate-700/80 focus:border-cyan-400 focus:outline-none font-medium max-w-[140px] truncate cursor-pointer"
+            >
+              <option value="" className="bg-[#121622] text-white">All Strategies</option>
+              {strategies.map(s => (
+                <option key={s.id} value={s.id} className="bg-[#121622] text-white">{s.name}</option>
+              ))}
+            </select>
 
-          {/* Outcome Filter */}
-          <select
-            value={filters.outcome || ''}
-            onChange={(e) => handleFilterChange('outcome', e.target.value)}
-            className="bg-[#161F2E] text-xs text-slate-200 px-3 py-2 rounded-xl border border-slate-700/80 focus:border-emerald-400 focus:outline-none font-medium cursor-pointer"
-          >
-            <option value="" className="bg-[#121622] text-white">All Outcomes</option>
-            <option value="WIN" className="bg-[#121622] text-white">🟢 Win</option>
-            <option value="LOSS" className="bg-[#121622] text-white">🔴 Loss</option>
-            <option value="BREAKEVEN" className="bg-[#121622] text-white">⚪ Breakeven</option>
-          </select>
+            {/* Outcome Filter */}
+            <select
+              value={filters.outcome || ''}
+              onChange={(e) => handleFilterChange('outcome', e.target.value)}
+              className="bg-[#161F2E] text-xs text-slate-200 px-3 py-2 rounded-xl border border-slate-700/80 focus:border-cyan-400 focus:outline-none font-medium cursor-pointer"
+            >
+              <option value="" className="bg-[#121622] text-white">All Outcomes</option>
+              <option value="WIN" className="bg-[#121622] text-white">🟢 Win</option>
+              <option value="LOSS" className="bg-[#121622] text-white">🔴 Loss</option>
+              <option value="BREAKEVEN" className="bg-[#121622] text-white">⚪ Breakeven</option>
+            </select>
 
-          {/* Reset Filters */}
+          </div>
+
+          {/* Reset Filters Button */}
           <button
-            onClick={onResetFilters}
-            className="px-2.5 py-2 text-xs font-semibold text-slate-400 hover:text-slate-200 bg-slate-800/80 hover:bg-slate-800 rounded-xl border border-slate-700/70 transition-all flex items-center gap-1 cursor-pointer"
+            onClick={() => {
+              setSelectedTimeframe('All Time');
+              setSearchTerm('');
+              if (onResetFilters) onResetFilters();
+            }}
+            className="px-3 py-2 text-xs font-semibold text-slate-400 hover:text-slate-200 bg-slate-800/80 hover:bg-slate-800 rounded-xl border border-slate-700/70 transition-all flex items-center gap-1 cursor-pointer shrink-0 font-mono"
           >
             <X className="w-3.5 h-3.5" />
-            Reset
-          </button>
-
-          {/* CSV Export Button */}
-          <button
-            onClick={handleExportCSV}
-            className="px-3 py-2 text-xs font-semibold text-emerald-400 hover:text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 rounded-xl border border-emerald-500/30 transition-all flex items-center gap-1.5 cursor-pointer"
-            title="Export Trade Log to CSV"
-          >
-            <Download className="w-3.5 h-3.5" />
-            Export CSV
-          </button>
-
-          {/* CSV Import Button */}
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleImportFileChange}
-            accept=".csv"
-            className="hidden"
-          />
-          <button
-            onClick={() => fileInputRef.current && fileInputRef.current.click()}
-            className="px-3 py-2 text-xs font-semibold text-blue-400 hover:text-blue-300 bg-blue-500/10 hover:bg-blue-500/20 rounded-xl border border-blue-500/30 transition-all flex items-center gap-1.5 cursor-pointer"
-            title="Import Trades from CSV Backup"
-          >
-            <Upload className="w-3.5 h-3.5" />
-            Import CSV
+            <span>Reset Filters</span>
           </button>
 
         </div>
@@ -351,8 +414,8 @@ export default function TradeTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800/50 text-xs sm:text-sm">
-            {filteredTrades.length > 0 ? (
-              filteredTrades.map((t) => {
+            {displayedTrades.length > 0 ? (
+              displayedTrades.map((t) => {
                 const isLong = t.trade_type === 'LONG';
                 const isWin = t.net_pnl > 0;
                 const isLoss = t.net_pnl < 0;

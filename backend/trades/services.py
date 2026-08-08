@@ -25,7 +25,13 @@ class AnalyticsService:
         loss_count = len(losses)
         breakeven_count = len(breakevens)
 
-        win_rate = float(round((Decimal(win_count) / Decimal(total_closed)) * Decimal('100'), 2))
+        decisive_trades = win_count + loss_count
+        if decisive_trades > 0:
+            win_rate = float(round((Decimal(win_count) / Decimal(decisive_trades)) * Decimal('100'), 2))
+        elif total_closed > 0:
+            win_rate = float(round((Decimal(win_count) / Decimal(total_closed)) * Decimal('100'), 2))
+        else:
+            win_rate = 0.0
 
         total_net_pnl = float(round(sum((t.net_pnl for t in closed_trades), Decimal('0')), 2))
         total_gross_pnl = float(round(sum((t.gross_pnl for t in closed_trades), Decimal('0')), 2))

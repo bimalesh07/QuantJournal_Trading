@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { jsPDF } from 'jspdf';
 import {
   ResponsiveContainer,
@@ -29,8 +29,11 @@ import {
   Award,
   BarChart2,
   Clock,
-  Sparkles
+  Sparkles,
+  Plus
 } from 'lucide-react';
+import { isTradeInTimeframe, calculateAnalyticsFromTrades } from '../utils/analyticsUtils';
+import TimeframeDropdown from './TimeframeDropdown';
 
 // 3D Antigravity Tilt Card Component
 const AntigravityCard = ({ children, className = '', bloomColor = 'emerald' }) => {
@@ -107,8 +110,49 @@ const AntigravityCard = ({ children, className = '', bloomColor = 'emerald' }) =
   );
 };
 
-export default function DashboardOverview({ analytics, trades = [] }) {
-  if (!analytics || !analytics.overview) {
+export default function DashboardOverview({
+  analytics,
+  trades = [],
+  activeTimeframe = 'All Time',
+  onTimeframeChange,
+  isTransitioning: propIsTransitioning = false,
+  onOpenTradeModal,
+  hideTimeframeDropdown = false
+}) {
+  const [localTimeframe, setLocalTimeframe] = useState('All Time');
+  const [localTransitioning, setLocalTransitioning] = useState(false);
+
+  const currentTimeframe = onTimeframeChange ? activeTimeframe : localTimeframe;
+  const isTransitioning = propIsTransitioning || localTransitioning;
+
+  const handleSelectTimeframe = (tf) => {
+    if (tf === currentTimeframe) return;
+    setLocalTransitioning(true);
+    setTimeout(() => {
+      setLocalTimeframe(tf);
+      if (onTimeframeChange) {
+        onTimeframeChange(tf);
+      }
+      setTimeout(() => {
+        setLocalTransitioning(false);
+      }, 50);
+    }, 150);
+  };
+
+  const filteredTrades = useMemo(() => {
+    return (trades || []).filter((t) => isTradeInTimeframe(t, currentTimeframe));
+  }, [trades, currentTimeframe]);
+
+  const effectiveAnalytics = useMemo(() => {
+    if (currentTimeframe === 'All Time' && analytics && analytics.overview) {
+      return analytics;
+    }
+    return calculateAnalyticsFromTrades(filteredTrades, analytics);
+  }, [filteredTrades, analytics, currentTimeframe]);
+
+  const activeAnalytics = effectiveAnalytics || analytics;
+
+  if (!activeAnalytics || !activeAnalytics.overview) {
     return (
       <div className="p-12 text-center text-slate-400 font-mono text-sm space-y-3">
         <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
@@ -117,23 +161,23 @@ export default function DashboardOverview({ analytics, trades = [] }) {
     );
   }
 
-  const { overview, best_strategy, worst_strategy, best_asset, worst_asset, equity_curve = [], strategy_performance = [] } = analytics;
-  const isNetPositive = overview.total_net_pnl >= 0;
+  const { overview = {}, best_strategy, worst_strategy, best_asset, worst_asset, equity_curve = [], strategy_performance = [] } = activeAnalytics;
+  const isNetPositive = (overview.total_net_pnl || 0) >= 0;
 
   // Dynamic Fallback calculation for Asset Symbol Name & Last Traded Price
-  const computedBestAsset = best_asset || (trades.length > 0 ? {
-    name: trades[0].symbol,
-    pnl: trades[0].net_pnl,
-    price: trades[0].exit_price || trades[0].entry_price || 0,
-    winRate: trades[0].net_pnl > 0 ? 100 : 0,
+  const computedBestAsset = best_asset || (filteredTrades.length > 0 ? {
+    name: filteredTrades[0].symbol,
+    pnl: filteredTrades[0].net_pnl,
+    price: filteredTrades[0].exit_price || filteredTrades[0].entry_price || 0,
+    winRate: filteredTrades[0].net_pnl > 0 ? 100 : 0,
     trades: 1
   } : null);
 
-  const computedWorstAsset = worst_asset || (trades.length > 0 ? {
-    name: trades[trades.length - 1].symbol,
-    pnl: trades[trades.length - 1].net_pnl,
-    price: trades[trades.length - 1].exit_price || trades[trades.length - 1].entry_price || 0,
-    winRate: trades[trades.length - 1].net_pnl > 0 ? 100 : 0,
+  const computedWorstAsset = worst_asset || (filteredTrades.length > 0 ? {
+    name: filteredTrades[filteredTrades.length - 1].symbol,
+    pnl: filteredTrades[filteredTrades.length - 1].net_pnl,
+    price: filteredTrades[filteredTrades.length - 1].exit_price || filteredTrades[filteredTrades.length - 1].entry_price || 0,
+    winRate: filteredTrades[filteredTrades.length - 1].net_pnl > 0 ? 100 : 0,
     trades: 1
   } : null);
 
@@ -209,7 +253,7 @@ export default function DashboardOverview({ analytics, trades = [] }) {
   };
 
   // Sort trades newest first (latest entry time / id descending)
-  const sortedTrades = [...trades].sort((a, b) => {
+  const sortedTrades = [...filteredTrades].sort((a, b) => {
     const dateA = new Date(a.entry_time || a.created_at || 0).getTime();
     const dateB = new Date(b.entry_time || b.created_at || 0).getTime();
     if (dateB !== dateA) return dateB - dateA;
@@ -225,6 +269,22 @@ export default function DashboardOverview({ analytics, trades = [] }) {
 
   return (
     <div className="space-y-6 font-sans">
+
+      {/* Timeframe Filter Bar - Premium Dropdown Selector */}
+      {!hideTimeframeDropdown && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/10">
+          <TimeframeDropdown
+            activeTimeframe={currentTimeframe}
+            onSelectTimeframe={handleSelectTimeframe}
+            tradeCount={filteredTrades.length}
+          />
+
+          <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
+            <Calendar className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+            <span>Scope: <strong className="text-cyan-300 font-bold">{currentTimeframe}</strong> ({filteredTrades.length} trades evaluated)</span>
+          </div>
+        </div>
+      )}
 
       {/* Top Section Header with Title & PDF Export Action */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1">
@@ -252,9 +312,12 @@ export default function DashboardOverview({ analytics, trades = [] }) {
         </button>
       </div>
 
-      {/* ========================================================================= */}
-      {/* 1. TOP 4 EXECUTIVE FINANCIAL KPI CARDS */}
-      {/* ========================================================================= */}
+      {/* Dynamic Content Container with 200ms Opacity Transition */}
+      <div className={`space-y-6 transition-all duration-200 ${isTransitioning ? 'opacity-25 scale-[0.995]' : 'opacity-100 scale-100'}`}>
+
+        {/* ========================================================================= */}
+        {/* 1. TOP 4 EXECUTIVE FINANCIAL KPI CARDS */}
+        {/* ========================================================================= */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 font-mono">
 
         {/* Card 1: Portfolio Net PnL */}
@@ -357,6 +420,9 @@ export default function DashboardOverview({ analytics, trades = [] }) {
 
           <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] font-mono">
             <span className="text-emerald-400 font-bold">{overview.win_count} Wins</span>
+            {overview.breakeven_count > 0 && (
+              <span className="text-slate-400 font-bold">{overview.breakeven_count} BE</span>
+            )}
             <span className="text-rose-400">{overview.loss_count} Losses</span>
           </div>
         </AntigravityCard>
@@ -756,7 +822,10 @@ export default function DashboardOverview({ analytics, trades = [] }) {
 
           <div className="pt-3 border-t border-white/10 flex items-center justify-center gap-1.5 text-xs font-mono font-bold text-emerald-400">
             <ArrowUpRight className="w-4 h-4 stroke-[2.5]" />
-            <span>{overview.win_count} Wins • {overview.loss_count} Losses</span>
+            <span>
+              {overview.win_count} Wins • {overview.loss_count} Losses
+              {overview.breakeven_count > 0 ? ` • ${overview.breakeven_count} BE` : ''}
+            </span>
           </div>
         </div>
 
@@ -958,6 +1027,8 @@ export default function DashboardOverview({ analytics, trades = [] }) {
             )}
           </div>
         </div>
+
+      </div>
 
       </div>
 
