@@ -820,12 +820,23 @@ export default function DashboardOverview({
             </div>
           </div>
 
-          <div className="pt-3 border-t border-white/10 flex items-center justify-center gap-1.5 text-xs font-mono font-bold text-emerald-400">
-            <ArrowUpRight className="w-4 h-4 stroke-[2.5]" />
-            <span>
-              {overview.win_count} Wins • {overview.loss_count} Losses
-              {overview.breakeven_count > 0 ? ` • ${overview.breakeven_count} BE` : ''}
+          <div className="pt-3 border-t border-white/10 flex items-center justify-center gap-2 text-xs font-mono font-bold">
+            <span className="text-emerald-400 flex items-center gap-1">
+              <ArrowUpRight className="w-3.5 h-3.5 stroke-[2.5]" />
+              {overview.win_count} Wins
             </span>
+            <span className="text-slate-500">•</span>
+            <span className="text-rose-400">
+              {overview.loss_count} Losses
+            </span>
+            {overview.breakeven_count > 0 && (
+              <>
+                <span className="text-slate-500">•</span>
+                <span className="text-amber-400">
+                  {overview.breakeven_count} BE
+                </span>
+              </>
+            )}
           </div>
         </div>
 
