@@ -155,7 +155,7 @@ export default function Navbar({
                   setActiveTab(tab.id);
                   setIsMobileMenuOpen(false);
                 }}
-                className={`h-8 px-3 flex items-center gap-1.5 rounded-full text-[11.5px] font-mono font-bold leading-none transition-all whitespace-nowrap cursor-pointer shrink-0 relative overflow-hidden ${
+                className={`h-8 px-2.5 xl:px-3 flex items-center gap-1.5 rounded-full text-[11px] xl:text-[11.5px] font-mono font-bold leading-none transition-all whitespace-nowrap cursor-pointer shrink-0 relative overflow-hidden ${
                   isActive
                     ? 'bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 text-slate-950 shadow-md shadow-emerald-500/30 font-black'
                     : 'text-slate-400 hover:text-white hover:bg-white/5'
@@ -169,70 +169,73 @@ export default function Navbar({
         </nav>
 
         {/* 3. Right Action Buttons (Desktop MD+ Only) */}
-        <div className="hidden md:flex items-center gap-2 shrink-0">
+        <div className="hidden md:flex items-center gap-1.5 xl:gap-2 shrink-0">
+          {/* Theme Toggle */}
           <button
             onClick={onToggleTheme}
-            className="h-9 px-3.5 flex items-center gap-1.5 rounded-full text-xs font-mono font-bold bg-[#140F24] hover:bg-[#1C1533] text-amber-300 border border-purple-500/30 hover:border-purple-400 hover:shadow-lg hover:shadow-purple-500/20 transition-all cursor-pointer shadow-sm"
+            className="h-8.5 px-2.5 xl:px-3.5 flex items-center gap-1.5 rounded-full text-xs font-mono font-bold bg-[#140F24] hover:bg-[#1C1533] text-amber-300 border border-purple-500/30 hover:border-purple-400 transition-all cursor-pointer shadow-sm shrink-0"
             title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Theme`}
           >
             {theme === 'dark' ? (
               <>
                 <Sun className="w-3.5 h-3.5 text-amber-400 fill-amber-400/20 shrink-0" />
-                <span className="text-amber-200">Light</span>
+                <span className="text-amber-200 hidden xl:inline">Light</span>
               </>
             ) : (
               <>
                 <Moon className="w-3.5 h-3.5 text-indigo-400 fill-indigo-400/20 shrink-0" />
-                <span className="text-slate-700">Dark</span>
+                <span className="text-slate-700 hidden xl:inline">Dark</span>
               </>
             )}
           </button>
 
+          {/* Strategies */}
           <button
             onClick={onOpenStrategyModal}
-            className="h-9 flex items-center gap-1.5 px-3.5 rounded-full text-xs font-mono font-bold text-purple-200 bg-[#120D22] hover:bg-purple-950/60 hover:text-purple-100 border border-purple-500/30 hover:border-purple-400 transition-all cursor-pointer shadow-sm"
+            className="h-8.5 flex items-center gap-1.5 px-2.5 xl:px-3.5 rounded-full text-xs font-mono font-bold text-purple-200 bg-[#120D22] hover:bg-purple-950/60 hover:text-purple-100 border border-purple-500/30 hover:border-purple-400 transition-all cursor-pointer shadow-sm shrink-0"
+            title="Manage Trading Strategies"
           >
             <Layers className="w-3.5 h-3.5 text-purple-400 shrink-0" />
-            <span>Strategies</span>
+            <span className="hidden xl:inline">Strategies</span>
           </button>
 
+          {/* Risk Calculator */}
           <button
             onClick={onOpenRiskCalculator}
-            className="h-9 flex items-center gap-1.5 px-3.5 rounded-full text-xs font-mono font-bold text-cyan-200 bg-[#0B1726] hover:bg-cyan-950/60 hover:text-cyan-100 border border-cyan-500/40 hover:border-cyan-400 transition-all cursor-pointer shadow-sm"
+            className="h-8.5 flex items-center gap-1.5 px-2.5 xl:px-3.5 rounded-full text-xs font-mono font-bold text-cyan-200 bg-[#0B1726] hover:bg-cyan-950/60 hover:text-cyan-100 border border-cyan-500/40 hover:border-cyan-400 transition-all cursor-pointer shadow-sm shrink-0"
             title="Open Automated Risk & Lot Size Calculator"
           >
             <Calculator className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-            <span>Risk Calc</span>
+            <span className="hidden xl:inline">Risk Calc</span>
           </button>
 
+          {/* Log Trade CTA */}
           <button
             onClick={() => onOpenTradeModal()}
-            className="h-9 flex items-center gap-1.5 px-4 rounded-full text-xs font-mono font-black text-slate-950 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 hover:scale-105 shadow-xl shadow-emerald-500/30 transition-all cursor-pointer border border-emerald-300/40 active:scale-95"
+            className="h-8.5 flex items-center gap-1.5 px-3.5 xl:px-4 rounded-full text-xs font-mono font-black text-slate-950 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 hover:scale-105 shadow-lg shadow-emerald-500/20 transition-all cursor-pointer border border-emerald-300/40 active:scale-95 shrink-0 whitespace-nowrap"
           >
             <PlusCircle className="w-3.5 h-3.5 text-slate-950 stroke-[2.5] shrink-0" />
             <span>+ Log Trade</span>
           </button>
 
+          {/* User Profile & Logout */}
           {currentUser && (
-            <div className="flex items-center gap-1.5 pl-2 border-l border-white/15 shrink-0">
-              <div className="flex items-center gap-1.5 p-1 pr-1.5 rounded-full bg-[#0D121F] border border-white/15 text-xs font-mono font-bold text-slate-200 shadow-md hover:border-emerald-500/40 transition-all shrink-0">
-                {/* User Avatar Circle */}
-                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-500/30 to-teal-500/20 border border-emerald-500/50 flex items-center justify-center text-emerald-300 font-bold uppercase text-[11px] shrink-0">
+            <div className="flex items-center gap-1 pl-1.5 border-l border-white/15 shrink-0">
+              <div className="flex items-center gap-1 p-0.5 pr-1 rounded-full bg-[#0D121F] border border-white/15 text-xs font-mono font-bold text-slate-200 shadow-md hover:border-emerald-500/40 transition-all shrink-0">
+                <div className="w-6.5 h-6.5 rounded-full bg-gradient-to-br from-emerald-500/30 to-teal-500/20 border border-emerald-500/50 flex items-center justify-center text-emerald-300 font-bold uppercase text-[10px] shrink-0">
                   {currentUser.username ? currentUser.username.charAt(0) : 'U'}
                 </div>
 
-                {/* Truncated Username */}
-                <span className="text-slate-200 text-xs max-w-[85px] lg:max-w-[110px] truncate px-1">
+                <span className="text-slate-200 text-xs max-w-[65px] lg:max-w-[90px] xl:max-w-[110px] truncate px-1">
                   {currentUser.username}
                 </span>
 
-                {/* Integrated Logout Button */}
                 <button
                   onClick={onLogout}
-                  className="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-rose-300 hover:bg-rose-500/20 border border-transparent hover:border-rose-500/40 transition-all cursor-pointer shrink-0"
+                  className="w-6.5 h-6.5 rounded-full flex items-center justify-center text-slate-400 hover:text-rose-300 hover:bg-rose-500/20 border border-transparent hover:border-rose-500/40 transition-all cursor-pointer shrink-0"
                   title="Lock System & Log Out"
                 >
-                  <LogOut className="w-3.5 h-3.5" />
+                  <LogOut className="w-3 h-3" />
                 </button>
               </div>
             </div>
