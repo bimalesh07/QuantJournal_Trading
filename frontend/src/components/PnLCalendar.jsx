@@ -127,87 +127,95 @@ export default function PnLCalendar({ analytics, onSelectDateFilter }) {
 
       </div>
 
-      {/* Days of Week Header */}
-      <div className="grid grid-cols-7 gap-2.5 text-center text-xs font-extrabold text-slate-200 uppercase tracking-widest font-mono">
-        {daysOfWeek.map((d) => (
-          <div key={d} className="py-2.5 bg-[#181E2C] rounded-xl border border-slate-800 shadow-md text-emerald-400/90 font-bold">
-            {d}
-          </div>
-        ))}
-      </div>
-
-      {/* Monthly Grid */}
-      <div className="grid grid-cols-7 gap-2.5">
-        {gridCells.map((cell) => {
-          if (cell.isPadding) {
-            return (
-              <div
-                key={cell.key}
-                className="h-28 sm:h-32 rounded-2xl bg-[#121622]/40 border border-slate-800/30 opacity-20"
-              />
-            );
-          }
-
-          const hasData = !!cell.data;
-          const pnl = hasData ? cell.data.net_pnl : 0;
-          const isProfitable = pnl > 0;
-          const isLoss = pnl < 0;
-
-          let cardStyle = 'bg-[#141924] border border-slate-800/90 hover:border-slate-700 hover:bg-[#1A2130] text-slate-300';
-          if (hasData) {
-            if (isProfitable) {
-              cardStyle = 'bg-gradient-to-br from-[#062c21] via-[#0d3d2e] to-[#0a261c] border-2 border-emerald-500/70 text-emerald-300 shadow-lg shadow-emerald-500/20 hover:border-emerald-400 hover:scale-[1.02]';
-            } else if (isLoss) {
-              cardStyle = 'bg-gradient-to-br from-[#3b0a12] via-[#4d0f19] to-[#2e070e] border-2 border-rose-500/70 text-rose-300 shadow-lg shadow-rose-500/20 hover:border-rose-400 hover:scale-[1.02]';
-            } else {
-              cardStyle = 'bg-[#181E2C] border-2 border-slate-700 text-slate-200 hover:border-slate-500';
-            }
-          }
-
-          return (
-            <div
-              key={cell.key}
-              onClick={() => hasData && onSelectDateFilter && onSelectDateFilter(cell.dateStr)}
-              className={`h-28 sm:h-32 p-3 rounded-2xl border flex flex-col justify-between transition-all cursor-pointer shadow-md ${cardStyle}`}
-            >
-              <div className="flex items-center justify-between">
-                <span className={`text-xs sm:text-sm font-extrabold font-mono px-2 py-0.5 rounded-lg ${
-                  hasData 
-                    ? isProfitable ? 'bg-emerald-500/25 text-emerald-200 border border-emerald-400/50 shadow-sm' : isLoss ? 'bg-rose-500/25 text-rose-200 border border-rose-400/50 shadow-sm' : 'bg-slate-800 text-slate-200 border border-slate-700'
-                    : 'bg-slate-800/80 text-slate-300 border border-slate-700/60'
-                }`}>
-                  {cell.dayNumber}
-                </span>
-                {hasData && (
-                  <span className={`text-xs px-2 py-0.5 rounded-lg font-mono font-extrabold border shadow-sm ${
-                    isProfitable ? 'bg-emerald-400/20 text-emerald-300 border-emerald-400/40' : isLoss ? 'bg-rose-400/20 text-rose-300 border-rose-400/40' : 'bg-slate-800 text-slate-300 border-slate-700'
-                  }`}>
-                    {cell.data.trades} {cell.data.trades === 1 ? 'trade' : 'trades'}
-                  </span>
-                )}
+      {/* Responsive Calendar Container with Horizontal Scroll on Mobile */}
+      <div className="overflow-x-auto pb-2 [scrollbar-width:thin] max-w-full">
+        <div className="min-w-[620px] sm:min-w-0 space-y-2.5">
+          
+          {/* Days of Week Header */}
+          <div className="grid grid-cols-7 gap-1.5 sm:gap-2.5 text-center text-xs font-extrabold text-slate-200 uppercase tracking-widest font-mono">
+            {daysOfWeek.map((d) => (
+              <div key={d} className="py-2 sm:py-2.5 bg-[#181E2C] rounded-xl border border-slate-800 shadow-md text-emerald-400/90 font-bold text-[10px] sm:text-xs">
+                {d}
               </div>
+            ))}
+          </div>
 
-              {hasData ? (
-                <div className="text-right space-y-0.5">
-                  <div className={`text-sm sm:text-base font-extrabold font-mono ${
-                    isProfitable ? 'text-emerald-400 drop-shadow-[0_2px_4px_rgba(16,185,129,0.3)]' : isLoss ? 'text-rose-400 drop-shadow-[0_2px_4px_rgba(244,63,94,0.3)]' : 'text-slate-200'
-                  }`}>
-                    {isProfitable ? '+' : ''}${pnl.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+          {/* Monthly Grid */}
+          <div className="grid grid-cols-7 gap-1.5 sm:gap-2.5">
+            {gridCells.map((cell) => {
+              if (cell.isPadding) {
+                return (
+                  <div
+                    key={cell.key}
+                    className="h-24 sm:h-32 rounded-xl sm:rounded-2xl bg-[#121622]/40 border border-slate-800/30 opacity-20"
+                  />
+                );
+              }
+
+              const hasData = !!cell.data;
+              const pnl = hasData ? cell.data.net_pnl : 0;
+              const isProfitable = pnl > 0;
+              const isLoss = pnl < 0;
+
+              let cardStyle = 'bg-[#141924] border border-slate-800/90 hover:border-slate-700 hover:bg-[#1A2130] text-slate-300';
+              if (hasData) {
+                if (isProfitable) {
+                  cardStyle = 'bg-gradient-to-br from-[#062c21] via-[#0d3d2e] to-[#0a261c] border border-emerald-500/70 text-emerald-300 shadow-lg shadow-emerald-500/20 hover:border-emerald-400 hover:scale-[1.02]';
+                } else if (isLoss) {
+                  cardStyle = 'bg-gradient-to-br from-[#3b0a12] via-[#4d0f19] to-[#2e070e] border border-rose-500/70 text-rose-300 shadow-lg shadow-rose-500/20 hover:border-rose-400 hover:scale-[1.02]';
+                } else {
+                  cardStyle = 'bg-[#181E2C] border border-slate-700 text-slate-200 hover:border-slate-500';
+                }
+              }
+
+              return (
+                <div
+                  key={cell.key}
+                  onClick={() => hasData && onSelectDateFilter && onSelectDateFilter(cell.dateStr)}
+                  className={`h-24 sm:h-32 p-2 sm:p-3 rounded-xl sm:rounded-2xl border flex flex-col justify-between transition-all cursor-pointer shadow-md overflow-hidden ${cardStyle}`}
+                >
+                  <div className="flex items-center justify-between gap-1">
+                    <span className={`text-[10px] sm:text-sm font-extrabold font-mono px-1.5 sm:px-2 py-0.5 rounded-md sm:rounded-lg ${
+                      hasData 
+                        ? isProfitable ? 'bg-emerald-500/25 text-emerald-200 border border-emerald-400/50 shadow-sm' : isLoss ? 'bg-rose-500/25 text-rose-200 border border-rose-400/50 shadow-sm' : 'bg-slate-800 text-slate-200 border border-slate-700'
+                        : 'bg-slate-800/80 text-slate-300 border border-slate-700/60'
+                    }`}>
+                      {cell.dayNumber}
+                    </span>
+                    {hasData && (
+                      <span className={`text-[9px] sm:text-xs px-1 sm:px-2 py-0.5 rounded-md sm:rounded-lg font-mono font-extrabold border shadow-sm shrink-0 ${
+                        isProfitable ? 'bg-emerald-400/20 text-emerald-300 border-emerald-400/40' : isLoss ? 'bg-rose-400/20 text-rose-300 border-rose-400/40' : 'bg-slate-800 text-slate-300 border-slate-700'
+                      }`}>
+                        <span className="sm:hidden">{cell.data.trades}t</span>
+                        <span className="hidden sm:inline">{cell.data.trades} {cell.data.trades === 1 ? 'trade' : 'trades'}</span>
+                      </span>
+                    )}
                   </div>
-                  <div className="text-xs font-mono font-bold flex items-center justify-end gap-1.5">
-                    <span className="text-emerald-400">{cell.data.wins}W</span>
-                    <span className="text-slate-400">/</span>
-                    <span className="text-rose-400">{cell.data.losses}L</span>
-                  </div>
+
+                  {hasData ? (
+                    <div className="text-right space-y-0.5 truncate">
+                      <div className={`text-xs sm:text-base font-extrabold font-mono truncate ${
+                        isProfitable ? 'text-emerald-400 drop-shadow-[0_2px_4px_rgba(16,185,129,0.3)]' : isLoss ? 'text-rose-400 drop-shadow-[0_2px_4px_rgba(244,63,94,0.3)]' : 'text-slate-200'
+                      }`}>
+                        {isProfitable ? '+' : ''}${pnl.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      </div>
+                      <div className="text-[10px] sm:text-xs font-mono font-bold flex items-center justify-end gap-1">
+                        <span className="text-emerald-400">{cell.data.wins}W</span>
+                        <span className="text-slate-400">/</span>
+                        <span className="text-rose-400">{cell.data.losses}L</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-right text-[10px] sm:text-xs font-mono text-slate-500 font-semibold opacity-70">
+                      No trades
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div className="text-right text-xs font-mono text-slate-500 font-semibold opacity-70">
-                  No trades
-                </div>
-              )}
-            </div>
-          );
-        })}
+              );
+            })}
+          </div>
+
+        </div>
       </div>
 
     </div>

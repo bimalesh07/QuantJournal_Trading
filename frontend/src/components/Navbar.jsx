@@ -126,18 +126,18 @@ export default function Navbar({
           <div className="flex lg:hidden items-center gap-1.5 shrink-0">
             <button
               onClick={() => onOpenTradeModal()}
-              className="h-8 px-3 flex items-center gap-1 rounded-full text-[11px] font-mono font-black text-slate-950 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 shadow-md shadow-emerald-500/20 shrink-0 cursor-pointer active:scale-95 transition-transform"
+              className="h-8 px-2.5 sm:px-3 flex items-center gap-1 rounded-full text-[11px] font-mono font-black text-slate-950 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 shadow-md shadow-emerald-500/20 shrink-0 cursor-pointer active:scale-95 transition-transform whitespace-nowrap"
             >
-              <PlusCircle className="w-3.5 h-3.5 text-slate-950 stroke-[2.5]" />
+              <PlusCircle className="w-3.5 h-3.5 text-slate-950 stroke-[2.5] shrink-0" />
               <span>+ Log</span>
             </button>
 
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="h-8.5 w-8.5 flex items-center justify-center rounded-xl bg-[#121824] border border-white/15 text-emerald-400 active:scale-95 transition-all cursor-pointer shadow-sm"
+              className="h-8 w-8 flex items-center justify-center rounded-xl bg-[#121824] border border-white/15 text-emerald-400 active:scale-95 transition-all cursor-pointer shadow-sm shrink-0"
               aria-label="Toggle Mobile Navigation Drawer"
             >
-              {isMobileMenuOpen ? <X className="w-4.5 h-4.5 text-emerald-400" /> : <Menu className="w-4.5 h-4.5 text-emerald-400" />}
+              {isMobileMenuOpen ? <X className="w-4 h-4 text-emerald-400" /> : <Menu className="w-4 h-4 text-emerald-400" />}
             </button>
           </div>
 

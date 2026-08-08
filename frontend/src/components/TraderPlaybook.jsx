@@ -468,12 +468,12 @@ export default function TraderPlaybook({ theme = 'dark' }) {
           </button>
 
           {/* Sub-Tab Controls */}
-          <div className={`flex items-center gap-1 p-1 rounded-xl border shrink-0 ${
+          <div className={`flex items-center gap-1 p-1 rounded-xl border shrink-0 overflow-x-auto [scrollbar-width:none] max-w-full ${
             isLight ? 'bg-slate-100 border-slate-200' : 'bg-[#0E1320] border-white/10'
           }`}>
             <button
               onClick={() => setActiveSubTab('concepts')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
                 activeSubTab === 'concepts'
                   ? 'bg-gradient-to-r from-cyan-400 to-emerald-400 text-slate-950 shadow-md font-black'
                   : isLight ? 'text-slate-600 hover:text-slate-900' : 'text-slate-400 hover:text-white'
@@ -485,7 +485,7 @@ export default function TraderPlaybook({ theme = 'dark' }) {
 
             <button
               onClick={() => setActiveSubTab('daily')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
                 activeSubTab === 'daily'
                   ? 'bg-gradient-to-r from-cyan-400 to-emerald-400 text-slate-950 shadow-md font-black'
                   : isLight ? 'text-slate-600 hover:text-slate-900' : 'text-slate-400 hover:text-white'
@@ -497,7 +497,7 @@ export default function TraderPlaybook({ theme = 'dark' }) {
 
             <button
               onClick={() => setActiveSubTab('setups')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
                 activeSubTab === 'setups'
                   ? 'bg-gradient-to-r from-cyan-400 to-emerald-400 text-slate-950 shadow-md font-black'
                   : isLight ? 'text-slate-600 hover:text-slate-900' : 'text-slate-400 hover:text-white'
