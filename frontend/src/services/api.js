@@ -30,6 +30,8 @@ const api = axios.create({
   },
 });
 
+const CLOUD_BACKEND_URL = 'https://trading-track.onrender.com/api';
+
 // Interceptor to dynamically attach Token Authorization header
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('quant_journal_token');
@@ -38,6 +40,22 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+// Interceptor to auto-fallback from offline local Django (localhost:8000) to Live Cloud Render Backend
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    // If request failed because local backend is offline and we haven't retried yet
+    if (!error.response && originalRequest && !originalRequest._retryCloud && originalRequest.baseURL && originalRequest.baseURL.includes('localhost:8000')) {
+      originalRequest._retryCloud = true;
+      originalRequest.baseURL = CLOUD_BACKEND_URL;
+      console.warn('Local Django server offline. Auto-redirecting request to live Cloud Render backend:', CLOUD_BACKEND_URL);
+      return api(originalRequest);
+    }
+    return Promise.reject(error);
+  }
+);
 
 // Auth API Calls
 export const registerUser = async (credentials) => {

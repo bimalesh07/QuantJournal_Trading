@@ -81,7 +81,7 @@ export default function AuthScreen({ onAuthSuccess, onBackToHome }) {
       console.error('Authentication error:', err);
       let msg = 'Authentication failed. Please check your credentials.';
       if (!err.response) {
-        msg = 'Connecting to cloud backend... If server is sleeping, please wait ~20 seconds and click Unlock Dashboard again!';
+        msg = 'Connecting to backend... If local server is offline, waking up live Cloud Render server (~15-20s). Click Unlock Dashboard again!';
       } else if (err.response.data?.error) {
         msg = err.response.data.error;
       } else if (err.response.data?.detail) {
