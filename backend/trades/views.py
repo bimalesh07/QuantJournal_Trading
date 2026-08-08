@@ -162,3 +162,13 @@ def analytics_view(request):
     queryset = trade_viewset.get_queryset()
     data = AnalyticsService.calculate_analytics(queryset)
     return Response(data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def health_check_view(request):
+    return Response({
+        'status': 'ok',
+        'service': 'TradeTrack PRO Backend API',
+        'message': 'Keep-alive ping successful.'
+    }, status=status.HTTP_200_OK)
