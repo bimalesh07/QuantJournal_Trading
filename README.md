@@ -8,21 +8,22 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon_Cloud-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://neon.tech/)
 [![Deployment](https://img.shields.io/badge/Hosted_On-Vercel_%26_Render-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
 
-**TradeTrack PRO** is an executive-grade, full-stack quantitative trade logging and analytics platform engineered for professional traders, prop firm funding candidates, and quantitative analysts. It provides real-time portfolio health tracking, psychological leak identification, setup strategy rankings, interactive PnL calendars, and automated PDF executive performance report generation.
+**TradeTrack PRO** is an executive-grade, full-stack quantitative trade logging and analytics platform engineered for professional traders, prop firm candidates, and quantitative analysts. It provides real-time portfolio health tracking, psychological leak identification, setup strategy rankings, interactive PnL calendars, and automated PDF executive performance report generation.
 
 ---
 
 ## 🌟 Key Features
 
-* **⚡ Executive 3D Aerogel Glassmorphic Interface:** State-of-the-art dark and light mode UI with 3D tilt interactions, crystal badges, and sleek floating navigation.
-* **📱 100% Mobile Native Responsiveness:** Dedicated Glassmorphic Hamburger Drawer navigation, touch-friendly tab switching, and zero text/table clipping across all mobile viewports.
-* **📊 Quantitative Analytics Engine:** Real-time calculation of Net PnL, Win Rate %, Profit Factor, Risk-to-Reward Ratio (RRR), total trade executions, and win/loss breakdowns.
+* **⚡ Executive 3D Aerogel Glassmorphic Interface:** Dark and light mode UI with 3D tilt interaction cards, crystal badges, and floating navigation.
+* **⚡ 1-Click Double-Click Local Launcher (`run_project.bat`):** Launch backend, frontend, and open local browser automatically with zero manual terminal commands.
+* **📊 Quantitative Analytics Engine:** Accurate calculation of Net PnL, Win Rate %, Profit Factor, Risk-to-Reward Ratio (RRR), total trade executions, and win/loss breakdowns.
 * **🧠 Psychological Leak & Mindset Analysis:** Track emotional discipline per trade (*Disciplined, Patient, FOMO, Revenge, Fearful, Greedy*) to eliminate trading flaws.
 * **📅 Interactive PnL Calendar:** Visual daily PnL breakdown with win/loss color-coded heatmaps and instant date filtering.
 * **🎯 Setup Strategy Ranking & Management:** Create, manage, and evaluate win rates and profitability across custom trading strategies and setup tags.
 * **🔐 Bank-Grade Security & Auth:** Token-based Django REST Framework authentication, strict CORS origin protection, dynamic host header verification, and environment variable isolation.
 * **📄 Automated PDF Executive Report Generator:** Export detailed, professional quantitative analytics reports in one click using client-side PDF synthesis.
 * **💾 Data Backup & CSV Import/Export:** Full trade history export to CSV and automated backup import capability.
+* **💓 Keep-Alive Health Ping Endpoint (`/api/health/`):** Lightweight endpoint for 10-minute cron pings to keep cloud services awake 24/7.
 
 ---
 
@@ -38,25 +39,7 @@ graph TD
 
 ---
 
-## 🛠️ Technology Stack
-
-### Frontend
-* **Framework:** React 18 with Vite
-* **Styling:** TailwindCSS, Vanilla CSS Tokens, Custom Glassmorphism
-* **Icons:** Lucide React Icons
-* **PDF Engine:** jsPDF
-* **HTTP Client:** Axios with Dynamic API Interceptors
-
-### Backend
-* **Framework:** Python 3.10+ & Django 5.0
-* **API Engine:** Django REST Framework (DRF)
-* **Web Server:** Gunicorn & WhiteNoise
-* **Database Driver:** Psycopg 3 & dj-database-url
-* **Security:** Corsheaders, Django Security Middleware, Token Authentication
-
----
-
-## 🚀 Local Installation & Setup Guide
+## 🚀 Quick Setup & Installation Guide
 
 ### Prerequisites
 * **Python 3.10+**
@@ -65,47 +48,45 @@ graph TD
 
 ---
 
-### 1. Clone Repository
-```bash
-git clone https://github.com/bimalesh07/QuantJournal_Trading.git
-cd QuantJournal_Trading
-```
+### ⚡ Method 1: 1-Click Starter (Windows Recommended)
+
+1. **Clone Repository:**
+   ```bash
+   git clone https://github.com/bimalesh07/QuantJournal_Trading.git
+   cd QuantJournal_Trading
+   ```
+
+2. **Double-Click `run_project.bat`:**
+   - Double-click **`run_project.bat`** in the project folder.
+   - It will automatically launch the Django Backend (`http://localhost:8000`), Vite Frontend (`http://localhost:3000`), and open your default browser!
+
+3. **Double-Click `save_and_backup.bat` to sync changes:**
+   - Double-click **`save_and_backup.bat`** to stage, commit, and push all project changes to GitHub in 1 click!
 
 ---
 
-### 2. Backend Setup (Django)
+### 💻 Method 2: Manual Terminal Setup (Windows / Mac / Linux)
+
+#### 1. Backend Setup (Django)
 
 ```bash
 # Navigate to backend directory
 cd backend
 
-# Create & activate virtual environment
-python -m venv venv
-
-# On Windows:
-venv\Scripts\activate
-# On macOS/Linux:
-source venv/bin/activate
-
-# Install requirements
+# Install dependencies
 pip install -r requirements.txt
 
 # Run database migrations
 python manage.py migrate
 
-# Create a superuser (Admin)
-python manage.py createsuperuser
-
-# Start local Django development server
+# Start local Django server
 python manage.py runserver 8000
 ```
-> The Django backend will run at `http://localhost:8000/api/`
+> Backend active at: `http://localhost:8000/api/`
 
----
+#### 2. Frontend Setup (React / Vite)
 
-### 3. Frontend Setup (React / Vite)
-
-Open a new terminal window:
+Open a new terminal tab:
 
 ```bash
 # Navigate to frontend directory
@@ -114,10 +95,23 @@ cd frontend
 # Install Node dependencies
 npm install
 
-# Start Vite local development server
+# Start Vite dev server
 npm run dev
 ```
-> The React frontend will run at `http://localhost:5173/`
+> Frontend active at: `http://localhost:3000/`
+
+---
+
+## 💓 24/7 Keep-Alive Cron Job Setup (Render / Free Hosting)
+
+To keep your free cloud backend web service awake 24/7 without cold-start delays:
+
+1. Sign up for free at **[cron-job.org](https://cron-job.org/)** or **[uptimerobot.com](https://uptimerobot.com/)**.
+2. Create a new cron job with the following parameters:
+   - **Title:** `TradeTrack Backend Ping`
+   - **URL:** `https://your-backend-service.onrender.com/api/health/`
+   - **Interval:** Every `10 minutes` (`*/10 * * * *`)
+3. Save the cron job! Your backend will stay active 24/7 with zero spin-up delays.
 
 ---
 
@@ -128,7 +122,7 @@ npm run dev
 SECRET_KEY=your_custom_django_secret_key
 DEBUG=True
 DATABASE_URL=postgresql://user:password@ep-neon-db.neon.tech/dbname?sslmode=require
-CORS_ALLOWED_ORIGINS=http://localhost:5173,https://your-vercel-app.vercel.app
+CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173,https://your-vercel-app.vercel.app
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
@@ -143,33 +137,33 @@ VITE_API_URL=http://localhost:8000/api
 
 ## 🌐 Production Deployment Guide
 
-### Deploying Backend on Render
+### Backend on Render
 1. Create a new **Web Service** on [Render](https://render.com/).
-2. Set **Root Directory** to `backend`.
-3. Set **Build Command** to `./build.sh`.
-4. Set **Start Command** to `gunicorn trading_journal.wsgi --bind 0.0.0.0:$PORT`.
-5. Add Environment Variables:
-   * `PYTHON_VERSION`: `3.11.9`
-   * `SECRET_KEY`: *Your Django secret key*
-   * `DATABASE_URL`: *Your Neon PostgreSQL connection string*
+2. Root Directory: `backend`
+3. Build Command: `./build.sh`
+4. Start Command: `gunicorn trading_journal.wsgi --bind 0.0.0.0:$PORT`
+5. Environment Variables:
+   - `PYTHON_VERSION`: `3.11.9`
+   - `SECRET_KEY`: *Your Django secret key*
+   - `DATABASE_URL`: *Your Neon PostgreSQL connection string*
 
-### Deploying Frontend on Vercel
+### Frontend on Vercel
 1. Import repository on [Vercel](https://vercel.com/).
-2. Set **Root Directory** to `frontend`.
-3. Set Environment Variable:
-   * `VITE_API_URL`: `https://your-render-service.onrender.com/api`
+2. Root Directory: `frontend`
+3. Environment Variable:
+   - `VITE_API_URL`: `https://your-render-service.onrender.com/api`
 4. Click **Deploy**.
 
 ---
 
-## 👤 System Owner & Author
+## 👤 Author & Owner
 
-* **Developer & Owner:** Bimalesh Yadav
-* **GitHub:** [@bimalesh07](https://github.com/bimalesh07)
-* **Project Name:** TradeTrack PRO Systems
+* **Owner & Lead Developer:** Bimalesh Yadav
+* **GitHub Repository:** [@bimalesh07/QuantJournal_Trading](https://github.com/bimalesh07/QuantJournal_Trading)
+* **System Name:** TradeTrack PRO Quantitative Analytics Engine
 
 ---
 
 ## 📜 License
 
-Distributed under the MIT License. See `LICENSE` for more details.
+Distributed under the MIT License. See `LICENSE` for details.
