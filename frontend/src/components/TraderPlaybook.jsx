@@ -120,26 +120,34 @@ export default function TraderPlaybook({ theme = 'dark' }) {
 
   const [activeSubTab, setActiveSubTab] = useState('concepts'); // 'concepts' | 'daily' | 'setups'
 
-  // Form state for creating a new Setup rule
+  // Form state for creating/editing a Setup rule
   const [isAddingSetup, setIsAddingSetup] = useState(false);
+  const [editingSetupId, setEditingSetupId] = useState(null);
   const [newSetup, setNewSetup] = useState({
     title: '',
     category: 'Price Action',
+    customCategory: '',
     description: '',
     checklistText: '',
     imageUrl: ''
   });
 
-  // Form state for creating a Concept Note
+  // Form state for creating/editing a Concept Note
   const [isAddingConcept, setIsAddingConcept] = useState(false);
+  const [editingConceptId, setEditingConceptId] = useState(null);
   const [newConcept, setNewConcept] = useState({
     title: '',
-    topic: 'Price Action Logic',
+    topic: 'ICT & Smart Money Concepts',
+    customTopic: '',
     explanation: '',
     imageUrl: ''
   });
 
   const [conceptImagePreview, setConceptImagePreview] = useState('');
+
+  // Derived available custom & default topics/categories
+  const availableTopics = Array.from(new Set(conceptNotes.map(c => c.topic).filter(Boolean)));
+  const availableSetupCategories = Array.from(new Set(setups.map(s => s.category).filter(Boolean)));
 
   // Current day note inputs
   const currentNote = dailyNotes[selectedDate] || { morningBias: '', newsEvents: '', eveningReview: '', rating: 5 };
@@ -178,26 +186,73 @@ export default function TraderPlaybook({ theme = 'dark' }) {
     }));
   };
 
-  const handleCreateSetup = (e) => {
+  const handleSaveSetup = (e) => {
     e.preventDefault();
     if (!newSetup.title.trim()) return;
+
+    const finalCategory = (newSetup.category === 'CUSTOM' ? newSetup.customCategory : newSetup.category).trim() || 'Price Action';
 
     const checklistArr = newSetup.checklistText
       ? newSetup.checklistText.split('\n').filter(line => line.trim())
       : ['Confirm Risk Rule', 'HTF Bias Match'];
 
-    const setupObj = {
-      id: Date.now(),
-      title: newSetup.title,
-      category: newSetup.category,
-      description: newSetup.description,
-      checklist: checklistArr,
-      imageUrl: newSetup.imageUrl
-    };
+    if (editingSetupId) {
+      setSetups(prev => prev.map(s => {
+        if (s.id === editingSetupId) {
+          return {
+            ...s,
+            title: newSetup.title.trim(),
+            category: finalCategory,
+            description: newSetup.description,
+            checklist: checklistArr,
+            imageUrl: newSetup.imageUrl
+          };
+        }
+        return s;
+      }));
+    } else {
+      const setupObj = {
+        id: Date.now(),
+        title: newSetup.title.trim(),
+        category: finalCategory,
+        description: newSetup.description,
+        checklist: checklistArr,
+        imageUrl: newSetup.imageUrl
+      };
+      setSetups(prev => [setupObj, ...prev]);
+    }
 
-    setSetups(prev => [setupObj, ...prev]);
-    setNewSetup({ title: '', category: 'Price Action', description: '', checklistText: '', imageUrl: '' });
+    setNewSetup({ title: '', category: 'Price Action', customCategory: '', description: '', checklistText: '', imageUrl: '' });
+    setEditingSetupId(null);
     setIsAddingSetup(false);
+  };
+
+  const handleStartEditSetup = (setup) => {
+    const defaultCategories = [
+      'Indian F&O',
+      'ICT / Smart Money',
+      'Price Action',
+      'Crypto',
+      'Forex & Commodities'
+    ];
+    const isCustom = !defaultCategories.includes(setup.category);
+
+    setNewSetup({
+      title: setup.title || '',
+      category: isCustom ? 'CUSTOM' : setup.category,
+      customCategory: isCustom ? setup.category : '',
+      description: setup.description || '',
+      checklistText: (setup.checklist || []).join('\n'),
+      imageUrl: setup.imageUrl || ''
+    });
+    setEditingSetupId(setup.id);
+    setIsAddingSetup(true);
+  };
+
+  const handleCancelSetupForm = () => {
+    setIsAddingSetup(false);
+    setEditingSetupId(null);
+    setNewSetup({ title: '', category: 'Price Action', customCategory: '', description: '', checklistText: '', imageUrl: '' });
   };
 
   const handleImageUpload = (e) => {
@@ -212,23 +267,69 @@ export default function TraderPlaybook({ theme = 'dark' }) {
     }
   };
 
-  const handleCreateConcept = (e) => {
+  const handleSaveConcept = (e) => {
     e.preventDefault();
     if (!newConcept.title.trim()) return;
 
-    const conceptObj = {
-      id: Date.now(),
-      title: newConcept.title,
-      topic: newConcept.topic,
-      explanation: newConcept.explanation,
-      imageUrl: newConcept.imageUrl || conceptImagePreview,
-      dateAdded: new Date().toISOString().slice(0, 10)
-    };
+    const finalTopic = (newConcept.topic === 'CUSTOM' ? newConcept.customTopic : newConcept.topic).trim() || 'General Concept';
 
-    setConceptNotes(prev => [conceptObj, ...prev]);
-    setNewConcept({ title: '', topic: 'Price Action Logic', explanation: '', imageUrl: '' });
+    if (editingConceptId) {
+      setConceptNotes(prev => prev.map(c => {
+        if (c.id === editingConceptId) {
+          return {
+            ...c,
+            title: newConcept.title.trim(),
+            topic: finalTopic,
+            explanation: newConcept.explanation,
+            imageUrl: newConcept.imageUrl || conceptImagePreview
+          };
+        }
+        return c;
+      }));
+    } else {
+      const conceptObj = {
+        id: Date.now(),
+        title: newConcept.title.trim(),
+        topic: finalTopic,
+        explanation: newConcept.explanation,
+        imageUrl: newConcept.imageUrl || conceptImagePreview,
+        dateAdded: new Date().toISOString().slice(0, 10)
+      };
+      setConceptNotes(prev => [conceptObj, ...prev]);
+    }
+
+    setNewConcept({ title: '', topic: 'ICT & Smart Money Concepts', customTopic: '', explanation: '', imageUrl: '' });
     setConceptImagePreview('');
+    setEditingConceptId(null);
     setIsAddingConcept(false);
+  };
+
+  const handleStartEditConcept = (concept) => {
+    const defaultTopics = [
+      'ICT & Smart Money Concepts',
+      'Indian F&O Price Action',
+      'Chart Pattern & Breakout',
+      'Risk Management & Psychology'
+    ];
+    const isCustom = !defaultTopics.includes(concept.topic);
+
+    setNewConcept({
+      title: concept.title || '',
+      topic: isCustom ? 'CUSTOM' : concept.topic,
+      customTopic: isCustom ? concept.topic : '',
+      explanation: concept.explanation || '',
+      imageUrl: concept.imageUrl || ''
+    });
+    setConceptImagePreview(concept.imageUrl || '');
+    setEditingConceptId(concept.id);
+    setIsAddingConcept(true);
+  };
+
+  const handleCancelConceptForm = () => {
+    setIsAddingConcept(false);
+    setEditingConceptId(null);
+    setNewConcept({ title: '', topic: 'ICT & Smart Money Concepts', customTopic: '', explanation: '', imageUrl: '' });
+    setConceptImagePreview('');
   };
 
   const handleDeleteSetup = (id, title = 'setup rule') => {
@@ -556,23 +657,27 @@ export default function TraderPlaybook({ theme = 'dark' }) {
             {/* Category Filter Pills */}
             <div className="flex items-center gap-1.5 overflow-x-auto [scrollbar-width:none]">
               <Filter className="w-3.5 h-3.5 text-cyan-500 shrink-0 mr-1" />
-              {[
-                { id: 'ALL', label: 'All Notes' },
-                { id: 'ICT & Smart Money Concepts', label: 'ICT / FVG' },
-                { id: 'Indian F&O Price Action', label: 'Indian F&O' },
-                { id: 'Chart Pattern & Breakout', label: 'Price Action' },
-                { id: 'Risk Management & Psychology', label: 'Risk Rules' },
-              ].map((cat) => (
+              <button
+                onClick={() => setCategoryFilter('ALL')}
+                className={`px-3 py-1 rounded-full text-[11px] font-mono font-bold transition-all cursor-pointer whitespace-nowrap ${
+                  categoryFilter === 'ALL'
+                    ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 font-black'
+                    : isLight ? 'bg-slate-100 text-slate-600 border border-slate-200' : 'bg-[#0E1320] text-slate-400 border border-white/10 hover:text-white'
+                }`}
+              >
+                All Notes ({conceptNotes.length})
+              </button>
+              {availableTopics.map((top) => (
                 <button
-                  key={cat.id}
-                  onClick={() => setCategoryFilter(cat.id)}
+                  key={top}
+                  onClick={() => setCategoryFilter(top)}
                   className={`px-3 py-1 rounded-full text-[11px] font-mono font-bold transition-all cursor-pointer whitespace-nowrap ${
-                    categoryFilter === cat.id
+                    categoryFilter === top
                       ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 font-black'
                       : isLight ? 'bg-slate-100 text-slate-600 border border-slate-200' : 'bg-[#0E1320] text-slate-400 border border-white/10 hover:text-white'
                   }`}
                 >
-                  {cat.label}
+                  {top}
                 </button>
               ))}
             </div>
@@ -624,7 +729,12 @@ export default function TraderPlaybook({ theme = 'dark' }) {
               </div>
 
               <button
-                onClick={() => setIsAddingConcept(true)}
+                onClick={() => {
+                  setEditingConceptId(null);
+                  setNewConcept({ title: '', topic: 'ICT & Smart Money Concepts', customTopic: '', explanation: '', imageUrl: '' });
+                  setConceptImagePreview('');
+                  setIsAddingConcept(true);
+                }}
                 className="px-3.5 py-1.5 text-xs font-mono font-black text-slate-950 bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 hover:scale-105 rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer border border-cyan-300/40 shrink-0"
               >
                 <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -635,26 +745,26 @@ export default function TraderPlaybook({ theme = 'dark' }) {
 
           </div>
 
-          {/* New Concept Form Modal */}
+          {/* New / Edit Concept Form Modal */}
           {isAddingConcept && (
-            <form onSubmit={handleCreateConcept} className={`border border-cyan-500/40 rounded-2xl p-5 sm:p-6 shadow-2xl space-y-4 animate-fadeIn ${
+            <form onSubmit={handleSaveConcept} className={`border border-cyan-500/40 rounded-2xl p-5 sm:p-6 shadow-2xl space-y-4 animate-fadeIn ${
               isLight ? 'bg-white text-slate-900' : 'bg-[#080C16] text-white'
             }`}>
               <div className="flex justify-between items-center pb-3 border-b border-white/10">
                 <h4 className="text-base font-bold text-cyan-500 flex items-center gap-2">
-                  <FileCode className="w-5 h-5 text-cyan-500" />
-                  <span>Write New Trading Concept & Logic Note (MS Word Style)</span>
+                  {editingConceptId ? <Edit3 className="w-5 h-5 text-cyan-400" /> : <FileCode className="w-5 h-5 text-cyan-500" />}
+                  <span>{editingConceptId ? 'Edit Trading Concept & Logic Note' : 'Write New Trading Concept & Logic Note (MS Word Style)'}</span>
                 </h4>
-                <button type="button" onClick={() => setIsAddingConcept(false)} className="text-slate-400 hover:text-white text-xs">Cancel</button>
+                <button type="button" onClick={handleCancelConceptForm} className="text-slate-400 hover:text-white text-xs cursor-pointer">Cancel</button>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs text-slate-400 block mb-1">Concept Title</label>
+                  <label className="text-xs text-slate-400 block mb-1 font-bold">Concept Title</label>
                   <input
                     type="text"
                     required
-                    placeholder=""
+                    placeholder="Enter concept title..."
                     value={newConcept.title}
                     onChange={(e) => setNewConcept(prev => ({ ...prev, title: e.target.value }))}
                     className={`w-full border rounded-xl p-3 text-xs outline-none focus:border-cyan-400 ${
@@ -664,7 +774,7 @@ export default function TraderPlaybook({ theme = 'dark' }) {
                 </div>
 
                 <div>
-                  <label className="text-xs text-slate-400 block mb-1">Topic Category</label>
+                  <label className="text-xs text-slate-400 block mb-1 font-bold">Topic Category</label>
                   <select
                     value={newConcept.topic}
                     onChange={(e) => setNewConcept(prev => ({ ...prev, topic: e.target.value }))}
@@ -676,7 +786,30 @@ export default function TraderPlaybook({ theme = 'dark' }) {
                     <option value="Indian F&O Price Action">Indian F&O Price Action (NIFTY/BankNifty)</option>
                     <option value="Chart Pattern & Breakout">Chart Pattern & Breakout Logic</option>
                     <option value="Risk Management & Psychology">Risk Management & Psychology Rules</option>
+                    {availableTopics.filter(t => ![
+                      'ICT & Smart Money Concepts',
+                      'Indian F&O Price Action',
+                      'Chart Pattern & Breakout',
+                      'Risk Management & Psychology',
+                      'CUSTOM'
+                    ].includes(t)).map(customTop => (
+                      <option key={customTop} value={customTop}>{customTop} (Saved Category)</option>
+                    ))}
+                    <option value="CUSTOM">+ Add Custom Category / Topic...</option>
                   </select>
+
+                  {newConcept.topic === 'CUSTOM' && (
+                    <input
+                      type="text"
+                      required
+                      placeholder="Type custom category name (e.g. Scalping Strategy, Volume Delta)..."
+                      value={newConcept.customTopic}
+                      onChange={(e) => setNewConcept(prev => ({ ...prev, customTopic: e.target.value }))}
+                      className={`w-full mt-2 border rounded-xl p-2.5 text-xs outline-none focus:border-cyan-400 ${
+                        isLight ? 'bg-slate-50 border-slate-300 text-slate-900' : 'bg-[#0E1320] border-cyan-500/40 text-cyan-300 font-bold'
+                      }`}
+                    />
+                  )}
                 </div>
               </div>
 
@@ -696,7 +829,7 @@ export default function TraderPlaybook({ theme = 'dark' }) {
 
                   <input
                     type="url"
-                    placeholder=""
+                    placeholder="https://..."
                     value={newConcept.imageUrl}
                     onChange={(e) => {
                       setNewConcept(prev => ({ ...prev, imageUrl: e.target.value }));
@@ -722,7 +855,7 @@ export default function TraderPlaybook({ theme = 'dark' }) {
                 <textarea
                   rows={8}
                   required
-                  placeholder=""
+                  placeholder="Detailed logic explanation..."
                   value={newConcept.explanation}
                   onChange={(e) => setNewConcept(prev => ({ ...prev, explanation: e.target.value }))}
                   className={`w-full border rounded-xl p-4 text-sm font-mono focus:border-cyan-400 outline-none leading-relaxed resize-y ${
@@ -733,10 +866,17 @@ export default function TraderPlaybook({ theme = 'dark' }) {
 
               <div className="flex justify-end gap-2 pt-2">
                 <button
+                  type="button"
+                  onClick={handleCancelConceptForm}
+                  className="px-4 py-3 text-xs font-mono font-bold text-slate-400 hover:text-white rounded-xl border border-white/10 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
                   type="submit"
                   className="px-6 py-3 text-xs font-black text-slate-950 bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 rounded-xl shadow-lg font-mono cursor-pointer"
                 >
-                  Save Concept Note to Vault
+                  {editingConceptId ? 'Update Concept Note' : 'Save Concept Note to Vault'}
                 </button>
               </div>
             </form>
@@ -761,13 +901,22 @@ export default function TraderPlaybook({ theme = 'dark' }) {
                         <h4 className="text-base sm:text-lg font-extrabold mt-1.5 leading-snug">{concept.title}</h4>
                       </div>
 
-                      <button
-                        onClick={() => handleDeleteConcept(concept.id)}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 transition-colors shrink-0 cursor-pointer"
-                        title="Delete Concept Note"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          onClick={() => handleStartEditConcept(concept)}
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-cyan-400 hover:bg-cyan-500/10 transition-colors cursor-pointer"
+                          title="Edit Concept Note"
+                        >
+                          <Edit3 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteConcept(concept.id, concept.title)}
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                          title="Delete Concept Note"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
 
                     {/* Chart Screenshot Display (Click to open Zoom Inspector) */}
@@ -866,9 +1015,16 @@ export default function TraderPlaybook({ theme = 'dark' }) {
                           {concept.explanation}
                         </div>
 
-                        <div className="flex justify-end pt-2">
+                        <div className="flex justify-end gap-2 pt-2">
                           <button
-                            onClick={() => handleDeleteConcept(concept.id)}
+                            onClick={() => handleStartEditConcept(concept)}
+                            className="px-3 py-1.5 rounded-lg text-xs text-cyan-400 hover:bg-cyan-500/10 border border-cyan-500/30 flex items-center gap-1 cursor-pointer"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                            <span>Edit Concept Note</span>
+                          </button>
+                          <button
+                            onClick={() => handleDeleteConcept(concept.id, concept.title)}
                             className="px-3 py-1.5 rounded-lg text-xs text-rose-400 hover:bg-rose-500/10 border border-rose-500/30 flex items-center gap-1 cursor-pointer"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -900,7 +1056,11 @@ export default function TraderPlaybook({ theme = 'dark' }) {
             </div>
 
             <button
-              onClick={() => setIsAddingSetup(true)}
+              onClick={() => {
+                setEditingSetupId(null);
+                setNewSetup({ title: '', category: 'Price Action', customCategory: '', description: '', checklistText: '', imageUrl: '' });
+                setIsAddingSetup(true);
+              }}
               className="px-4 py-2.5 text-xs font-mono font-black text-slate-950 bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 hover:scale-105 rounded-xl shadow-lg shadow-cyan-500/25 transition-all flex items-center gap-2 cursor-pointer border border-cyan-300/40"
             >
               <Plus className="w-4 h-4 stroke-[2.5]" />
@@ -908,26 +1068,26 @@ export default function TraderPlaybook({ theme = 'dark' }) {
             </button>
           </div>
 
-          {/* New Setup Modal Form */}
+          {/* New / Edit Setup Modal Form */}
           {isAddingSetup && (
-            <form onSubmit={handleCreateSetup} className={`border border-cyan-500/40 rounded-2xl p-5 shadow-2xl space-y-4 animate-fadeIn ${
+            <form onSubmit={handleSaveSetup} className={`border border-cyan-500/40 rounded-2xl p-5 shadow-2xl space-y-4 animate-fadeIn ${
               isLight ? 'bg-white text-slate-900' : 'bg-[#080C16] text-white'
             }`}>
               <div className="flex justify-between items-center pb-3 border-b border-white/10">
                 <h4 className="text-base font-bold text-cyan-500 flex items-center gap-2">
-                  <Sparkles className="w-4 h-4" />
-                  <span>Create New Setup Playbook Entry</span>
+                  {editingSetupId ? <Edit3 className="w-4 h-4 text-cyan-400" /> : <Sparkles className="w-4 h-4" />}
+                  <span>{editingSetupId ? 'Edit Setup Playbook Entry' : 'Create New Setup Playbook Entry'}</span>
                 </h4>
-                <button type="button" onClick={() => setIsAddingSetup(false)} className="text-slate-400 hover:text-white text-xs">Cancel</button>
+                <button type="button" onClick={handleCancelSetupForm} className="text-slate-400 hover:text-white text-xs cursor-pointer">Cancel</button>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs text-slate-400 block mb-1">Setup Title Name</label>
+                  <label className="text-xs text-slate-400 block mb-1 font-bold">Setup Title Name</label>
                   <input
                     type="text"
                     required
-                    placeholder=""
+                    placeholder="Enter setup title..."
                     value={newSetup.title}
                     onChange={(e) => setNewSetup(prev => ({ ...prev, title: e.target.value }))}
                     className={`w-full border rounded-xl p-2.5 text-xs outline-none focus:border-cyan-400 ${
@@ -937,7 +1097,7 @@ export default function TraderPlaybook({ theme = 'dark' }) {
                 </div>
 
                 <div>
-                  <label className="text-xs text-slate-400 block mb-1">Market Category</label>
+                  <label className="text-xs text-slate-400 block mb-1 font-bold">Market Category</label>
                   <select
                     value={newSetup.category}
                     onChange={(e) => setNewSetup(prev => ({ ...prev, category: e.target.value }))}
@@ -950,16 +1110,40 @@ export default function TraderPlaybook({ theme = 'dark' }) {
                     <option value="Price Action">Price Action / Breakout</option>
                     <option value="Crypto">Crypto Setup</option>
                     <option value="Forex & Commodities">Forex & Commodities (Gold/Silver)</option>
+                    {availableSetupCategories.filter(c => ![
+                      'Indian F&O',
+                      'ICT / Smart Money',
+                      'Price Action',
+                      'Crypto',
+                      'Forex & Commodities',
+                      'CUSTOM'
+                    ].includes(c)).map(customCat => (
+                      <option key={customCat} value={customCat}>{customCat} (Saved Category)</option>
+                    ))}
+                    <option value="CUSTOM">+ Add Custom Category...</option>
                   </select>
+
+                  {newSetup.category === 'CUSTOM' && (
+                    <input
+                      type="text"
+                      required
+                      placeholder="Type custom market category name (e.g. Options Buying, Harmonic Patterns)..."
+                      value={newSetup.customCategory}
+                      onChange={(e) => setNewSetup(prev => ({ ...prev, customCategory: e.target.value }))}
+                      className={`w-full mt-2 border rounded-xl p-2 text-xs outline-none focus:border-cyan-400 ${
+                        isLight ? 'bg-slate-50 border-slate-300 text-slate-900' : 'bg-[#0E1320] border-cyan-500/40 text-cyan-300 font-bold'
+                      }`}
+                    />
+                  )}
                 </div>
               </div>
 
               <div>
-                <label className="text-xs text-slate-400 block mb-1">Description & Entry Execution Trigger Rules</label>
+                <label className="text-xs text-slate-400 block mb-1 font-bold">Description & Entry Execution Trigger Rules</label>
                 <textarea
                   rows={3}
                   required
-                  placeholder=""
+                  placeholder="Describe strategy execution trigger rules..."
                   value={newSetup.description}
                   onChange={(e) => setNewSetup(prev => ({ ...prev, description: e.target.value }))}
                   className={`w-full border rounded-xl p-2.5 text-xs outline-none focus:border-cyan-400 ${
@@ -969,10 +1153,10 @@ export default function TraderPlaybook({ theme = 'dark' }) {
               </div>
 
               <div>
-                <label className="text-xs text-slate-400 block mb-1">Pre-Trade Checklist Items (One per line)</label>
+                <label className="text-xs text-slate-400 block mb-1 font-bold">Pre-Trade Checklist Items (One per line)</label>
                 <textarea
                   rows={3}
-                  placeholder=""
+                  placeholder="HTF Bias Alignment&#10;Clear 15m Displacement&#10;5m FVG Entry Trigger"
                   value={newSetup.checklistText}
                   onChange={(e) => setNewSetup(prev => ({ ...prev, checklistText: e.target.value }))}
                   className={`w-full border rounded-xl p-2.5 text-xs outline-none focus:border-cyan-400 ${
@@ -983,10 +1167,17 @@ export default function TraderPlaybook({ theme = 'dark' }) {
 
               <div className="flex justify-end gap-2 pt-2">
                 <button
+                  type="button"
+                  onClick={handleCancelSetupForm}
+                  className="px-4 py-2.5 text-xs font-mono font-bold text-slate-400 hover:text-white rounded-xl border border-white/10 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
                   type="submit"
                   className="px-5 py-2.5 text-xs font-black text-slate-950 bg-gradient-to-r from-cyan-400 to-emerald-400 rounded-xl shadow-lg font-mono cursor-pointer"
                 >
-                  Save Setup to Playbook
+                  {editingSetupId ? 'Update Setup Rule' : 'Save Setup to Playbook'}
                 </button>
               </div>
             </form>
@@ -1010,13 +1201,22 @@ export default function TraderPlaybook({ theme = 'dark' }) {
                       <h4 className="text-base font-extrabold mt-1">{setup.title}</h4>
                     </div>
 
-                    <button
-                      onClick={() => handleDeleteSetup(setup.id)}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
-                      title="Delete setup"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        onClick={() => handleStartEditSetup(setup)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-cyan-400 hover:bg-cyan-500/10 transition-colors cursor-pointer"
+                        title="Edit Setup Rule"
+                      >
+                        <Edit3 className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteSetup(setup.id, setup.title)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                        title="Delete setup"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
 
                   <p className={`text-xs font-sans leading-relaxed ${isLight ? 'text-slate-700' : 'text-slate-300'}`}>
