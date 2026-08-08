@@ -169,22 +169,22 @@ export default function Navbar({
         </nav>
 
         {/* 3. Right Action Buttons (Desktop MD+ Only) */}
-        <div className="hidden md:flex items-center gap-1.5 xl:gap-2 shrink-0">
+        <div className="hidden md:flex items-center gap-1.5 2xl:gap-2 shrink-0 pr-1">
           {/* Theme Toggle */}
           <button
             onClick={onToggleTheme}
-            className="h-8.5 px-2.5 xl:px-3.5 flex items-center gap-1.5 rounded-full text-xs font-mono font-bold bg-[#140F24] hover:bg-[#1C1533] text-amber-300 border border-purple-500/30 hover:border-purple-400 transition-all cursor-pointer shadow-sm shrink-0"
+            className="h-8.5 px-2.5 2xl:px-3.5 flex items-center gap-1.5 rounded-full text-xs font-mono font-bold bg-[#140F24] hover:bg-[#1C1533] text-amber-300 border border-purple-500/30 hover:border-purple-400 transition-all cursor-pointer shadow-sm shrink-0"
             title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Theme`}
           >
             {theme === 'dark' ? (
               <>
                 <Sun className="w-3.5 h-3.5 text-amber-400 fill-amber-400/20 shrink-0" />
-                <span className="text-amber-200 hidden xl:inline">Light</span>
+                <span className="text-amber-200 hidden 2xl:inline">Light</span>
               </>
             ) : (
               <>
                 <Moon className="w-3.5 h-3.5 text-indigo-400 fill-indigo-400/20 shrink-0" />
-                <span className="text-slate-700 hidden xl:inline">Dark</span>
+                <span className="text-slate-700 hidden 2xl:inline">Dark</span>
               </>
             )}
           </button>
@@ -192,27 +192,27 @@ export default function Navbar({
           {/* Strategies */}
           <button
             onClick={onOpenStrategyModal}
-            className="h-8.5 flex items-center gap-1.5 px-2.5 xl:px-3.5 rounded-full text-xs font-mono font-bold text-purple-200 bg-[#120D22] hover:bg-purple-950/60 hover:text-purple-100 border border-purple-500/30 hover:border-purple-400 transition-all cursor-pointer shadow-sm shrink-0"
+            className="h-8.5 flex items-center gap-1.5 px-2.5 2xl:px-3.5 rounded-full text-xs font-mono font-bold text-purple-200 bg-[#120D22] hover:bg-purple-950/60 hover:text-purple-100 border border-purple-500/30 hover:border-purple-400 transition-all cursor-pointer shadow-sm shrink-0"
             title="Manage Trading Strategies"
           >
             <Layers className="w-3.5 h-3.5 text-purple-400 shrink-0" />
-            <span className="hidden xl:inline">Strategies</span>
+            <span className="hidden 2xl:inline">Strategies</span>
           </button>
 
           {/* Risk Calculator */}
           <button
             onClick={onOpenRiskCalculator}
-            className="h-8.5 flex items-center gap-1.5 px-2.5 xl:px-3.5 rounded-full text-xs font-mono font-bold text-cyan-200 bg-[#0B1726] hover:bg-cyan-950/60 hover:text-cyan-100 border border-cyan-500/40 hover:border-cyan-400 transition-all cursor-pointer shadow-sm shrink-0"
+            className="h-8.5 flex items-center gap-1.5 px-2.5 2xl:px-3.5 rounded-full text-xs font-mono font-bold text-cyan-200 bg-[#0B1726] hover:bg-cyan-950/60 hover:text-cyan-100 border border-cyan-500/40 hover:border-cyan-400 transition-all cursor-pointer shadow-sm shrink-0"
             title="Open Automated Risk & Lot Size Calculator"
           >
             <Calculator className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-            <span className="hidden xl:inline">Risk Calc</span>
+            <span className="hidden 2xl:inline">Risk Calc</span>
           </button>
 
           {/* Log Trade CTA */}
           <button
             onClick={() => onOpenTradeModal()}
-            className="h-8.5 flex items-center gap-1.5 px-3.5 xl:px-4 rounded-full text-xs font-mono font-black text-slate-950 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 hover:scale-105 shadow-lg shadow-emerald-500/20 transition-all cursor-pointer border border-emerald-300/40 active:scale-95 shrink-0 whitespace-nowrap"
+            className="h-8.5 flex items-center gap-1.5 px-3 2xl:px-4 rounded-full text-xs font-mono font-black text-slate-950 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 hover:scale-105 shadow-lg shadow-emerald-500/20 transition-all cursor-pointer border border-emerald-300/40 active:scale-95 shrink-0 whitespace-nowrap"
           >
             <PlusCircle className="w-3.5 h-3.5 text-slate-950 stroke-[2.5] shrink-0" />
             <span>+ Log Trade</span>
@@ -226,7 +226,7 @@ export default function Navbar({
                   {currentUser.username ? currentUser.username.charAt(0) : 'U'}
                 </div>
 
-                <span className="text-slate-200 text-xs max-w-[65px] lg:max-w-[90px] xl:max-w-[110px] truncate px-1">
+                <span className="text-slate-200 text-xs max-w-[70px] lg:max-w-[85px] 2xl:max-w-[110px] truncate px-1">
                   {currentUser.username}
                 </span>
 
