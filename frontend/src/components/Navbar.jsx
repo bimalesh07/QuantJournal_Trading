@@ -16,7 +16,8 @@ import {
   X,
   ChevronRight,
   ShieldCheck,
-  BookOpen
+  BookOpen,
+  Calculator
 } from 'lucide-react';
 
 export default function Navbar({ 
@@ -24,6 +25,7 @@ export default function Navbar({
   setActiveTab, 
   onOpenTradeModal, 
   onOpenStrategyModal,
+  onOpenRiskCalculator,
   currentUser,
   onLogout,
   theme = 'dark',
@@ -192,6 +194,15 @@ export default function Navbar({
           >
             <Layers className="w-3.5 h-3.5 text-purple-400 shrink-0" />
             <span>Strategies</span>
+          </button>
+
+          <button
+            onClick={onOpenRiskCalculator}
+            className="h-9 flex items-center gap-1.5 px-3.5 rounded-full text-xs font-mono font-bold text-cyan-200 bg-[#0B1726] hover:bg-cyan-950/60 hover:text-cyan-100 border border-cyan-500/40 hover:border-cyan-400 transition-all cursor-pointer shadow-sm"
+            title="Open Automated Risk & Lot Size Calculator"
+          >
+            <Calculator className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+            <span>Risk Calc</span>
           </button>
 
           <button

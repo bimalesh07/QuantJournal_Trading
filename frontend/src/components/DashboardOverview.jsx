@@ -237,12 +237,49 @@ export default function DashboardOverview({
     doc.save(`TradeTrack_Performance_Report_${new Date().toISOString().slice(0, 10)}.pdf`);
   };
 
-  // Speedometer Arc calculation
-  const winRateVal = Number(overview.win_rate) || 0;
-  const radius = 65;
+  // Speedometer Arc calculation - Calibrated Precision Semicircle
+  const winRateVal = Math.min(100, Math.max(0, Number(overview.win_rate) || 0));
+  const radius = 68;
   const strokeWidth = 12;
   const circumference = Math.PI * radius;
   const strokeDashoffset = circumference - (winRateVal / 100) * circumference;
+
+  // Dynamic Color Palette for Speedometer Gauge based on Win Rate
+  const getSpeedometerTheme = (rate) => {
+    if (rate >= 65) {
+      return {
+        gradId: 'speedometerGradGreen',
+        stop1: '#10b981',
+        stop2: '#22d3ee',
+        stop3: '#38bdf8',
+        shadow: 'drop-shadow-[0_0_14px_rgba(16,185,129,0.7)]',
+        textColor: 'text-cyan-300 drop-shadow-[0_0_15px_rgba(34,211,238,0.6)]',
+        badgeBg: 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400',
+      };
+    }
+    if (rate >= 40) {
+      return {
+        gradId: 'speedometerGradAmber',
+        stop1: '#f59e0b',
+        stop2: '#06b6d4',
+        stop3: '#38bdf8',
+        shadow: 'drop-shadow-[0_0_14px_rgba(245,158,11,0.7)]',
+        textColor: 'text-amber-300 drop-shadow-[0_0_15px_rgba(245,158,11,0.6)]',
+        badgeBg: 'bg-amber-500/15 border-amber-500/30 text-amber-400',
+      };
+    }
+    return {
+      gradId: 'speedometerGradRose',
+      stop1: '#f43f5e',
+      stop2: '#e11d48',
+      stop3: '#fb7185',
+      shadow: 'drop-shadow-[0_0_14px_rgba(244,63,94,0.7)]',
+      textColor: 'text-rose-400 drop-shadow-[0_0_15px_rgba(244,63,94,0.6)]',
+      badgeBg: 'bg-rose-500/15 border-rose-500/30 text-rose-400',
+    };
+  };
+
+  const speedoTheme = getSpeedometerTheme(winRateVal);
 
   // Format Date Short for X-Axis
   const formatShortDate = (dateStr) => {
@@ -362,7 +399,7 @@ export default function DashboardOverview({
 
           <div className="mt-2">
             <h3 className="text-2xl sm:text-3xl font-black text-sky-300 tracking-tight drop-shadow-[0_0_15px_rgba(56,189,248,0.4)]">
-              1 : {Number(overview.avg_rrr || 1.5).toFixed(2)}
+              1 : {overview.closed_trades > 0 && overview.avg_rrr ? Number(overview.avg_rrr).toFixed(2) : '0.00'}
             </h3>
           </div>
 
@@ -446,7 +483,7 @@ export default function DashboardOverview({
           {/* Avg Trades/Day */}
           <div className="p-3.5 rounded-xl bg-[#0E1320] border border-white/10 space-y-1">
             <span className="text-[11px] text-slate-400 block font-sans">Avg. Trades / Day</span>
-            <p className="text-base font-black text-cyan-400">{overview.avg_trades_per_day || 1.0}</p>
+            <p className="text-base font-black text-cyan-400">{overview.closed_trades > 0 ? (overview.avg_trades_per_day || 0) : 0}</p>
           </div>
 
           {/* Avg PnL per Trade */}
@@ -778,43 +815,81 @@ export default function DashboardOverview({
             <h3 className="text-base font-bold font-mono text-white tracking-wide">
               Win Rate Accuracy
             </h3>
-            <span className="text-xs font-mono text-emerald-400 font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30">Speedometer</span>
+            <span className={`text-xs font-mono font-bold px-2.5 py-0.5 rounded-full border ${speedoTheme.badgeBg}`}>
+              Speedometer
+            </span>
           </div>
 
-          {/* Semicircle Speedometer SVG */}
-          <div className="relative py-4 flex flex-col items-center justify-center my-auto">
-            <svg width="210" height="115" viewBox="0 0 160 90" className="overflow-visible">
+          {/* Semicircle Speedometer SVG with Precision Geometry & Ticks */}
+          <div className="relative py-3 flex flex-col items-center justify-center my-auto">
+            <svg width="220" height="125" viewBox="0 0 200 115" className="overflow-visible">
+              {/* Outer Tick Marks (0%, 25%, 50%, 75%, 100%) */}
+              <g stroke="#334155" strokeWidth="2" strokeLinecap="round">
+                {/* 0% Left Tick */}
+                <line x1="14" y1="95" x2="22" y2="95" />
+                {/* 25% Tick (135 deg) */}
+                <line x1="40" y1="35" x2="46" y2="41" />
+                {/* 50% Top Tick (90 deg) */}
+                <line x1="100" y1="10" x2="100" y2="18" />
+                {/* 75% Tick (45 deg) */}
+                <line x1="160" y1="35" x2="154" y2="41" />
+                {/* 100% Right Tick */}
+                <line x1="186" y1="95" x2="178" y2="95" />
+              </g>
+
+              {/* Tick Percentage Labels */}
+              <text x="8" y="99" fill="#64748B" fontSize="9" fontFamily="JetBrains Mono" fontWeight="bold">0%</text>
+              <text x="100" y="7" fill="#64748B" fontSize="9" fontFamily="JetBrains Mono" fontWeight="bold" textAnchor="middle">50%</text>
+              <text x="192" y="99" fill="#64748B" fontSize="9" fontFamily="JetBrains Mono" fontWeight="bold">100%</text>
+
+              {/* Background Arc Path */}
               <path
-                d="M 15 80 A 65 65 0 0 1 145 80"
+                d="M 32 95 A 68 68 0 0 1 168 95"
                 fill="none"
                 stroke="#1E293B"
                 strokeWidth={strokeWidth}
                 strokeLinecap="round"
               />
+
+              {/* Active Gauge Gradient Filled Arc */}
               <path
-                d="M 15 80 A 65 65 0 0 1 145 80"
+                d="M 32 95 A 68 68 0 0 1 168 95"
                 fill="none"
-                stroke="url(#speedometerGrad)"
+                stroke={`url(#${speedoTheme.gradId})`}
                 strokeWidth={strokeWidth}
                 strokeLinecap="round"
-                strokeDasharray={circumference}
+                strokeDasharray={`${circumference} ${circumference}`}
                 strokeDashoffset={strokeDashoffset}
-                className="transition-all duration-1000 ease-out drop-shadow-[0_0_12px_rgba(16,185,129,0.6)]"
+                strokeOpacity={winRateVal > 0 ? 1 : 0}
+                className={`transition-all duration-1000 ease-out ${speedoTheme.shadow}`}
               />
+
+              {/* SVG Gradients */}
               <defs>
-                <linearGradient id="speedometerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <linearGradient id="speedometerGradGreen" x1="0%" y1="0%" x2="100%" y2="0%">
                   <stop offset="0%" stopColor="#10b981" />
                   <stop offset="50%" stopColor="#22d3ee" />
                   <stop offset="100%" stopColor="#38bdf8" />
                 </linearGradient>
+                <linearGradient id="speedometerGradAmber" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#f59e0b" />
+                  <stop offset="50%" stopColor="#06b6d4" />
+                  <stop offset="100%" stopColor="#38bdf8" />
+                </linearGradient>
+                <linearGradient id="speedometerGradRose" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#f43f5e" />
+                  <stop offset="50%" stopColor="#e11d48" />
+                  <stop offset="100%" stopColor="#fb7185" />
+                </linearGradient>
               </defs>
             </svg>
 
-            <div className="absolute top-[48px] flex flex-col items-center">
-              <span className="text-3xl font-black font-mono text-cyan-300 tracking-tight drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]">
-                {overview.win_rate}%
+            {/* Centered Win Rate Display Inside Gauge */}
+            <div className="absolute top-[48px] flex flex-col items-center justify-center w-full px-2">
+              <span className={`text-2xl sm:text-3xl font-black font-mono tracking-tight ${speedoTheme.textColor}`}>
+                {winRateVal.toFixed(winRateVal % 1 === 0 ? 0 : 2)}%
               </span>
-              <span className="text-[11px] font-sans text-slate-300 font-bold tracking-wide mt-0.5">
+              <span className="text-[11px] font-sans text-slate-300 font-bold tracking-wide mt-1">
                 Execution Edge
               </span>
             </div>

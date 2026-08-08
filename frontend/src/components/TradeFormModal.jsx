@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { X, Upload, Star, Calculator, Image as ImageIcon, ShieldCheck, CheckSquare, Square, Check, ArrowUpRight, ArrowDownRight, Tag } from 'lucide-react';
+import RichNoteEditor from './RichNoteEditor';
 
-export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData = null, strategies = [] }) {
+export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData = null, strategies = [], onOpenRiskCalculator }) {
   if (!isOpen) return null;
 
   const [formData, setFormData] = useState({
@@ -360,7 +361,22 @@ export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData 
           </div>
 
           {/* SECTION 3: Execution Prices & Numbers */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider font-mono">Execution Prices & Position Numbers</span>
+              {onOpenRiskCalculator && (
+                <button
+                  type="button"
+                  onClick={onOpenRiskCalculator}
+                  className="px-2.5 py-1 text-[11px] font-mono font-bold text-cyan-300 bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 rounded-lg flex items-center gap-1.5 cursor-pointer shadow-sm"
+                >
+                  <Calculator className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>📐 Auto Risk Calculator</span>
+                </button>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             
             <div>
               <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1 font-mono">Entry Price *</label>
@@ -442,6 +458,7 @@ export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData 
               />
             </div>
 
+            </div>
           </div>
 
           {/* SECTION 4: Strategy, Status, Emotion & Rating */}
@@ -552,14 +569,12 @@ export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData 
           {/* SECTION 6: Notes & Chart Attachments (Compact Side-by-Side) */}
           <div className="space-y-3">
             <div>
-              <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1 font-mono">Execution Logic & Review Notes</label>
-              <textarea
-                name="notes"
-                rows="2"
-                placeholder=""
-                value={formData.notes}
-                onChange={handleChange}
-                className="w-full bg-[#161B27] text-xs sm:text-sm text-white px-3.5 py-2.5 rounded-xl border border-slate-700/70 focus:border-emerald-400 focus:outline-none font-medium resize-y"
+              <RichNoteEditor
+                label="Execution Logic & Review Notes"
+                placeholder="Log your execution rationale, confluences, discipline rating notes, and highlight key words..."
+                rows={3}
+                value={formData.notes || ''}
+                onChange={(val) => setFormData(prev => ({ ...prev, notes: val }))}
               />
             </div>
 

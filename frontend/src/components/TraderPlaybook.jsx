@@ -33,6 +33,8 @@ import {
 } from 'lucide-react';
 import ImageLightboxModal from './ImageLightboxModal';
 import DeleteConfirmModal from './DeleteConfirmModal';
+import RichNoteEditor from './RichNoteEditor';
+import FormattedTextDisplay from './FormattedTextDisplay';
 
 export default function TraderPlaybook({ theme = 'dark' }) {
   const isLight = theme === 'light';
@@ -587,18 +589,14 @@ export default function TraderPlaybook({ theme = 'dark' }) {
               </div>
 
               <div className="space-y-4 font-sans text-xs">
-                <div>
-                  <label className="text-slate-400 block mb-1.5 font-mono font-bold">Morning Market Bias & Key Levels (NIFTY, BankNifty, Gold, Crypto)</label>
-                  <textarea
-                    rows={4}
-                    placeholder=""
-                    value={currentNote.morningBias || ''}
-                    onChange={(e) => handleUpdateCurrentNote('morningBias', e.target.value)}
-                    className={`w-full border rounded-xl p-3.5 text-sm font-mono focus:border-cyan-400 outline-none resize-y leading-relaxed ${
-                      isLight ? 'bg-slate-50 border-slate-300 text-slate-900' : 'bg-[#0E1320] border-white/15 text-white'
-                    }`}
-                  />
-                </div>
+                <RichNoteEditor
+                  label="Morning Market Bias & Key Levels (NIFTY, BankNifty, Gold, Crypto)"
+                  placeholder="Record morning market bias, key liquidity pools, and setup levels..."
+                  rows={4}
+                  isLight={isLight}
+                  value={currentNote.morningBias || ''}
+                  onChange={(val) => handleUpdateCurrentNote('morningBias', val)}
+                />
 
                 <div>
                   <label className="text-slate-400 block mb-1.5 font-mono font-bold">Economic News Calendar Events & Risk Warnings</label>
@@ -627,15 +625,13 @@ export default function TraderPlaybook({ theme = 'dark' }) {
               </div>
 
               <div className="space-y-2 font-sans text-xs">
-                <label className="text-slate-400 block font-mono font-bold">Trading Performance Retrospective & Psychological Lessons</label>
-                <textarea
+                <RichNoteEditor
+                  label="Trading Performance Retrospective & Psychological Lessons"
+                  placeholder="Record trading performance, mistakes, discipline lessons..."
                   rows={4}
-                  placeholder=""
+                  isLight={isLight}
                   value={currentNote.eveningReview || ''}
-                  onChange={(e) => handleUpdateCurrentNote('eveningReview', e.target.value)}
-                  className={`w-full border rounded-xl p-3.5 text-sm font-mono focus:border-emerald-400 outline-none resize-y leading-relaxed ${
-                    isLight ? 'bg-slate-50 border-slate-300 text-slate-900' : 'bg-[#0E1320] border-white/15 text-white'
-                  }`}
+                  onChange={(val) => handleUpdateCurrentNote('eveningReview', val)}
                 />
               </div>
             </div>
@@ -849,20 +845,16 @@ export default function TraderPlaybook({ theme = 'dark' }) {
                 )}
               </div>
 
-              {/* Multi-Line Deep Explanation Note Textarea */}
-              <div className="space-y-1">
-                <label className="text-xs text-slate-400 block font-bold">Detailed Logic Explanation & Entry Rules</label>
-                <textarea
-                  rows={8}
-                  required
-                  placeholder="Detailed logic explanation..."
-                  value={newConcept.explanation}
-                  onChange={(e) => setNewConcept(prev => ({ ...prev, explanation: e.target.value }))}
-                  className={`w-full border rounded-xl p-4 text-sm font-mono focus:border-cyan-400 outline-none leading-relaxed resize-y ${
-                    isLight ? 'bg-slate-50 border-slate-300 text-slate-900' : 'bg-[#0E1320] border-white/15 text-white'
-                  }`}
-                />
-              </div>
+              {/* Multi-Line Deep Explanation Note Rich Text Editor */}
+              <RichNoteEditor
+                label="Detailed Logic Explanation & Entry Rules"
+                placeholder="Write detailed entry logic, key rules, and highlight important words (e.g., IDM, FVG, Liquidity)..."
+                rows={8}
+                required
+                isLight={isLight}
+                value={newConcept.explanation}
+                onChange={(val) => setNewConcept(prev => ({ ...prev, explanation: val }))}
+              />
 
               <div className="flex justify-end gap-2 pt-2">
                 <button
@@ -935,10 +927,10 @@ export default function TraderPlaybook({ theme = 'dark' }) {
                     )}
 
                     {/* Formatted Multi-Line Explanation Text */}
-                    <div className={`p-4 rounded-xl border font-sans text-xs space-y-2 whitespace-pre-line leading-relaxed ${
+                    <div className={`p-4 rounded-xl border font-sans text-xs space-y-2 leading-relaxed ${
                       isLight ? 'bg-slate-50 border-slate-200 text-slate-700' : 'bg-[#0B0F1A] border-white/10 text-slate-300'
                     }`}>
-                      {concept.explanation}
+                      <FormattedTextDisplay content={concept.explanation} />
                     </div>
                   </div>
 
@@ -1009,10 +1001,10 @@ export default function TraderPlaybook({ theme = 'dark' }) {
                           </div>
                         )}
 
-                        <div className={`p-4 rounded-xl border font-sans text-xs space-y-2 whitespace-pre-line leading-relaxed ${
+                        <div className={`p-4 rounded-xl border font-sans text-xs space-y-2 leading-relaxed ${
                           isLight ? 'bg-slate-50 border-slate-200 text-slate-700' : 'bg-[#0B0F1A] border-white/10 text-slate-300'
                         }`}>
-                          {concept.explanation}
+                          <FormattedTextDisplay content={concept.explanation} />
                         </div>
 
                         <div className="flex justify-end gap-2 pt-2">
@@ -1138,19 +1130,15 @@ export default function TraderPlaybook({ theme = 'dark' }) {
                 </div>
               </div>
 
-              <div>
-                <label className="text-xs text-slate-400 block mb-1 font-bold">Description & Entry Execution Trigger Rules</label>
-                <textarea
-                  rows={3}
-                  required
-                  placeholder="Describe strategy execution trigger rules..."
-                  value={newSetup.description}
-                  onChange={(e) => setNewSetup(prev => ({ ...prev, description: e.target.value }))}
-                  className={`w-full border rounded-xl p-2.5 text-xs outline-none focus:border-cyan-400 ${
-                    isLight ? 'bg-slate-50 border-slate-300 text-slate-900' : 'bg-[#0E1320] border-white/15 text-white'
-                  }`}
-                />
-              </div>
+              <RichNoteEditor
+                label="Description & Entry Execution Trigger Rules"
+                placeholder="Describe strategy execution trigger rules and key setups..."
+                rows={3}
+                required
+                isLight={isLight}
+                value={newSetup.description}
+                onChange={(val) => setNewSetup(prev => ({ ...prev, description: val }))}
+              />
 
               <div>
                 <label className="text-xs text-slate-400 block mb-1 font-bold">Pre-Trade Checklist Items (One per line)</label>

@@ -15,6 +15,7 @@ import TraderMilestones from './components/TraderMilestones';
 import TraderPlaybook from './components/TraderPlaybook';
 import TradeFilterBar from './components/TradeFilterBar';
 import DeleteConfirmModal from './components/DeleteConfirmModal';
+import RiskCalculatorModal from './components/RiskCalculatorModal';
 import { isTradeInTimeframe, calculateAnalyticsFromTrades } from './utils/analyticsUtils';
 
 import { 
@@ -102,6 +103,22 @@ export default function App() {
   const [selectedTradeForDetail, setSelectedTradeForDetail] = useState(null);
 
   const [isStrategyModalOpen, setIsStrategyModalOpen] = useState(false);
+  const [isRiskCalculatorOpen, setIsRiskCalculatorOpen] = useState(false);
+
+  const handleLogTradeWithCalculatedData = (calculatedData) => {
+    setEditingTrade({
+      symbol: calculatedData.symbol || '',
+      asset_class: calculatedData.asset_class || 'CRYPTO',
+      trade_type: calculatedData.trade_type || 'LONG',
+      entry_price: calculatedData.entry_price || '',
+      stop_loss: calculatedData.stop_loss || '',
+      take_profit: calculatedData.take_profit || '',
+      quantity: calculatedData.quantity || '',
+      status: 'CLOSED',
+      fees: '0.00'
+    });
+    setIsTradeModalOpen(true);
+  };
 
   // Notification Banner
   const [notification, setNotification] = useState(null);
@@ -342,6 +359,7 @@ export default function App() {
         setActiveTab={setActiveTab}
         onOpenTradeModal={handleOpenNewTradeModal}
         onOpenStrategyModal={() => setIsStrategyModalOpen(true)}
+        onOpenRiskCalculator={() => setIsRiskCalculatorOpen(true)}
         currentUser={currentUser}
         onLogout={handleLogout}
         theme={theme}
@@ -483,6 +501,7 @@ export default function App() {
         onSubmit={handleSaveTrade}
         initialData={editingTrade}
         strategies={strategies}
+        onOpenRiskCalculator={() => setIsRiskCalculatorOpen(true)}
       />
 
       <TradeDetailModal
@@ -497,6 +516,13 @@ export default function App() {
         strategies={strategies}
         onCreateStrategy={handleCreateStrategy}
         onDeleteStrategy={handleDeleteStrategy}
+      />
+
+      <RiskCalculatorModal
+        isOpen={isRiskCalculatorOpen}
+        onClose={() => setIsRiskCalculatorOpen(false)}
+        onLogTradeWithCalculatedData={handleLogTradeWithCalculatedData}
+        theme={theme}
       />
 
       <DeleteConfirmModal
