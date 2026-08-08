@@ -214,20 +214,27 @@ export default function Navbar({
           </button>
 
           {currentUser && (
-            <div className="flex items-center gap-2 pl-2 border-l border-white/10">
-              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#0E121B] border border-white/10 text-xs font-mono font-bold text-slate-200 shadow-sm hover:border-emerald-500/40 transition-all">
-                <div className="w-5.5 h-5.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-300 font-bold uppercase text-[10px]">
+            <div className="flex items-center gap-1.5 pl-2 border-l border-white/15 shrink-0">
+              <div className="flex items-center gap-1.5 p-1 pr-1.5 rounded-full bg-[#0D121F] border border-white/15 text-xs font-mono font-bold text-slate-200 shadow-md hover:border-emerald-500/40 transition-all shrink-0">
+                {/* User Avatar Circle */}
+                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-500/30 to-teal-500/20 border border-emerald-500/50 flex items-center justify-center text-emerald-300 font-bold uppercase text-[11px] shrink-0">
                   {currentUser.username ? currentUser.username.charAt(0) : 'U'}
                 </div>
-                <span className="text-slate-300">{currentUser.username}</span>
+
+                {/* Truncated Username */}
+                <span className="text-slate-200 text-xs max-w-[85px] lg:max-w-[110px] truncate px-1">
+                  {currentUser.username}
+                </span>
+
+                {/* Integrated Logout Button */}
+                <button
+                  onClick={onLogout}
+                  className="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-rose-300 hover:bg-rose-500/20 border border-transparent hover:border-rose-500/40 transition-all cursor-pointer shrink-0"
+                  title="Lock System & Log Out"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                </button>
               </div>
-              <button
-                onClick={onLogout}
-                className="h-8.5 w-8.5 flex items-center justify-center text-slate-400 hover:text-rose-400 bg-[#0E121B] hover:bg-rose-500/10 rounded-full border border-white/10 hover:border-rose-500/40 transition-all cursor-pointer"
-                title="Lock System & Log Out"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-              </button>
             </div>
           )}
         </div>
