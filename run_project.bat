@@ -3,7 +3,7 @@ title TradeTrack PRO - One Click Local Starter
 color 0A
 
 echo =========================================================================
-echo               📈 TradeTrack PRO - Analytics Engine Launcher
+echo               TradeTrack PRO - Analytics Engine Launcher
 echo =========================================================================
 echo.
 echo [1/3] Starting Django Backend Server (Port 8000)...

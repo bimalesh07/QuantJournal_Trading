@@ -17,7 +17,9 @@ import {
   ChevronRight,
   ShieldCheck,
   BookOpen,
-  Calculator
+  Calculator,
+  FlaskConical,
+  ChevronDown
 } from 'lucide-react';
 
 export default function Navbar({ 
@@ -40,6 +42,19 @@ export default function Navbar({
   ];
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isToolsDropdownOpen, setIsToolsDropdownOpen] = useState(false);
+  const toolsRef = useRef(null);
+
+  // Close dropdown on click outside
+  React.useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (toolsRef.current && !toolsRef.current.contains(e.target)) {
+        setIsToolsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // 3D Parallax Tilt State for floating capsule
   const navRef = useRef(null);
@@ -69,7 +84,7 @@ export default function Navbar({
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full backdrop-blur-2xl bg-[#070A14]/95 border-b border-white/15 px-3 sm:px-6 py-2.5 shadow-2xl transition-all relative">
+    <header className="sticky top-0 z-40 w-full backdrop-blur-2xl bg-[#070A14]/95 border-b border-white/15 px-2 sm:px-4 lg:px-6 py-2 shadow-2xl transition-all relative">
       {/* Glowing Bottom Border Gradient Accent */}
       <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent"></div>
 
@@ -78,13 +93,13 @@ export default function Navbar({
         onMouseMove={handleMouseMove}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={handleMouseLeave}
-        className="w-full max-w-[1850px] mx-auto flex items-center justify-between gap-2 relative"
+        className="w-full max-w-[1850px] mx-auto flex items-center justify-between gap-1.5 sm:gap-2 lg:gap-3 relative"
       >
 
         {/* 1. Brand Identity */}
-        <div className="flex items-center justify-between shrink-0 gap-2">
-          <div className="flex items-center space-x-2 sm:space-x-3 cursor-pointer" onClick={() => setActiveTab('dashboard')}>
-            <div className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full p-[2px] overflow-hidden shadow-lg shadow-emerald-500/30 group/orb shrink-0">
+        <div className="flex items-center justify-between shrink-0 gap-1.5">
+          <div className="flex items-center space-x-1.5 sm:space-x-2.5 cursor-pointer" onClick={() => setActiveTab('dashboard')}>
+            <div className="relative w-7 h-7 sm:w-8 sm:h-8 rounded-full p-[2px] overflow-hidden shadow-lg shadow-emerald-500/30 group/orb shrink-0">
               <div 
                 className="absolute -inset-[150%] animate-spin-slow opacity-100 pointer-events-none"
                 style={{
@@ -92,13 +107,13 @@ export default function Navbar({
                 }}
               />
               <div className="relative w-full h-full bg-[#070A12] rounded-full flex items-center justify-center group-hover/orb:bg-transparent transition-colors">
-                <TrendingUp className="w-4 h-4 text-emerald-400 group-hover/orb:text-slate-950 font-black transition-colors stroke-[2.2]" />
+                <TrendingUp className="w-3.5 h-3.5 text-emerald-400 group-hover/orb:text-slate-950 font-black transition-colors stroke-[2.2]" />
               </div>
             </div>
 
             <div>
-              <div className="flex items-center space-x-1.5">
-                <span className="font-black text-base sm:text-lg tracking-wider text-white font-mono">
+              <div className="flex items-center space-x-1">
+                <span className="font-black text-sm sm:text-base tracking-wider text-white font-mono whitespace-nowrap">
                   Trade<span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">Track</span>
                 </span>
 
@@ -109,13 +124,13 @@ export default function Navbar({
                       background: 'conic-gradient(from 0deg at 50% 50%, transparent 0deg, transparent 200deg, #06b6d4 260deg, #10b981 310deg, #f59e0b 360deg)'
                     }}
                   />
-                  <span className="relative px-1.5 py-0.5 text-[8.5px] font-black tracking-widest bg-[#070A12] text-emerald-300 rounded-full font-mono uppercase block">
+                  <span className="relative px-1 py-0.5 text-[8px] font-black tracking-widest bg-[#070A12] text-emerald-300 rounded-full font-mono uppercase block">
                     PRO
                   </span>
                 </div>
               </div>
 
-              <p className="text-[9px] text-slate-400 hidden lg:flex items-center gap-1 font-mono font-medium whitespace-nowrap">
+              <p className="text-[8.5px] text-slate-400 hidden 2xl:flex items-center gap-1 font-mono font-medium whitespace-nowrap">
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(6,182,212,0.9)]"></span>
                 <span>Trading Journal & Analytics</span>
               </p>
@@ -144,7 +159,7 @@ export default function Navbar({
         </div>
 
         {/* 2. Desktop Navigation Tab Bar */}
-        <nav className="hidden lg:flex items-center gap-1 bg-[#070A12]/90 p-1 rounded-full border border-white/10 shadow-inner shrink-0">
+        <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1 bg-[#070A12]/90 p-1 rounded-full border border-white/10 shadow-inner shrink-0">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -155,7 +170,7 @@ export default function Navbar({
                   setActiveTab(tab.id);
                   setIsMobileMenuOpen(false);
                 }}
-                className={`h-8 px-2.5 xl:px-3 flex items-center gap-1.5 rounded-full text-[11px] xl:text-[11.5px] font-mono font-bold leading-none transition-all whitespace-nowrap cursor-pointer shrink-0 relative overflow-hidden ${
+                className={`h-7.5 px-2 xl:px-2.5 2xl:px-3 flex items-center gap-1 xl:gap-1.5 rounded-full text-[10.5px] xl:text-[11px] 2xl:text-xs font-mono font-bold leading-none transition-all whitespace-nowrap cursor-pointer shrink-0 relative overflow-hidden ${
                   isActive
                     ? 'bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 text-slate-950 shadow-md shadow-emerald-500/30 font-black'
                     : 'text-slate-400 hover:text-white hover:bg-white/5'
@@ -169,11 +184,11 @@ export default function Navbar({
         </nav>
 
         {/* 3. Right Action Buttons (Desktop MD+ Only) */}
-        <div className="hidden md:flex items-center gap-1.5 2xl:gap-2 shrink-0 pr-1">
+        <div className="hidden md:flex items-center gap-1 xl:gap-1.5 2xl:gap-2 shrink-0">
           {/* Theme Toggle */}
           <button
             onClick={onToggleTheme}
-            className="h-8.5 px-2.5 2xl:px-3.5 flex items-center gap-1.5 rounded-full text-xs font-mono font-bold bg-[#140F24] hover:bg-[#1C1533] text-amber-300 border border-purple-500/30 hover:border-purple-400 transition-all cursor-pointer shadow-sm shrink-0"
+            className="h-8 px-2 xl:px-2.5 2xl:px-3 flex items-center gap-1 rounded-full text-[11px] 2xl:text-xs font-mono font-bold bg-[#140F24] hover:bg-[#1C1533] text-amber-300 border border-purple-500/30 hover:border-purple-400 transition-all cursor-pointer shadow-sm shrink-0"
             title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Theme`}
           >
             {theme === 'dark' ? (
@@ -189,51 +204,104 @@ export default function Navbar({
             )}
           </button>
 
-          {/* Strategies */}
-          <button
-            onClick={onOpenStrategyModal}
-            className="h-8.5 flex items-center gap-1.5 px-2.5 2xl:px-3.5 rounded-full text-xs font-mono font-bold text-purple-200 bg-[#120D22] hover:bg-purple-950/60 hover:text-purple-100 border border-purple-500/30 hover:border-purple-400 transition-all cursor-pointer shadow-sm shrink-0"
-            title="Manage Trading Strategies"
-          >
-            <Layers className="w-3.5 h-3.5 text-purple-400 shrink-0" />
-            <span className="hidden 2xl:inline">Strategies</span>
-          </button>
+          {/* 1-Click Quant Tools Dropdown Menu */}
+          <div className="relative shrink-0" ref={toolsRef}>
+            <button
+              onClick={() => setIsToolsDropdownOpen(!isToolsDropdownOpen)}
+              className={`h-8 px-2.5 xl:px-3 flex items-center gap-1.5 rounded-full text-xs font-mono font-bold transition-all cursor-pointer border shadow-sm ${
+                activeTab === 'backtest'
+                  ? 'bg-gradient-to-r from-cyan-500/20 via-teal-500/20 to-emerald-500/20 text-cyan-300 border-cyan-400/60 shadow-cyan-500/20 font-black'
+                  : 'bg-[#0B1726] hover:bg-cyan-950/60 text-cyan-200 border-cyan-500/40 hover:border-cyan-400'
+              }`}
+              title="Open Trading Tools Menu (Backtest Lab, Risk Calc, Strategies)"
+            >
+              <Zap className="w-3.5 h-3.5 text-amber-400 fill-amber-400/20 shrink-0" />
+              <span>Tools</span>
+              {activeTab === 'backtest' && (
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+              )}
+              <ChevronDown className={`w-3 h-3 text-cyan-400 transition-transform ${isToolsDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
 
-          {/* Risk Calculator */}
-          <button
-            onClick={onOpenRiskCalculator}
-            className="h-8.5 flex items-center gap-1.5 px-2.5 2xl:px-3.5 rounded-full text-xs font-mono font-bold text-cyan-200 bg-[#0B1726] hover:bg-cyan-950/60 hover:text-cyan-100 border border-cyan-500/40 hover:border-cyan-400 transition-all cursor-pointer shadow-sm shrink-0"
-            title="Open Automated Risk & Lot Size Calculator"
-          >
-            <Calculator className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-            <span className="hidden 2xl:inline">Risk Calc</span>
-          </button>
+            {/* Dropdown Popover */}
+            {isToolsDropdownOpen && (
+              <div className="absolute right-0 top-10 z-50 w-56 p-2 rounded-2xl bg-[#090D16]/95 border border-cyan-500/30 backdrop-blur-2xl shadow-2xl space-y-1 animate-fadeIn font-mono">
+                <p className="text-[9.5px] font-bold text-slate-500 uppercase px-2 py-1 tracking-wider border-b border-white/5">
+                  1-Click Quant Tools
+                </p>
+
+                {/* 1. Backtest Lab */}
+                <button
+                  onClick={() => {
+                    setActiveTab('backtest');
+                    setIsToolsDropdownOpen(false);
+                  }}
+                  className={`w-full flex items-center justify-between p-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    activeTab === 'backtest'
+                      ? 'bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-400 text-slate-950 font-black shadow-md'
+                      : 'text-cyan-300 hover:bg-cyan-500/10'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <FlaskConical className="w-4 h-4 text-cyan-400" />
+                    <span>🧪 Backtest Lab</span>
+                  </div>
+                  {activeTab === 'backtest' && <span className="text-[10px] uppercase font-mono text-slate-950">Active</span>}
+                </button>
+
+                {/* 2. Risk Calculator */}
+                <button
+                  onClick={() => {
+                    onOpenRiskCalculator();
+                    setIsToolsDropdownOpen(false);
+                  }}
+                  className="w-full flex items-center gap-2 p-2 rounded-xl text-xs font-bold text-slate-200 hover:bg-white/5 transition-all cursor-pointer"
+                >
+                  <Calculator className="w-4 h-4 text-cyan-400" />
+                  <span>Risk & Lot Calculator</span>
+                </button>
+
+                {/* 3. Strategies Manager */}
+                <button
+                  onClick={() => {
+                    onOpenStrategyModal();
+                    setIsToolsDropdownOpen(false);
+                  }}
+                  className="w-full flex items-center gap-2 p-2 rounded-xl text-xs font-bold text-purple-200 hover:bg-white/5 transition-all cursor-pointer"
+                >
+                  <Layers className="w-4 h-4 text-purple-400" />
+                  <span>Strategies Manager</span>
+                </button>
+              </div>
+            )}
+          </div>
 
           {/* Log Trade CTA */}
           <button
             onClick={() => onOpenTradeModal()}
-            className="h-8.5 flex items-center gap-1.5 px-3 2xl:px-4 rounded-full text-xs font-mono font-black text-slate-950 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 hover:scale-105 shadow-lg shadow-emerald-500/20 transition-all cursor-pointer border border-emerald-300/40 active:scale-95 shrink-0 whitespace-nowrap"
+            className="h-8 flex items-center gap-1 px-2.5 xl:px-3 2xl:px-3.5 rounded-full text-[11px] 2xl:text-xs font-mono font-black text-slate-950 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 hover:scale-105 shadow-lg shadow-emerald-500/20 transition-all cursor-pointer border border-emerald-300/40 active:scale-95 shrink-0 whitespace-nowrap"
           >
             <PlusCircle className="w-3.5 h-3.5 text-slate-950 stroke-[2.5] shrink-0" />
-            <span>+ Log Trade</span>
+            <span className="hidden 2xl:inline">+ Log Trade</span>
+            <span className="inline 2xl:hidden">+ Log</span>
           </button>
 
           {/* User Profile & Logout */}
           {currentUser && (
-            <div className="flex items-center gap-1 pl-1.5 border-l border-white/15 shrink-0">
+            <div className="flex items-center gap-1 pl-1 border-l border-white/15 shrink-0">
               <div 
                 className="flex items-center gap-1 p-0.5 rounded-full bg-[#0D121F] border border-white/15 text-xs font-mono font-bold text-slate-200 shadow-md hover:border-emerald-500/40 transition-all shrink-0"
                 title={`Logged in as ${currentUser.username}`}
               >
                 {/* User Avatar Circle */}
-                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-500/30 via-teal-500/20 to-cyan-500/30 border border-emerald-500/50 flex items-center justify-center text-emerald-300 font-black uppercase text-xs shadow-inner shrink-0">
+                <div className="w-6.5 h-6.5 rounded-full bg-gradient-to-br from-emerald-500/30 via-teal-500/20 to-cyan-500/30 border border-emerald-500/50 flex items-center justify-center text-emerald-300 font-black uppercase text-[11px] shadow-inner shrink-0">
                   {currentUser.username ? currentUser.username.charAt(0) : 'U'}
                 </div>
 
                 {/* Integrated Logout Button */}
                 <button
                   onClick={onLogout}
-                  className="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-rose-300 hover:bg-rose-500/20 border border-transparent hover:border-rose-500/40 transition-all cursor-pointer shrink-0"
+                  className="w-6.5 h-6.5 rounded-full flex items-center justify-center text-slate-400 hover:text-rose-300 hover:bg-rose-500/20 border border-transparent hover:border-rose-500/40 transition-all cursor-pointer shrink-0"
                   title="Lock System & Log Out"
                 >
                   <LogOut className="w-3.5 h-3.5" />
@@ -321,6 +389,25 @@ export default function Navbar({
                   <span>Strategies Manager</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-purple-500" />
+              </button>
+
+              {/* Backtest Lab Option */}
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  setActiveTab('backtest');
+                }}
+                className={`w-full flex items-center justify-between p-2.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer border ${
+                  activeTab === 'backtest'
+                    ? 'bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-400 text-slate-950 border-cyan-300 font-black shadow-lg shadow-cyan-500/20'
+                    : 'text-cyan-300 hover:bg-cyan-950/40 border-cyan-500/20'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <FlaskConical className="w-4 h-4 text-cyan-400" />
+                  <span>🧪 Backtest Lab</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-cyan-500" />
               </button>
             </div>
 

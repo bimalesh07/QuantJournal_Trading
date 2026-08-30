@@ -4,11 +4,12 @@ import React from 'react';
  * Component to safely parse and display formatted text with rich highlights,
  * headers/big fonts, bold/italic, bullet lists, callout boxes, and tags.
  */
-export default function FormattedTextDisplay({ content = '', className = '' }) {
-  if (!content) return null;
+export default function FormattedTextDisplay({ content = '', text = '', className = '' }) {
+  const rawText = content || text || '';
+  if (!rawText) return null;
 
   // Convert basic markdown/HTML-like patterns into formatted JSX elements
-  const lines = String(content).split('\n');
+  const lines = String(rawText).split('\n');
 
   // Helper to parse line-level formatting (bold, italic, mark/highlight, tags)
   const parseInlineStyles = (text) => {

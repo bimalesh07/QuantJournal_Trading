@@ -181,6 +181,34 @@ export default function DashboardOverview({
     trades: 1
   } : null);
 
+  // Calculate Today's Live Net PnL & Daily Risk Threshold
+  const todayNetPnL = useMemo(() => {
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const todayTrades = (trades || []).filter((t) => {
+      const entryStr = t.entry_time ? new Date(t.entry_time).toISOString().slice(0, 10) : '';
+      return entryStr === todayStr;
+    });
+    return todayTrades.reduce((acc, t) => acc + (parseFloat(t.net_pnl) || 0), 0);
+  }, [trades]);
+
+  const DAILY_MAX_LOSS_LIMIT = 200; // $200 daily max loss limit
+  const dailyLossRatio = todayNetPnL < 0 ? Math.abs(todayNetPnL) / DAILY_MAX_LOSS_LIMIT : 0;
+
+  // Calculate Trader Discipline Psychology Score (0-100 PTS)
+  const disciplineScore = useMemo(() => {
+    if (!trades || trades.length === 0) return 92;
+    let totalScore = 0;
+    trades.forEach((t) => {
+      let score = (t.rating || 3) * 15; // Rating component (15 - 75 PTS)
+      if (t.emotion === 'DISCIPLINED' || t.emotion === 'PATIENT') score += 25;
+      else if (t.emotion === 'FOMO' || t.emotion === 'IMPULSIVE') score += 5;
+      else if (t.emotion === 'REVENGE') score += 0;
+      else score += 15;
+      totalScore += Math.min(100, score);
+    });
+    return Math.round(totalScore / trades.length);
+  }, [trades]);
+
   // PDF Report Generator
   const generatePDFReport = () => {
     const doc = new jsPDF({
@@ -351,6 +379,48 @@ export default function DashboardOverview({
 
       {/* Dynamic Content Container with 200ms Opacity Transition */}
       <div className={`space-y-6 transition-all duration-200 ${isTransitioning ? 'opacity-25 scale-[0.995]' : 'opacity-100 scale-100'}`}>
+
+        {/* 🛡️ Daily Max Loss & Tilt Risk Safeguard Banner */}
+        <div className={`p-4 rounded-2xl border backdrop-blur-xl shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 font-mono transition-all ${
+          dailyLossRatio >= 1.0
+            ? 'bg-rose-950/40 border-rose-500/50 text-rose-200 shadow-rose-500/10'
+            : dailyLossRatio >= 0.75
+            ? 'bg-amber-950/40 border-amber-500/50 text-amber-200 shadow-amber-500/10'
+            : 'bg-[#090D16] border-white/10 text-slate-300'
+        }`}>
+          <div className="flex items-center gap-3">
+            <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+              dailyLossRatio >= 1.0 
+                ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40 animate-pulse' 
+                : dailyLossRatio >= 0.75
+                ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
+                : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+            }`}>
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="font-bold text-xs sm:text-sm flex items-center gap-2">
+                <span>{dailyLossRatio >= 1.0 ? '🛑 DAILY MAX LOSS LIMIT BREACHED!' : dailyLossRatio >= 0.75 ? '⚠️ DAILY RISK WARNING' : '🛡️ DAILY RISK PROTECTOR'}</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/10 text-white font-semibold">
+                  Today PnL: ${todayNetPnL >= 0 ? `+${todayNetPnL.toFixed(2)}` : todayNetPnL.toFixed(2)}
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-400 mt-0.5">
+                {dailyLossRatio >= 1.0
+                  ? 'Daily risk threshold (-$200) hit! Step away from the screens to protect capital & eliminate revenge trading.'
+                  : dailyLossRatio >= 0.75
+                  ? `Used ${Math.round(dailyLossRatio * 100)}% of daily risk budget (-$200 max limit). Execute with extreme caution.`
+                  : 'Daily risk protection active. Max daily loss limit set at -$200 (2% account equity).'}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 self-end sm:self-auto bg-black/30 px-3 py-1.5 rounded-xl border border-white/10 text-xs">
+            <Trophy className="w-3.5 h-3.5 text-amber-400" />
+            <span className="text-[10px] text-slate-400 uppercase">Discipline Score:</span>
+            <span className="font-black text-cyan-300">{disciplineScore}/100 PTS</span>
+          </div>
+        </div>
 
         {/* ========================================================================= */}
         {/* 1. TOP 4 EXECUTIVE FINANCIAL KPI CARDS */}

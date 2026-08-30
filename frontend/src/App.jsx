@@ -16,7 +16,11 @@ import TraderPlaybook from './components/TraderPlaybook';
 import TradeFilterBar from './components/TradeFilterBar';
 import DeleteConfirmModal from './components/DeleteConfirmModal';
 import RiskCalculatorModal from './components/RiskCalculatorModal';
+import BacktestLab from './components/BacktestLab';
+import BacktestFormModal from './components/BacktestFormModal';
+import BacktestDetailModal from './components/BacktestDetailModal';
 import { isTradeInTimeframe, calculateAnalyticsFromTrades } from './utils/analyticsUtils';
+import { SEED_BACKTEST_TRADES, parseBacktestsFromCSV } from './utils/backtestUtils';
 
 import { 
   getTrades, 
@@ -102,8 +106,82 @@ export default function App() {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedTradeForDetail, setSelectedTradeForDetail] = useState(null);
 
+  // Standalone Isolated Backtest State (Stored in LocalStorage key: quant_journal_backtest_trades)
+  const [backtestTrades, setBacktestTrades] = useState(() => {
+    try {
+      const saved = localStorage.getItem('quant_journal_backtest_trades');
+      return saved ? JSON.parse(saved) : SEED_BACKTEST_TRADES;
+    } catch (err) {
+      console.error('Error parsing backtest trades:', err);
+      return SEED_BACKTEST_TRADES;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('quant_journal_backtest_trades', JSON.stringify(backtestTrades));
+    } catch (err) {
+      console.error('Error saving backtest trades:', err);
+    }
+  }, [backtestTrades]);
+
+  // Backtest Modals State
+  const [isBacktestFormOpen, setIsBacktestFormOpen] = useState(false);
+  const [editingBacktestTrade, setEditingBacktestTrade] = useState(null);
+  const [isBacktestDetailOpen, setIsBacktestDetailOpen] = useState(false);
+  const [selectedBacktestForDetail, setSelectedBacktestForDetail] = useState(null);
+
   const [isStrategyModalOpen, setIsStrategyModalOpen] = useState(false);
   const [isRiskCalculatorOpen, setIsRiskCalculatorOpen] = useState(false);
+
+  const handleOpenNewBacktestModal = () => {
+    setEditingBacktestTrade(null);
+    setIsBacktestFormOpen(true);
+  };
+
+  const handleOpenEditBacktestModal = (trade) => {
+    setEditingBacktestTrade(trade);
+    setIsBacktestFormOpen(true);
+  };
+
+  const handleOpenBacktestDetailModal = (trade) => {
+    setSelectedBacktestForDetail(trade);
+    setIsBacktestDetailOpen(true);
+  };
+
+  const handleSaveBacktestTrade = (tradeData) => {
+    setBacktestTrades(prev => {
+      const exists = prev.some(t => t.id === tradeData.id);
+      if (exists) {
+        return prev.map(t => t.id === tradeData.id ? tradeData : t);
+      } else {
+        return [tradeData, ...prev];
+      }
+    });
+    setIsBacktestFormOpen(false);
+    setEditingBacktestTrade(null);
+    showNotification('Backtest trade record saved successfully!');
+  };
+
+  const handleDeleteBacktestTrade = (id) => {
+    setBacktestTrades(prev => prev.filter(t => t.id !== id));
+    showNotification('Backtest trade deleted.');
+  };
+
+  const handleImportBacktestCSV = (csvText) => {
+    try {
+      const imported = parseBacktestsFromCSV(csvText);
+      if (imported.length > 0) {
+        setBacktestTrades(prev => [...imported, ...prev]);
+        showNotification(`Successfully imported ${imported.length} backtest setups from CSV!`);
+      } else {
+        showNotification('No valid backtest rows found in CSV.', 'error');
+      }
+    } catch (err) {
+      console.error('CSV parse error:', err);
+      showNotification('Error parsing backtest CSV file.', 'error');
+    }
+  };
 
   const handleLogTradeWithCalculatedData = (calculatedData) => {
     setEditingTrade({
@@ -489,12 +567,43 @@ export default function App() {
                 <TraderPlaybook theme={theme} />
               </div>
             )}
+
+            {/* View Tab 6: Backtesting Lab Engine */}
+            {activeTab === 'backtest' && (
+              <div className="space-y-6 animate-fadeIn">
+                <BacktestLab
+                  backtestTrades={backtestTrades}
+                  strategies={strategies}
+                  onOpenLogModal={handleOpenNewBacktestModal}
+                  onOpenEditModal={handleOpenEditBacktestModal}
+                  onOpenDetailModal={handleOpenBacktestDetailModal}
+                  onDeleteTrade={handleDeleteBacktestTrade}
+                  onImportCSV={handleImportBacktestCSV}
+                  theme={theme}
+                />
+              </div>
+            )}
           </>
         )}
 
       </main>
 
       {/* Modals */}
+      <BacktestFormModal
+        isOpen={isBacktestFormOpen}
+        onClose={() => setIsBacktestFormOpen(false)}
+        onSubmit={handleSaveBacktestTrade}
+        initialData={editingBacktestTrade}
+        strategies={strategies}
+        theme={theme}
+      />
+
+      <BacktestDetailModal
+        isOpen={isBacktestDetailOpen}
+        onClose={() => setIsBacktestDetailOpen(false)}
+        trade={selectedBacktestForDetail}
+      />
+
       <TradeFormModal
         isOpen={isTradeModalOpen}
         onClose={() => setIsTradeModalOpen(false)}

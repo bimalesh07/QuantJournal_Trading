@@ -30,3 +30,6 @@ yarn-error.log*
 *.swo
 .DS_Store
 Thumbs.db
+
+# Project Roadmap & Notes
+FUTURE_TRADING_ROADMAP.md
