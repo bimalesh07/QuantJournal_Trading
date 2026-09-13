@@ -52,12 +52,18 @@ class Trade(models.Model):
         ('NEW_YORK', 'New York Session'),
     ]
 
+    CURRENCY_CHOICES = [
+        ('INR', 'INR (₹)'),
+        ('USD', 'USD ($)'),
+    ]
+
     # Owner & Basic Info
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='trades')
     symbol = models.CharField(max_length=30)
     trade_type = models.CharField(max_length=10, choices=TRADE_TYPE_CHOICES, default='LONG')
     asset_class = models.CharField(max_length=20, choices=ASSET_CLASS_CHOICES, default='CRYPTO')
     session = models.CharField(max_length=20, choices=SESSION_CHOICES, default='NEW_YORK')
+    currency = models.CharField(max_length=5, choices=CURRENCY_CHOICES, default='USD')
 
     # Price & Size
     entry_price = models.DecimalField(max_digits=18, decimal_places=6)
@@ -93,6 +99,16 @@ class Trade(models.Model):
 
     def __str__(self):
         return f"{self.trade_type} {self.symbol} @ {self.entry_price} ({self.status})"
+
+    def save(self, *args, **kwargs):
+        if not self.currency:
+            sym = (self.symbol or '').upper().strip()
+            asset = (self.asset_class or '').upper().strip()
+            if asset in ['INDIAN_FNO', 'INDIAN_STOCKS'] or any(kw in sym for kw in ['NIFTY', 'BANKNIFTY', 'SENSEX', 'FINNIFTY', 'MIDCPNIFTY', 'INR']):
+                self.currency = 'INR'
+            else:
+                self.currency = 'USD'
+        super().save(*args, **kwargs)
 
     @property
     def gross_pnl(self):

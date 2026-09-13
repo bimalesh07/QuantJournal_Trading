@@ -34,6 +34,7 @@ class TradeSerializer(serializers.ModelSerializer):
             'trade_type',
             'asset_class',
             'session',
+            'currency',
             'entry_price',
             'exit_price',
             'stop_loss',

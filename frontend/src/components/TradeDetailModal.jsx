@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, TrendingUp, TrendingDown, Star, Image as ImageIcon, Calendar, Target, DollarSign, Brain, Layers, Maximize2, Tag } from 'lucide-react';
 import ChartLightboxModal from './ChartLightboxModal';
 import { getMediaUrl } from '../services/api';
+import { getTradeCurrency, getCurrencySymbol } from '../utils/analyticsUtils';
 
 export default function TradeDetailModal({ trade, isOpen, onClose }) {
   if (!isOpen || !trade) return null;
@@ -12,6 +13,8 @@ export default function TradeDetailModal({ trade, isOpen, onClose }) {
   const isLong = trade.trade_type === 'LONG';
   const isWin = trade.net_pnl > 0;
   const isLoss = trade.net_pnl < 0;
+  const tradeCurr = getTradeCurrency(trade);
+  const currSym = getCurrencySymbol(tradeCurr);
 
   const entryImgUrl = getMediaUrl(trade.chart_entry);
   const exitImgUrl = getMediaUrl(trade.chart_exit);
@@ -46,6 +49,11 @@ export default function TradeDetailModal({ trade, isOpen, onClose }) {
                 <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-mono">
                   {trade.asset_class}
                 </span>
+                <span className={`text-xs px-2.5 py-0.5 rounded-full font-mono border font-semibold uppercase ${
+                  tradeCurr === 'INR' ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30' : 'bg-cyan-500/10 text-cyan-300 border-cyan-500/30'
+                }`}>
+                  {tradeCurr === 'INR' ? '₹ INR' : '$ USD'}
+                </span>
                 <span className="text-xs px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/30 font-mono font-semibold">
                   {trade.session === 'NEW_YORK' ? 'New York Session' : trade.session === 'LONDON' ? 'London Session' : trade.session === 'ASIAN' ? 'Asian Session' : 'New York Session'}
                 </span>
@@ -79,7 +87,7 @@ export default function TradeDetailModal({ trade, isOpen, onClose }) {
             {/* PnL Display */}
             <div className="text-right font-mono">
               <div className={`text-xl font-extrabold ${isWin ? 'text-emerald-400' : isLoss ? 'text-rose-400' : 'text-slate-300'}`}>
-                {isWin ? '+' : ''}${Number(trade.net_pnl).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                {isWin ? '+' : isLoss ? '-' : ''}{currSym}{Math.abs(Number(trade.net_pnl)).toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </div>
               <div className="text-xs text-slate-400">
                 Return: {Number(trade.return_percentage).toFixed(2)}%
@@ -101,12 +109,12 @@ export default function TradeDetailModal({ trade, isOpen, onClose }) {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div className="p-4 rounded-xl bg-[#151921] border border-slate-800">
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Entry Price</span>
-              <span className="text-base font-bold font-mono text-slate-200 mt-1 block">${Number(trade.entry_price).toLocaleString()}</span>
+              <span className="text-base font-bold font-mono text-slate-200 mt-1 block">{currSym}{Number(trade.entry_price).toLocaleString()}</span>
             </div>
             <div className="p-4 rounded-xl bg-[#151921] border border-slate-800">
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Exit Price</span>
               <span className="text-base font-bold font-mono text-slate-200 mt-1 block">
-                {trade.exit_price ? `$${Number(trade.exit_price).toLocaleString()}` : 'OPEN'}
+                {trade.exit_price ? `${currSym}${Number(trade.exit_price).toLocaleString()}` : 'OPEN'}
               </span>
             </div>
             <div className="p-4 rounded-xl bg-[#151921] border border-slate-800">

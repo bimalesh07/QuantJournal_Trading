@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import ChartLightboxModal from './ChartLightboxModal';
 import TimeframeDropdown from './TimeframeDropdown';
-import { isTradeInTimeframe } from '../utils/analyticsUtils';
+import { isTradeInTimeframe, getTradeCurrency, getCurrencySymbol } from '../utils/analyticsUtils';
 import { getMediaUrl } from '../services/api';
 
 export default function TradeTable({ 
@@ -55,6 +55,7 @@ export default function TradeTable({
       'Date & Time',
       'Symbol',
       'Asset Class',
+      'Currency',
       'Type',
       'Strategy',
       'Entry Price',
@@ -74,6 +75,7 @@ export default function TradeTable({
         `"${t.entry_time || ''}"`,
         `"${(t.symbol || '').replace(/"/g, '""')}"`,
         `"${t.asset_class || ''}"`,
+        `"${getTradeCurrency(t)}"`,
         `"${t.trade_type || ''}"`,
         `"${(t.strategy_name || '').replace(/"/g, '""')}"`,
         t.entry_price ?? '',
@@ -144,13 +146,23 @@ export default function TradeTable({
 
         rows.forEach(row => {
           if (row.length < 4) return;
-          const [entryTime, symbol, assetClass, tradeType, strategyName, entryPrice, exitPrice, netPnl, rrr, emotion, rating, tags, notes] = row;
+          let entryTime, symbol, assetClass, currency, tradeType, strategyName, entryPrice, exitPrice, netPnl, rrr, emotion, rating, tags, notes;
+          if (row.length >= 14) {
+            [entryTime, symbol, assetClass, currency, tradeType, strategyName, entryPrice, exitPrice, netPnl, rrr, emotion, rating, tags, notes] = row;
+          } else {
+            [entryTime, symbol, assetClass, tradeType, strategyName, entryPrice, exitPrice, netPnl, rrr, emotion, rating, tags, notes] = row;
+          }
 
           if (symbol && entryPrice) {
+            const cleanSym = symbol.replace(/"/g, '').toUpperCase();
+            const cleanAsset = (assetClass || 'CRYPTO').replace(/"/g, '').toUpperCase();
+            const inferredCurr = currency ? currency.replace(/"/g, '').toUpperCase() : getTradeCurrency({ symbol: cleanSym, asset_class: cleanAsset });
+
             importedTrades.push({
               entry_time: entryTime ? new Date(entryTime.replace(/"/g, '')).toISOString() : new Date().toISOString(),
-              symbol: symbol.replace(/"/g, '').toUpperCase(),
-              asset_class: (assetClass || 'CRYPTO').replace(/"/g, '').toUpperCase(),
+              symbol: cleanSym,
+              asset_class: cleanAsset,
+              currency: inferredCurr,
               trade_type: (tradeType || 'LONG').replace(/"/g, '').toUpperCase(),
               entry_price: parseFloat(entryPrice) || 0,
               exit_price: exitPrice ? parseFloat(exitPrice) : null,
@@ -419,6 +431,8 @@ export default function TradeTable({
                 const isLong = t.trade_type === 'LONG';
                 const isWin = t.net_pnl > 0;
                 const isLoss = t.net_pnl < 0;
+                const tradeCurr = getTradeCurrency(t);
+                const currSym = getCurrencySymbol(tradeCurr);
                 const dateStr = new Date(t.entry_time).toLocaleDateString('en-US', {
                   month: 'short',
                   day: 'numeric',
@@ -440,6 +454,11 @@ export default function TradeTable({
                         <span className="font-extrabold text-white font-mono text-sm tracking-wide">{t.symbol}</span>
                         <span className="text-[10px] px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 font-mono border border-slate-700/70 font-semibold uppercase">
                           {t.asset_class}
+                        </span>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-md font-mono border font-semibold uppercase ${
+                          tradeCurr === 'INR' ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30' : 'bg-cyan-500/10 text-cyan-300 border-cyan-500/30'
+                        }`}>
+                          {tradeCurr === 'INR' ? '₹ INR' : '$ USD'}
                         </span>
                         <span className="text-[10px] px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-300 font-mono border border-blue-500/30 font-semibold uppercase">
                           {t.session === 'NEW_YORK' ? 'NY' : t.session === 'LONDON' ? 'London' : t.session === 'ASIAN' ? 'Asian' : 'NY'}
@@ -480,16 +499,16 @@ export default function TradeTable({
 
                     {/* Entry / Exit Prices */}
                     <td className="py-3.5 px-4 text-right font-mono whitespace-nowrap text-xs">
-                      <div className="text-slate-100 font-extrabold">${Number(t.entry_price).toLocaleString()}</div>
+                      <div className="text-slate-100 font-extrabold">{currSym}{Number(t.entry_price).toLocaleString()}</div>
                       <div className="text-slate-400 text-[11px] mt-0.5 font-medium">
-                        Exit: {t.exit_price ? `$${Number(t.exit_price).toLocaleString()}` : <span className="text-amber-400 font-bold">OPEN</span>}
+                        Exit: {t.exit_price ? `${currSym}${Number(t.exit_price).toLocaleString()}` : <span className="text-amber-400 font-bold">OPEN</span>}
                       </div>
                     </td>
 
                     {/* Net PnL */}
                     <td className="py-3.5 px-4 text-right font-mono whitespace-nowrap text-xs">
                       <div className={`font-extrabold text-sm ${isWin ? 'text-emerald-400' : isLoss ? 'text-rose-400' : 'text-slate-400'}`}>
-                        {isWin ? '+' : ''}${Number(t.net_pnl).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                        {isWin ? '+' : isLoss ? '-' : ''}{currSym}{Math.abs(Number(t.net_pnl)).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                       </div>
                       <div className={`text-[11px] font-semibold mt-0.5 ${isWin ? 'text-emerald-400/80' : isLoss ? 'text-rose-400/80' : 'text-slate-400'}`}>
                         {t.return_percentage ? `${Number(t.return_percentage).toFixed(2)}%` : '0.00%'}

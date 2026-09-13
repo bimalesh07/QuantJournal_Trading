@@ -5,11 +5,18 @@ import RichNoteEditor from './RichNoteEditor';
 export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData = null, strategies = [], onOpenRiskCalculator }) {
   if (!isOpen) return null;
 
+  const isIndianAssetOrSymbol = (symbolStr, assetStr) => {
+    const sym = (symbolStr || '').toUpperCase().trim();
+    const asset = (assetStr || '').toUpperCase().trim();
+    return asset === 'INDIAN_FNO' || asset === 'INDIAN_STOCKS' || ['NIFTY', 'BANKNIFTY', 'SENSEX', 'FINNIFTY', 'MIDCPNIFTY', 'INR'].some(kw => sym.includes(kw));
+  };
+
   const [formData, setFormData] = useState({
     symbol: '',
     trade_type: 'LONG',
     asset_class: 'CRYPTO',
     session: 'NEW_YORK',
+    currency: 'USD',
     entry_price: '',
     exit_price: '',
     stop_loss: '',
@@ -40,11 +47,16 @@ export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData 
 
   useEffect(() => {
     if (initialData) {
+      const initialSym = initialData.symbol || '';
+      const initialAsset = initialData.asset_class || 'CRYPTO';
+      const initialCurr = initialData.currency || (isIndianAssetOrSymbol(initialSym, initialAsset) ? 'INR' : 'USD');
+
       setFormData({
-        symbol: initialData.symbol || '',
+        symbol: initialSym,
         trade_type: initialData.trade_type || 'LONG',
-        asset_class: initialData.asset_class || 'CRYPTO',
+        asset_class: initialAsset,
         session: initialData.session || 'NEW_YORK',
+        currency: initialCurr,
         entry_price: initialData.entry_price || '',
         exit_price: initialData.exit_price || '',
         stop_loss: initialData.stop_loss || '',
@@ -80,7 +92,17 @@ export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => {
+      const updated = { ...prev, [name]: value };
+      if (name === 'asset_class' || name === 'symbol') {
+        if (isIndianAssetOrSymbol(updated.symbol, updated.asset_class)) {
+          updated.currency = 'INR';
+        } else if (name === 'asset_class' && value !== 'INDIAN_FNO' && value !== 'INDIAN_STOCKS' && !isIndianAssetOrSymbol(updated.symbol, value)) {
+          updated.currency = 'USD';
+        }
+      }
+      return updated;
+    });
   };
 
   const handleChecklistToggle = (key) => {
@@ -112,6 +134,7 @@ export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData 
   const sl = parseFloat(formData.stop_loss) || 0;
   const tp = parseFloat(formData.take_profit) || 0;
   const fee = parseFloat(formData.fees) || 0;
+  const currSym = formData.currency === 'INR' ? '₹' : '$';
 
   let calcGrossPnL = 0;
   if (entry > 0 && exit > 0 && qty > 0) {
@@ -179,7 +202,7 @@ export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData 
             <div>
               <span className="text-slate-500">Net PnL: </span>
               <span className={`font-bold ${calcNetPnL >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                {calcNetPnL >= 0 ? '+' : ''}${calcNetPnL.toFixed(2)}
+                {calcNetPnL >= 0 ? '+' : ''}{currSym}{calcNetPnL.toFixed(2)}
               </span>
             </div>
             <div className="h-3 w-px bg-slate-800"></div>
@@ -190,7 +213,7 @@ export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData 
             <div className="h-3 w-px bg-slate-800"></div>
             <div>
               <span className="text-slate-500">Risk: </span>
-              <span className="font-bold text-amber-400">${calcRiskAmount.toFixed(2)}</span>
+              <span className="font-bold text-amber-400">{currSym}{calcRiskAmount.toFixed(2)}</span>
             </div>
           </div>
 
@@ -361,7 +384,39 @@ export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData 
           </div>
 
           {/* SECTION 3: Execution Prices & Numbers */}
-          <div className="space-y-2">
+          <div className="space-y-3">
+            {/* Currency Book Toggle */}
+            <div className="flex items-center justify-between p-2.5 bg-[#141926] rounded-xl border border-slate-800 font-mono">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">Book Currency *</span>
+                <span className="text-[10px] text-slate-500 font-normal">(Dual-Book Isolation)</span>
+              </div>
+              <div className="flex items-center gap-1.5 p-1 bg-[#161B27] rounded-lg border border-slate-700/70">
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, currency: 'INR' }))}
+                  className={`px-3 py-1 rounded-md text-xs font-bold font-mono transition-all flex items-center gap-1.5 cursor-pointer ${
+                    formData.currency === 'INR'
+                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <span>🇮🇳 ₹ INR</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, currency: 'USD' }))}
+                  className={`px-3 py-1 rounded-md text-xs font-bold font-mono transition-all flex items-center gap-1.5 cursor-pointer ${
+                    formData.currency === 'USD'
+                      ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <span>🌐 $ USD</span>
+                </button>
+              </div>
+            </div>
+
             <div className="flex items-center justify-between">
               <span className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider font-mono">Execution Prices & Position Numbers</span>
               {onOpenRiskCalculator && (

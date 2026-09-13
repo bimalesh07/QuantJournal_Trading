@@ -32,7 +32,7 @@ import {
   Sparkles,
   Plus
 } from 'lucide-react';
-import { isTradeInTimeframe, calculateAnalyticsFromTrades } from '../utils/analyticsUtils';
+import { isTradeInTimeframe, calculateAnalyticsFromTrades, getTradeCurrency, getCurrencySymbol } from '../utils/analyticsUtils';
 import TimeframeDropdown from './TimeframeDropdown';
 
 // 3D Antigravity Tilt Card Component
@@ -121,9 +121,11 @@ export default function DashboardOverview({
 }) {
   const [localTimeframe, setLocalTimeframe] = useState('All Time');
   const [localTransitioning, setLocalTransitioning] = useState(false);
+  const [activeCurrencyBook, setActiveCurrencyBook] = useState('INR'); // 'INR' or 'USD'
 
   const currentTimeframe = onTimeframeChange ? activeTimeframe : localTimeframe;
   const isTransitioning = propIsTransitioning || localTransitioning;
+  const currSym = getCurrencySymbol(activeCurrencyBook);
 
   const handleSelectTimeframe = (tf) => {
     if (tf === currentTimeframe) return;
@@ -139,18 +141,19 @@ export default function DashboardOverview({
     }, 150);
   };
 
-  const filteredTrades = useMemo(() => {
-    return (trades || []).filter((t) => isTradeInTimeframe(t, currentTimeframe));
-  }, [trades, currentTimeframe]);
+  const currencyFilteredTrades = useMemo(() => {
+    return (trades || []).filter((t) => {
+      const matchesTimeframe = isTradeInTimeframe(t, currentTimeframe);
+      const tradeCurr = getTradeCurrency(t);
+      return matchesTimeframe && tradeCurr === activeCurrencyBook;
+    });
+  }, [trades, currentTimeframe, activeCurrencyBook]);
 
   const effectiveAnalytics = useMemo(() => {
-    if (currentTimeframe === 'All Time' && analytics && analytics.overview) {
-      return analytics;
-    }
-    return calculateAnalyticsFromTrades(filteredTrades, analytics);
-  }, [filteredTrades, analytics, currentTimeframe]);
+    return calculateAnalyticsFromTrades(currencyFilteredTrades, analytics);
+  }, [currencyFilteredTrades, analytics]);
 
-  const activeAnalytics = effectiveAnalytics || analytics;
+  const activeAnalytics = effectiveAnalytics;
 
   if (!activeAnalytics || !activeAnalytics.overview) {
     return (
@@ -165,19 +168,19 @@ export default function DashboardOverview({
   const isNetPositive = (overview.total_net_pnl || 0) >= 0;
 
   // Dynamic Fallback calculation for Asset Symbol Name & Last Traded Price
-  const computedBestAsset = best_asset || (filteredTrades.length > 0 ? {
-    name: filteredTrades[0].symbol,
-    pnl: filteredTrades[0].net_pnl,
-    price: filteredTrades[0].exit_price || filteredTrades[0].entry_price || 0,
-    winRate: filteredTrades[0].net_pnl > 0 ? 100 : 0,
+  const computedBestAsset = best_asset || (currencyFilteredTrades.length > 0 ? {
+    name: currencyFilteredTrades[0].symbol,
+    pnl: currencyFilteredTrades[0].net_pnl,
+    price: currencyFilteredTrades[0].exit_price || currencyFilteredTrades[0].entry_price || 0,
+    winRate: currencyFilteredTrades[0].net_pnl > 0 ? 100 : 0,
     trades: 1
   } : null);
 
-  const computedWorstAsset = worst_asset || (filteredTrades.length > 0 ? {
-    name: filteredTrades[filteredTrades.length - 1].symbol,
-    pnl: filteredTrades[filteredTrades.length - 1].net_pnl,
-    price: filteredTrades[filteredTrades.length - 1].exit_price || filteredTrades[filteredTrades.length - 1].entry_price || 0,
-    winRate: filteredTrades[filteredTrades.length - 1].net_pnl > 0 ? 100 : 0,
+  const computedWorstAsset = worst_asset || (currencyFilteredTrades.length > 0 ? {
+    name: currencyFilteredTrades[currencyFilteredTrades.length - 1].symbol,
+    pnl: currencyFilteredTrades[currencyFilteredTrades.length - 1].net_pnl,
+    price: currencyFilteredTrades[currencyFilteredTrades.length - 1].exit_price || currencyFilteredTrades[currencyFilteredTrades.length - 1].entry_price || 0,
+    winRate: currencyFilteredTrades[currencyFilteredTrades.length - 1].net_pnl > 0 ? 100 : 0,
     trades: 1
   } : null);
 
@@ -186,19 +189,21 @@ export default function DashboardOverview({
     const todayStr = new Date().toISOString().slice(0, 10);
     const todayTrades = (trades || []).filter((t) => {
       const entryStr = t.entry_time ? new Date(t.entry_time).toISOString().slice(0, 10) : '';
-      return entryStr === todayStr;
+      const tradeCurr = getTradeCurrency(t);
+      return entryStr === todayStr && tradeCurr === activeCurrencyBook;
     });
     return todayTrades.reduce((acc, t) => acc + (parseFloat(t.net_pnl) || 0), 0);
-  }, [trades]);
+  }, [trades, activeCurrencyBook]);
 
-  const DAILY_MAX_LOSS_LIMIT = 200; // $200 daily max loss limit
+  const DAILY_MAX_LOSS_LIMIT = activeCurrencyBook === 'INR' ? 16000 : 200; // ₹16,000 or $200 limit
   const dailyLossRatio = todayNetPnL < 0 ? Math.abs(todayNetPnL) / DAILY_MAX_LOSS_LIMIT : 0;
 
   // Calculate Trader Discipline Psychology Score (0-100 PTS)
   const disciplineScore = useMemo(() => {
-    if (!trades || trades.length === 0) return 92;
+    const bookTrades = (trades || []).filter(t => getTradeCurrency(t) === activeCurrencyBook);
+    if (!bookTrades || bookTrades.length === 0) return 92;
     let totalScore = 0;
-    trades.forEach((t) => {
+    bookTrades.forEach((t) => {
       let score = (t.rating || 3) * 15; // Rating component (15 - 75 PTS)
       if (t.emotion === 'DISCIPLINED' || t.emotion === 'PATIENT') score += 25;
       else if (t.emotion === 'FOMO' || t.emotion === 'IMPULSIVE') score += 5;
@@ -206,8 +211,8 @@ export default function DashboardOverview({
       else score += 15;
       totalScore += Math.min(100, score);
     });
-    return Math.round(totalScore / trades.length);
-  }, [trades]);
+    return Math.round(totalScore / bookTrades.length);
+  }, [trades, activeCurrencyBook]);
 
   // PDF Report Generator
   const generatePDFReport = () => {
@@ -318,7 +323,7 @@ export default function DashboardOverview({
   };
 
   // Sort trades newest first (latest entry time / id descending)
-  const sortedTrades = [...filteredTrades].sort((a, b) => {
+  const sortedTrades = [...currencyFilteredTrades].sort((a, b) => {
     const dateA = new Date(a.entry_time || a.created_at || 0).getTime();
     const dateB = new Date(b.entry_time || b.created_at || 0).getTime();
     if (dateB !== dateA) return dateB - dateA;
@@ -335,21 +340,47 @@ export default function DashboardOverview({
   return (
     <div className="space-y-6 font-sans">
 
-      {/* Timeframe Filter Bar - Premium Dropdown Selector */}
-      {!hideTimeframeDropdown && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/10">
-          <TimeframeDropdown
-            activeTimeframe={currentTimeframe}
-            onSelectTimeframe={handleSelectTimeframe}
-            tradeCount={filteredTrades.length}
-          />
+      {/* Timeframe Filter Bar & Dual-Book Currency Selector */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/10">
+        <div className="flex flex-wrap items-center gap-3">
+          {!hideTimeframeDropdown && (
+            <TimeframeDropdown
+              activeTimeframe={currentTimeframe}
+              onSelectTimeframe={handleSelectTimeframe}
+              tradeCount={currencyFilteredTrades.length}
+            />
+          )}
 
-          <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
-            <Calendar className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-            <span>Scope: <strong className="text-cyan-300 font-bold">{currentTimeframe}</strong> ({filteredTrades.length} trades evaluated)</span>
+          {/* Dual-Book Currency Toggle Pill */}
+          <div className="flex items-center gap-1 p-1 bg-[#121622] rounded-xl border border-slate-700/80 font-mono shadow-sm">
+            <button
+              onClick={() => setActiveCurrencyBook('INR')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                activeCurrencyBook === 'INR'
+                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <span>🇮🇳 INR Book (₹)</span>
+            </button>
+            <button
+              onClick={() => setActiveCurrencyBook('USD')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                activeCurrencyBook === 'USD'
+                  ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <span>🌐 USD Book ($)</span>
+            </button>
           </div>
         </div>
-      )}
+
+        <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
+          <Calendar className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+          <span>Book: <strong className="text-emerald-400 font-bold">{activeCurrencyBook === 'INR' ? '🇮🇳 INR (₹)' : '🌐 USD ($)'}</strong> | Scope: <strong className="text-cyan-300 font-bold">{currentTimeframe}</strong> ({currencyFilteredTrades.length} trades evaluated)</span>
+        </div>
+      </div>
 
       {/* Top Section Header with Title & PDF Export Action */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1">
@@ -402,15 +433,15 @@ export default function DashboardOverview({
               <div className="font-bold text-xs sm:text-sm flex items-center gap-2">
                 <span>{dailyLossRatio >= 1.0 ? '🛑 DAILY MAX LOSS LIMIT BREACHED!' : dailyLossRatio >= 0.75 ? '⚠️ DAILY RISK WARNING' : '🛡️ DAILY RISK PROTECTOR'}</span>
                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/10 text-white font-semibold">
-                  Today PnL: ${todayNetPnL >= 0 ? `+${todayNetPnL.toFixed(2)}` : todayNetPnL.toFixed(2)}
+                  Today PnL: {todayNetPnL >= 0 ? `+${currSym}${todayNetPnL.toFixed(2)}` : `-${currSym}${Math.abs(todayNetPnL).toFixed(2)}`}
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 mt-0.5">
                 {dailyLossRatio >= 1.0
-                  ? 'Daily risk threshold (-$200) hit! Step away from the screens to protect capital & eliminate revenge trading.'
+                  ? `Daily risk threshold (-${currSym}${DAILY_MAX_LOSS_LIMIT}) hit! Step away from the screens to protect capital & eliminate revenge trading.`
                   : dailyLossRatio >= 0.75
-                  ? `Used ${Math.round(dailyLossRatio * 100)}% of daily risk budget (-$200 max limit). Execute with extreme caution.`
-                  : 'Daily risk protection active. Max daily loss limit set at -$200 (2% account equity).'}
+                  ? `Used ${Math.round(dailyLossRatio * 100)}% of daily risk budget (-${currSym}${DAILY_MAX_LOSS_LIMIT} max limit). Execute with extreme caution.`
+                  : `Daily risk protection active. Max daily loss limit set at -${currSym}${DAILY_MAX_LOSS_LIMIT}.`}
               </p>
             </div>
           </div>
@@ -443,13 +474,13 @@ export default function DashboardOverview({
 
           <div className="mt-2">
             <h3 className={`text-2xl sm:text-3xl font-black tracking-tight ${isNetPositive ? 'text-emerald-400 drop-shadow-[0_0_15px_rgba(52,211,153,0.4)]' : 'text-rose-400 drop-shadow-[0_0_15px_rgba(244,63,94,0.4)]'}`}>
-              {isNetPositive ? '+' : ''}${overview.total_net_pnl.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+              {isNetPositive ? '+' : '-'}{currSym}{Math.abs(overview.total_net_pnl).toLocaleString('en-US', { minimumFractionDigits: 2 })}
             </h3>
           </div>
 
           <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-400 font-mono">
-            <span className="text-emerald-400 font-bold">Gross: +${overview.total_gross_pnl.toLocaleString()}</span>
-            <span className="text-slate-400">Fees: ${overview.total_fees.toLocaleString()}</span>
+            <span className="text-emerald-400 font-bold">Gross: {overview.total_gross_pnl >= 0 ? '+' : '-'}{currSym}{Math.abs(overview.total_gross_pnl).toLocaleString()}</span>
+            <span className="text-slate-400">Fees: {currSym}{overview.total_fees.toLocaleString()}</span>
           </div>
         </AntigravityCard>
 
@@ -474,7 +505,7 @@ export default function DashboardOverview({
           </div>
 
           <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] font-mono">
-            <span className="text-sky-300 font-bold">Expectancy: ${overview.expectancy}</span>
+            <span className="text-sky-300 font-bold">Expectancy: {currSym}{overview.expectancy}</span>
             <span className="text-slate-400">{overview.win_rate}% Win Rate</span>
           </div>
         </AntigravityCard>
@@ -500,8 +531,8 @@ export default function DashboardOverview({
           </div>
 
           <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] font-mono">
-            <span className="text-emerald-400 font-bold">+${overview.total_profit.toLocaleString()}</span>
-            <span className="text-rose-400">-${overview.total_loss.toLocaleString()}</span>
+            <span className="text-emerald-400 font-bold">+{currSym}{overview.total_profit.toLocaleString()}</span>
+            <span className="text-rose-400">-{currSym}{overview.total_loss.toLocaleString()}</span>
           </div>
         </AntigravityCard>
 
@@ -560,20 +591,20 @@ export default function DashboardOverview({
           <div className="p-3.5 rounded-xl bg-[#0E1320] border border-white/10 space-y-1">
             <span className="text-[11px] text-slate-400 block font-sans">Avg. P&L / Trade</span>
             <p className={`text-base font-black ${overview.avg_pnl_per_trade >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-              {overview.avg_pnl_per_trade >= 0 ? '+' : ''}${overview.avg_pnl_per_trade || 0}
+              {overview.avg_pnl_per_trade >= 0 ? '+' : '-'}{currSym}{Math.abs(overview.avg_pnl_per_trade || 0)}
             </p>
           </div>
 
           {/* Highest Win */}
           <div className="p-3.5 rounded-xl bg-[#0E1320] border border-emerald-500/30 space-y-1">
             <span className="text-[11px] text-slate-400 block font-sans">Highest Win 🏆</span>
-            <p className="text-base font-black text-emerald-400">+${overview.highest_win || 0}</p>
+            <p className="text-base font-black text-emerald-400">+{currSym}{overview.highest_win || 0}</p>
           </div>
 
           {/* Highest Loss */}
           <div className="p-3.5 rounded-xl bg-[#0E1320] border border-rose-500/30 space-y-1">
             <span className="text-[11px] text-slate-400 block font-sans">Highest Loss ⚠️</span>
-            <p className="text-base font-black text-rose-400">-${overview.highest_loss || 0}</p>
+            <p className="text-base font-black text-rose-400">-{currSym}{overview.highest_loss || 0}</p>
           </div>
 
           {/* Win Days */}
@@ -617,7 +648,7 @@ export default function DashboardOverview({
 
           <div className="text-right">
             <div className="text-lg sm:text-xl font-black text-emerald-400 drop-shadow-[0_0_10px_rgba(52,211,153,0.4)]">
-              {best_strategy ? `${best_strategy.total_net_pnl >= 0 ? '+' : ''}$${best_strategy.total_net_pnl.toLocaleString('en-US', { minimumFractionDigits: 2 })}` : '$0.00'}
+              {best_strategy ? `${best_strategy.total_net_pnl >= 0 ? '+' : '-'}${currSym}${Math.abs(best_strategy.total_net_pnl).toLocaleString('en-US', { minimumFractionDigits: 2 })}` : `${currSym}0.00`}
             </div>
             <div className="text-[11px] font-bold text-slate-400 mt-0.5">
               {best_strategy ? `${best_strategy.win_rate}% Win Rate (${best_strategy.trades_count} trades)` : '0 trades'}
@@ -646,7 +677,7 @@ export default function DashboardOverview({
 
           <div className="text-right">
             <div className={`text-lg sm:text-xl font-black ${worst_strategy && worst_strategy.total_net_pnl < 0 ? 'text-rose-400 drop-shadow-[0_0_10px_rgba(244,63,94,0.4)]' : 'text-slate-300'}`}>
-              {worst_strategy ? `${worst_strategy.total_net_pnl >= 0 ? '+' : ''}$${worst_strategy.total_net_pnl.toLocaleString('en-US', { minimumFractionDigits: 2 })}` : '$0.00'}
+              {worst_strategy ? `${worst_strategy.total_net_pnl >= 0 ? '+' : '-'}${currSym}${Math.abs(worst_strategy.total_net_pnl).toLocaleString('en-US', { minimumFractionDigits: 2 })}` : `${currSym}0.00`}
             </div>
             <div className="text-[11px] font-bold text-slate-400 mt-0.5">
               {worst_strategy ? `${worst_strategy.win_rate}% Win Rate (${worst_strategy.trades_count} trades)` : '0 trades'}
@@ -670,7 +701,7 @@ export default function DashboardOverview({
                 </span>
                 {computedBestAsset && computedBestAsset.price > 0 && (
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-teal-500/20 text-teal-300 font-bold border border-teal-500/30">
-                    ${Number(computedBestAsset.price).toLocaleString()}
+                    {currSym}{Number(computedBestAsset.price).toLocaleString()}
                   </span>
                 )}
               </div>
@@ -682,7 +713,7 @@ export default function DashboardOverview({
 
           <div className="text-right">
             <div className="text-lg sm:text-xl font-black text-teal-300 drop-shadow-[0_0_10px_rgba(45,212,191,0.4)]">
-              {computedBestAsset ? `${computedBestAsset.pnl >= 0 ? '+' : ''}$${Number(computedBestAsset.pnl).toLocaleString('en-US', { minimumFractionDigits: 2 })}` : '$0.00'}
+              {computedBestAsset ? `${computedBestAsset.pnl >= 0 ? '+' : '-'}${currSym}${Math.abs(computedBestAsset.pnl).toLocaleString('en-US', { minimumFractionDigits: 2 })}` : `${currSym}0.00`}
             </div>
             <div className="text-[11px] font-bold text-slate-400 mt-0.5">
               {computedBestAsset ? `${computedBestAsset.winRate || 100}% Win Rate (${computedBestAsset.trades} trades)` : '0 trades'}
@@ -706,7 +737,7 @@ export default function DashboardOverview({
                 </span>
                 {computedWorstAsset && computedWorstAsset.price > 0 && (
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-300 font-bold border border-rose-500/30">
-                    ${Number(computedWorstAsset.price).toLocaleString()}
+                    {currSym}{Number(computedWorstAsset.price).toLocaleString()}
                   </span>
                 )}
               </div>
@@ -718,7 +749,7 @@ export default function DashboardOverview({
 
           <div className="text-right">
             <div className={`text-lg sm:text-xl font-black ${computedWorstAsset && computedWorstAsset.pnl < 0 ? 'text-rose-400 drop-shadow-[0_0_10px_rgba(244,63,94,0.4)]' : 'text-slate-300'}`}>
-              {computedWorstAsset ? `${computedWorstAsset.pnl >= 0 ? '+' : ''}$${Number(computedWorstAsset.pnl).toLocaleString('en-US', { minimumFractionDigits: 2 })}` : '$0.00'}
+              {computedWorstAsset ? `${computedWorstAsset.pnl >= 0 ? '+' : '-'}${currSym}${Math.abs(computedWorstAsset.pnl).toLocaleString('en-US', { minimumFractionDigits: 2 })}` : `${currSym}0.00`}
             </div>
             <div className="text-[11px] font-bold text-slate-400 mt-0.5">
               {computedWorstAsset ? `${computedWorstAsset.winRate || 0}% Win Rate (${computedWorstAsset.trades} trades)` : '0 trades'}
@@ -764,7 +795,7 @@ export default function DashboardOverview({
                 </span>
                 <span className="font-extrabold text-white text-sm tracking-wide">{latestTrade.symbol}</span>
                 <span className={`font-black ${latestTrade.net_pnl >= 0 ? 'text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]' : 'text-rose-400'}`}>
-                  {latestTrade.net_pnl >= 0 ? '+' : ''}${Number(latestTrade.net_pnl).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                  {latestTrade.net_pnl >= 0 ? '+' : '-'}{currSym}{Math.abs(Number(latestTrade.net_pnl)).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                 </span>
               </div>
 
@@ -820,14 +851,14 @@ export default function DashboardOverview({
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
                   <XAxis dataKey="date" stroke="#64748B" fontSize={10} tickFormatter={formatShortDate} />
-                  <YAxis stroke="#64748B" fontSize={10} width={70} tickFormatter={(val) => `$${Number(val).toLocaleString()}`} domain={['auto', 'auto']} />
+                  <YAxis stroke="#64748B" fontSize={10} width={70} tickFormatter={(val) => `${currSym}${Number(val).toLocaleString()}`} domain={['auto', 'auto']} />
                   <Tooltip
                     contentStyle={{ backgroundColor: '#0F1422', borderColor: 'rgba(255,255,255,0.15)', borderRadius: '14px', fontSize: '12px', fontFamily: 'JetBrains Mono', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.5)' }}
                     formatter={(val, name, item) => {
                       const tradePnl = item?.payload?.trade_pnl;
-                      const formattedPnl = `$${Number(val).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+                      const formattedPnl = `${currSym}${Number(val).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
                       if (tradePnl !== undefined) {
-                        const tradePnlStr = `${tradePnl >= 0 ? '+' : ''}$${Number(tradePnl).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+                        const tradePnlStr = `${tradePnl >= 0 ? '+' : '-'}${currSym}${Math.abs(tradePnl).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
                         return [`${formattedPnl} (Trade P&L: ${tradePnlStr})`, 'Cumulative Equity'];
                       }
                       return [formattedPnl, 'Cumulative Equity'];
@@ -1031,7 +1062,7 @@ export default function DashboardOverview({
                         )}
                       </div>
                       <span className={isProfitable ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
-                        {isProfitable ? '+' : ''}${strat.total_net_pnl.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                        {isProfitable ? '+' : '-'}{currSym}{Math.abs(strat.total_net_pnl).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                       </span>
                     </div>
 
@@ -1137,7 +1168,7 @@ export default function DashboardOverview({
 
                         <div className="text-right pt-2">
                           <div className={`text-sm font-extrabold ${isWin ? 'text-emerald-400 drop-shadow-[0_0_10px_rgba(52,211,153,0.5)]' : isLoss ? 'text-rose-400 drop-shadow-[0_0_10px_rgba(244,63,94,0.5)]' : 'text-slate-400'}`}>
-                            {isWin ? '+' : ''}${Number(t.net_pnl).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                            {isWin ? '+' : isLoss ? '-' : ''}{currSym}{Math.abs(Number(t.net_pnl)).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                           </div>
                           <span className="text-[10px] text-slate-400 font-sans">{dateFormatted}</span>
                         </div>
@@ -1169,7 +1200,7 @@ export default function DashboardOverview({
 
                     <div className="text-right">
                       <div className={`text-sm font-extrabold ${isWin ? 'text-emerald-400' : isLoss ? 'text-rose-400' : 'text-slate-400'}`}>
-                        {isWin ? '+' : ''}${Number(t.net_pnl).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                        {isWin ? '+' : isLoss ? '-' : ''}{currSym}{Math.abs(Number(t.net_pnl)).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                       </div>
                       <span className="text-[10px] text-slate-400 font-sans">{dateFormatted}</span>
                     </div>

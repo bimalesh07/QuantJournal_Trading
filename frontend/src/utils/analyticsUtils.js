@@ -3,6 +3,27 @@
  * and dynamically recalculating all quantitative analytics metrics.
  */
 
+export const getTradeCurrency = (trade) => {
+  if (!trade) return 'USD';
+  if (trade.currency) return trade.currency;
+  const sym = (trade.symbol || '').toUpperCase().trim();
+  const asset = (trade.asset_class || '').toUpperCase().trim();
+  if (
+    asset === 'INDIAN_FNO' ||
+    asset === 'INDIAN_STOCKS' ||
+    ['NIFTY', 'BANKNIFTY', 'SENSEX', 'FINNIFTY', 'MIDCPNIFTY', 'INR'].some((kw) => sym.includes(kw))
+  ) {
+    return 'INR';
+  }
+  return 'USD';
+};
+
+export const getCurrencySymbol = (currencyOrTrade) => {
+  const currency = typeof currencyOrTrade === 'string' ? currencyOrTrade : getTradeCurrency(currencyOrTrade);
+  return currency === 'INR' ? '₹' : '$';
+};
+
+
 export const isTradeInTimeframe = (trade, timeframe) => {
   if (!timeframe || timeframe === 'All Time') return true;
 

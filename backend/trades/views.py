@@ -111,6 +111,11 @@ class TradeViewSet(viewsets.ModelViewSet):
         if asset_class:
             queryset = queryset.filter(asset_class=asset_class)
 
+        # Filter by currency
+        currency_param = params.get('currency')
+        if currency_param:
+            queryset = queryset.filter(currency=currency_param)
+
         # Filter by status
         trade_status = params.get('status')
         if trade_status:
