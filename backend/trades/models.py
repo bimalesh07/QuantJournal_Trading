@@ -62,6 +62,17 @@ class Trade(models.Model):
         ('PAPER', 'Paper / Demo Simulation'),
     ]
 
+    MISTAKE_CHOICES = [
+        ('NONE', 'None (Followed Plan)'),
+        ('MOVED_STOPLOSS', 'Moved / Widened Stoploss'),
+        ('FOMO_ENTRY', 'FOMO / Chased Market'),
+        ('EARLY_EXIT', 'Early Exit / Cut Winner'),
+        ('OVER_LEVERAGED', 'Over-leveraged / Oversized'),
+        ('REVENGE_TRADE', 'Revenge Trade'),
+        ('NO_SETUP', 'Impulse / No Clear Setup'),
+        ('HESITATED', 'Hesitated / Late Entry'),
+    ]
+
     # Owner & Basic Info
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='trades')
     symbol = models.CharField(max_length=30)
@@ -70,6 +81,7 @@ class Trade(models.Model):
     session = models.CharField(max_length=20, choices=SESSION_CHOICES, default='NEW_YORK')
     currency = models.CharField(max_length=5, choices=CURRENCY_CHOICES, default='USD')
     trade_mode = models.CharField(max_length=10, choices=TRADE_MODE_CHOICES, default='LIVE')
+    mistake = models.CharField(max_length=30, choices=MISTAKE_CHOICES, default='NONE')
 
     # Price & Size
     entry_price = models.DecimalField(max_digits=18, decimal_places=6)
@@ -163,3 +175,30 @@ class Trade(models.Model):
             return 'LOSS'
         else:
             return 'BREAKEVEN'
+
+
+class DailyNote(models.Model):
+    MOOD_CHOICES = [
+        ('DISCIPLINED', 'Disciplined'),
+        ('CALM', 'Calm & Focused'),
+        ('CONFIDENT', 'Confident'),
+        ('ANXIOUS', 'Anxious / Stressed'),
+        ('TILT', 'Tilt / Frustrated'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='daily_notes')
+    date = models.DateField()
+    pre_market_plan = models.TextField(blank=True, default='', help_text="Morning Bias, Key Levels & Pre-Market Plan")
+    post_market_review = models.TextField(blank=True, default='', help_text="Evening Lessons, Execution Review & Mindset")
+    mood = models.CharField(max_length=20, choices=MOOD_CHOICES, default='DISCIPLINED')
+    rating = models.IntegerField(default=5, help_text="Day discipline rating 1-5")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-date']
+        unique_together = ('user', 'date')
+
+    def __str__(self):
+        return f"Daily Note for {self.date} ({self.mood})"
+

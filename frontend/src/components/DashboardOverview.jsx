@@ -30,9 +30,10 @@ import {
   BarChart2,
   Clock,
   Sparkles,
-  Plus
+  Plus,
+  ShieldAlert
 } from 'lucide-react';
-import { isTradeInTimeframe, calculateAnalyticsFromTrades, getTradeCurrency, getCurrencySymbol } from '../utils/analyticsUtils';
+import { isTradeInTimeframe, calculateAnalyticsFromTrades, getTradeCurrency, getCurrencySymbol, MISTAKE_OPTIONS } from '../utils/analyticsUtils';
 import TimeframeDropdown from './TimeframeDropdown';
 
 // 3D Antigravity Tilt Card Component
@@ -663,6 +664,133 @@ export default function DashboardOverview({
 
         </div>
       </div>
+
+      {/* ========================================================================= */}
+      {/* 2.5 DISCIPLINE & CAPITAL LEAK DETECTOR (COST OF MISTAKES) */}
+      {/* ========================================================================= */}
+      {(() => {
+        const costStats = activeAnalytics?.cost_of_mistakes || {
+          total_mistake_loss: 0,
+          mistake_trades_count: 0,
+          top_mistake: null,
+          top_mistake_loss: 0,
+          breakdown: []
+        };
+        const hasLeaks = costStats.total_mistake_loss > 0;
+        const topMistakeObj = costStats.top_mistake ? MISTAKE_OPTIONS.find(m => m.id === costStats.top_mistake) : null;
+
+        return (
+          <div className="bg-[#080C16] border border-white/10 rounded-2xl p-5 shadow-xl space-y-4 font-sans">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-white/10 gap-2">
+              <div className="flex items-center gap-2">
+                <div className={`p-2 rounded-xl border ${hasLeaks ? 'bg-rose-500/15 border-rose-500/30 text-rose-400' : 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400'}`}>
+                  <ShieldAlert className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white font-mono flex items-center gap-2">
+                    <span>Discipline Leak Detector</span>
+                    <span className="text-xs font-sans font-normal text-slate-400">• Cost of Execution Mistakes</span>
+                  </h3>
+                  <p className="text-xs text-slate-400">Financial damage caused by rule breaks (Moved SL, FOMO, Revenge)</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {hasLeaks ? (
+                  <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-300 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse"></span>
+                    <span>{currSym}{costStats.total_mistake_loss.toLocaleString()} Leaked to Rule Violations</span>
+                  </span>
+                ) : (
+                  <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <span>100% Plan Discipline (Zero Leaks)</span>
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 font-mono">
+              {/* Stat 1: Total Leak Loss */}
+              <div className="p-4 rounded-xl bg-[#0E1320] border border-rose-500/25 flex items-center justify-between">
+                <div>
+                  <span className="text-xs text-slate-400 block font-sans">Total Preventable Loss</span>
+                  <div className="text-xl sm:text-2xl font-black text-rose-400 mt-1">
+                    -{currSym}{costStats.total_mistake_loss.toLocaleString()}
+                  </div>
+                  <span className="text-[11px] text-slate-500 font-sans mt-0.5 block">
+                    Across {costStats.mistake_trades_count} rule-breaking trades
+                  </span>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 text-lg shrink-0">
+                  💸
+                </div>
+              </div>
+
+              {/* Stat 2: Top Rule Leak */}
+              <div className="p-4 rounded-xl bg-[#0E1320] border border-amber-500/25 flex items-center justify-between">
+                <div>
+                  <span className="text-xs text-slate-400 block font-sans">Top Capital Leak</span>
+                  <div className="text-base sm:text-lg font-black text-amber-300 mt-1 flex items-center gap-1.5">
+                    <span>{topMistakeObj ? topMistakeObj.icon : '✅'}</span>
+                    <span className="truncate max-w-[170px]">{topMistakeObj ? topMistakeObj.label : 'Clean Execution'}</span>
+                  </div>
+                  <span className="text-[11px] text-slate-400 font-mono mt-0.5 block">
+                    {topMistakeObj ? `Lost: -${currSym}${costStats.top_mistake_loss.toLocaleString()}` : 'No rule violations recorded'}
+                  </span>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 text-lg shrink-0">
+                  ⚠️
+                </div>
+              </div>
+
+              {/* Stat 3: Discipline Psychology Score */}
+              <div className="p-4 rounded-xl bg-[#0E1320] border border-cyan-500/25 flex items-center justify-between">
+                <div>
+                  <span className="text-xs text-slate-400 block font-sans">Discipline Execution Score</span>
+                  <div className="text-xl sm:text-2xl font-black text-cyan-300 mt-1">
+                    {disciplineScore} <span className="text-sm font-normal text-slate-400">/ 100</span>
+                  </div>
+                  <span className="text-[11px] text-cyan-400 font-sans mt-0.5 block">
+                    {disciplineScore >= 80 ? '🌟 Institutional Grade Discipline' : disciplineScore >= 60 ? '⚡ Moderate Rule Adherence' : '🛑 Emotional Leaks Detected'}
+                  </span>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 text-lg shrink-0">
+                  🎯
+                </div>
+              </div>
+            </div>
+
+            {/* Breakdown Chips of Mistakes (if any) */}
+            {costStats.breakdown && costStats.breakdown.length > 0 && (
+              <div className="pt-2">
+                <span className="text-xs font-bold text-slate-400 font-sans uppercase tracking-wider block mb-2">
+                  Mistake Leak Breakdown
+                </span>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {costStats.breakdown.map((item) => (
+                    <div
+                      key={item.mistake}
+                      className="p-2.5 rounded-xl bg-[#0D1220] border border-slate-800 flex items-center justify-between font-mono"
+                    >
+                      <div className="truncate pr-2">
+                        <div className="flex items-center gap-1 text-xs font-bold text-slate-200">
+                          <span>{item.icon}</span>
+                          <span className="truncate">{item.label}</span>
+                        </div>
+                        <span className="text-[10px] text-slate-400 font-sans">{item.count} {item.count === 1 ? 'trade' : 'trades'}</span>
+                      </div>
+                      <span className="text-xs font-black text-rose-400 whitespace-nowrap">
+                        -{currSym}{Number(item.loss || 0).toLocaleString()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* ========================================================================= */}
       {/* 3. STRATEGY & ASSET LEADERBOARD MATRIX */}

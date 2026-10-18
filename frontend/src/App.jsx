@@ -461,9 +461,6 @@ export default function App() {
         onToggleTradeMode={handleToggleTradeMode}
       />
 
-      {/* Live Market Ticker Tape */}
-      <MarketTicker theme={theme} />
-
       {/* Simulation Mode Floating Status Ribbon */}
       {tradeMode === 'PAPER' && (
         <div className="bg-gradient-to-r from-amber-500/15 via-purple-500/15 to-amber-500/15 border-b border-amber-500/30 px-4 py-2 text-center text-xs font-mono font-bold text-amber-300 flex items-center justify-center gap-2 shadow-inner">
@@ -592,6 +589,8 @@ export default function App() {
                   analytics={analytics}
                   onSelectDateFilter={handleSelectCalendarDate}
                   theme={theme}
+                  trades={trades}
+                  tradeMode={tradeMode}
                 />
               </div>
             )}

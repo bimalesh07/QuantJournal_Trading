@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import ChartLightboxModal from './ChartLightboxModal';
 import TimeframeDropdown from './TimeframeDropdown';
-import { isTradeInTimeframe, getTradeCurrency, getCurrencySymbol } from '../utils/analyticsUtils';
+import { isTradeInTimeframe, getTradeCurrency, getCurrencySymbol, MISTAKE_OPTIONS, getMistakeInfo } from '../utils/analyticsUtils';
 import { getMediaUrl } from '../services/api';
 
 export default function TradeTable({ 
@@ -216,7 +216,16 @@ export default function TradeTable({
     if (filters.outcome === 'LOSS') matchesOutcome = t.net_pnl < 0;
     if (filters.outcome === 'BREAKEVEN') matchesOutcome = Number(t.net_pnl) === 0;
 
-    return matchesTimeframe && matchesSearch && matchesAsset && matchesType && matchesStrategy && matchesOutcome;
+    let matchesMistake = true;
+    if (filters.mistake === 'NONE') {
+      matchesMistake = !t.mistake || t.mistake === 'NONE';
+    } else if (filters.mistake === 'MISTAKES_ONLY') {
+      matchesMistake = t.mistake && t.mistake !== 'NONE';
+    } else if (filters.mistake) {
+      matchesMistake = t.mistake === filters.mistake;
+    }
+
+    return matchesTimeframe && matchesSearch && matchesAsset && matchesType && matchesStrategy && matchesOutcome && matchesMistake;
   });
 
   // Sort trades newest first
@@ -392,6 +401,22 @@ export default function TradeTable({
               <option value="BREAKEVEN" className="bg-[#121622] text-white">⚪ Breakeven</option>
             </select>
 
+            {/* Discipline / Mistake Filter */}
+            <select
+              value={filters.mistake || ''}
+              onChange={(e) => handleFilterChange('mistake', e.target.value)}
+              className="bg-[#161F2E] text-xs text-slate-200 px-3 py-2 rounded-xl border border-slate-700/80 focus:border-cyan-400 focus:outline-none font-medium cursor-pointer"
+            >
+              <option value="" className="bg-[#121622] text-white">All Discipline</option>
+              <option value="NONE" className="bg-[#121622] text-white">✅ Plan Followed Only</option>
+              <option value="MISTAKES_ONLY" className="bg-[#121622] text-white">🛑 Rule Breaks Only</option>
+              {MISTAKE_OPTIONS.filter(m => m.id !== 'NONE').map(m => (
+                <option key={m.id} value={m.id} className="bg-[#121622] text-white">
+                  {m.icon} {m.label}
+                </option>
+              ))}
+            </select>
+
           </div>
 
           {/* Reset Filters Button */}
@@ -533,6 +558,15 @@ export default function TradeTable({
                         <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-md border font-mono tracking-wide ${getEmotionBadge(t.emotion)}`}>
                           {t.emotion}
                         </span>
+                        {t.mistake && t.mistake !== 'NONE' ? (
+                          <span 
+                            title={`Rule Violation: ${getMistakeInfo(t.mistake).label}`}
+                            className="text-[9px] font-bold px-1.5 py-0.5 rounded-md border font-mono bg-rose-500/15 text-rose-300 border-rose-500/40 flex items-center gap-1 max-w-[125px] truncate shadow-sm"
+                          >
+                            <span>{getMistakeInfo(t.mistake).icon}</span>
+                            <span className="truncate">{getMistakeInfo(t.mistake).label}</span>
+                          </span>
+                        ) : null}
                         <div className="flex items-center justify-center gap-0.5 mt-0.5">
                           {[...Array(5)].map((_, i) => (
                             <Star

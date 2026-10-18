@@ -107,6 +107,9 @@ class AnalyticsService:
         best_asset = max(symbol_stats, key=lambda a: a['pnl']) if symbol_stats else None
         worst_asset = min(symbol_stats, key=lambda a: a['pnl']) if symbol_stats else None
 
+        # Psychological Cost of Mistakes Analysis
+        cost_of_mistakes = AnalyticsService._calculate_mistake_stats(closed_trades)
+
         return {
             'overview': {
                 'total_trades': total_trades,
@@ -144,6 +147,7 @@ class AnalyticsService:
             'monthly_pnl': monthly_pnl,
             'calendar_data': calendar_data,
             'pnl_by_asset_class': pnl_by_asset_class,
+            'cost_of_mistakes': cost_of_mistakes,
         }
 
     @staticmethod
@@ -176,6 +180,12 @@ class AnalyticsService:
             'equity_curve': [],
             'monthly_pnl': [],
             'calendar_data': {},
+            'cost_of_mistakes': {
+                'total_mistake_loss': 0.0,
+                'total_mistake_trades': 0,
+                'top_mistake': None,
+                'breakdown': [],
+            },
         }
 
     @staticmethod
@@ -447,3 +457,58 @@ class AnalyticsService:
             })
         result.sort(key=lambda x: x['pnl'], reverse=True)
         return result
+
+    @staticmethod
+    def _calculate_mistake_stats(closed_trades):
+        mistake_labels = dict(Trade.MISTAKE_CHOICES)
+        mistake_groups = defaultdict(lambda: {
+            'count': 0,
+            'total_loss': Decimal('0'),
+            'total_pnl': Decimal('0'),
+            'wins': 0,
+            'losses': 0
+        })
+
+        total_mistake_loss = Decimal('0')
+        total_mistake_trades = 0
+
+        for t in closed_trades:
+            m = getattr(t, 'mistake', 'NONE') or 'NONE'
+            if m != 'NONE':
+                total_mistake_trades += 1
+                if t.net_pnl < 0:
+                    total_mistake_loss += abs(t.net_pnl)
+
+            mistake_groups[m]['count'] += 1
+            mistake_groups[m]['total_pnl'] += t.net_pnl
+            if t.net_pnl < 0:
+                mistake_groups[m]['total_loss'] += abs(t.net_pnl)
+                mistake_groups[m]['losses'] += 1
+            elif t.net_pnl > 0:
+                mistake_groups[m]['wins'] += 1
+
+        breakdown = []
+        for m, s in mistake_groups.items():
+            if m == 'NONE':
+                continue
+            loss_val = float(round(s['total_loss'], 2))
+            breakdown.append({
+                'mistake': m,
+                'name': mistake_labels.get(m, m.replace('_', ' ').title()),
+                'count': s['count'],
+                'loss': loss_val,
+                'losses': s['losses'],
+                'wins': s['wins'],
+                'net_pnl': float(round(s['total_pnl'], 2)),
+            })
+
+        breakdown.sort(key=lambda x: x['loss'], reverse=True)
+        top_mistake = breakdown[0] if breakdown and breakdown[0]['loss'] > 0 else (breakdown[0] if breakdown else None)
+
+        return {
+            'total_mistake_loss': float(round(total_mistake_loss, 2)),
+            'total_mistake_trades': total_mistake_trades,
+            'top_mistake': top_mistake,
+            'breakdown': breakdown,
+        }
+

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { X, Upload, Star, Calculator, Image as ImageIcon, ShieldCheck, CheckSquare, Square, Check, ArrowUpRight, ArrowDownRight, Tag } from 'lucide-react';
+import { X, Upload, Star, Calculator, Image as ImageIcon, ShieldCheck, CheckSquare, Square, Check, ArrowUpRight, ArrowDownRight, Tag, AlertTriangle } from 'lucide-react';
 import RichNoteEditor from './RichNoteEditor';
+import { MISTAKE_OPTIONS } from '../utils/analyticsUtils';
 
 export default function TradeFormModal({ 
   isOpen, 
@@ -26,6 +27,7 @@ export default function TradeFormModal({
     session: 'NEW_YORK',
     currency: 'USD',
     trade_mode: defaultTradeMode || 'LIVE',
+    mistake: 'NONE',
     entry_price: '',
     exit_price: '',
     stop_loss: '',
@@ -67,6 +69,7 @@ export default function TradeFormModal({
         session: initialData.session || 'NEW_YORK',
         currency: initialCurr,
         trade_mode: initialData.trade_mode || defaultTradeMode || 'LIVE',
+        mistake: initialData.mistake || 'NONE',
         entry_price: initialData.entry_price || '',
         exit_price: initialData.exit_price || '',
         stop_loss: initialData.stop_loss || '',
@@ -94,6 +97,7 @@ export default function TradeFormModal({
       setFormData(prev => ({
         ...prev,
         trade_mode: defaultTradeMode || 'LIVE',
+        mistake: 'NONE',
       }));
       setChecklist({
         maxRisk: true,
@@ -637,6 +641,49 @@ export default function TradeFormModal({
               </div>
             </div>
 
+          </div>
+
+          {/* Rule Discipline & Execution Error Tracker */}
+          <div className="bg-[#141926]/70 border border-slate-800/90 rounded-xl p-3">
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider font-mono flex items-center gap-1.5">
+                <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+                Execution Mistake / Rule Broken
+              </label>
+              {formData.mistake && formData.mistake !== 'NONE' ? (
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-400 font-bold">
+                  Rule Violation Logged
+                </span>
+              ) : (
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                  Plan Followed
+                </span>
+              )}
+            </div>
+            
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+              {MISTAKE_OPTIONS.map((opt) => {
+                const isSelected = (formData.mistake || 'NONE') === opt.id;
+                const isNone = opt.id === 'NONE';
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, mistake: opt.id }))}
+                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-all text-left ${
+                      isSelected
+                        ? isNone
+                          ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300 font-bold shadow-sm shadow-emerald-500/10'
+                          : 'bg-rose-500/20 border-rose-500/50 text-rose-300 font-bold shadow-sm shadow-rose-500/10'
+                        : 'bg-[#161B27] border-slate-700/60 text-slate-400 hover:text-slate-200 hover:border-slate-600'
+                    }`}
+                  >
+                    <span className="text-sm shrink-0">{opt.icon}</span>
+                    <span className="truncate text-[11px]">{opt.label}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {/* SECTION 5: Entry Time & Tags */}

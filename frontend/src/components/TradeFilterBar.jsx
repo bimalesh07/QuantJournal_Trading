@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { Search, X, Download, Upload } from 'lucide-react';
 import TimeframeDropdown from './TimeframeDropdown';
+import { MISTAKE_OPTIONS } from '../utils/analyticsUtils';
 
 export default function TradeFilterBar({
   filters = {},
@@ -261,6 +262,22 @@ export default function TradeFilterBar({
             <option value="WIN" className="bg-[#121622] text-white">🟢 Win</option>
             <option value="LOSS" className="bg-[#121622] text-white">🔴 Loss</option>
             <option value="BREAKEVEN" className="bg-[#121622] text-white">⚪ Breakeven</option>
+          </select>
+
+          {/* Discipline / Mistake Filter */}
+          <select
+            value={filters.mistake || ''}
+            onChange={(e) => handleFilterChange('mistake', e.target.value)}
+            className="bg-[#161F2E] text-xs text-slate-200 px-3 py-2 rounded-xl border border-slate-700/80 focus:border-cyan-400 focus:outline-none font-medium cursor-pointer"
+          >
+            <option value="" className="bg-[#121622] text-white">All Discipline</option>
+            <option value="NONE" className="bg-[#121622] text-white">✅ Plan Followed Only</option>
+            <option value="MISTAKES_ONLY" className="bg-[#121622] text-white">🛑 Rule Breaks Only</option>
+            {MISTAKE_OPTIONS.filter(m => m.id !== 'NONE').map(m => (
+              <option key={m.id} value={m.id} className="bg-[#121622] text-white">
+                {m.icon} {m.label}
+              </option>
+            ))}
           </select>
 
           {/* Timeframe Dropdown (if enabled) */}

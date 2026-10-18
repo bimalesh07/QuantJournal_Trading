@@ -28,6 +28,28 @@ export const getTradeMode = (trade) => {
   return (trade.trade_mode || 'LIVE').toUpperCase();
 };
 
+export const MISTAKE_OPTIONS = [
+  { id: 'NONE', label: 'None (Followed Plan)', color: 'emerald', icon: '✅' },
+  { id: 'MOVED_STOPLOSS', label: 'Moved / Widened SL', color: 'rose', icon: '🛑' },
+  { id: 'FOMO_ENTRY', label: 'FOMO / Chased Market', color: 'amber', icon: '⚡' },
+  { id: 'EARLY_EXIT', label: 'Early Exit / Cut Winner', color: 'amber', icon: '✂️' },
+  { id: 'OVER_LEVERAGED', label: 'Over-leveraged / Oversized', color: 'rose', icon: '💣' },
+  { id: 'REVENGE_TRADE', label: 'Revenge Trade', color: 'rose', icon: '😡' },
+  { id: 'NO_SETUP', label: 'Impulse / No Clear Setup', color: 'purple', icon: '🎲' },
+  { id: 'HESITATED', label: 'Hesitated / Late Entry', color: 'blue', icon: '⏳' },
+];
+
+export const getMistakeInfo = (mistakeId) => {
+  const cleanId = (mistakeId || 'NONE').toUpperCase();
+  return MISTAKE_OPTIONS.find(m => m.id === cleanId) || {
+    id: cleanId,
+    label: cleanId.replace(/_/g, ' '),
+    color: cleanId !== 'NONE' ? 'rose' : 'emerald',
+    icon: cleanId !== 'NONE' ? '⚠️' : '✅'
+  };
+};
+
+
 
 export const isTradeInTimeframe = (trade, timeframe) => {
   if (!timeframe || timeframe === 'All Time') return true;
@@ -125,6 +147,12 @@ export const calculateAnalyticsFromTrades = (trades = [], fallbackAnalytics = nu
       monthly_pnl: [],
       calendar_data: {},
       pnl_by_asset_class: [],
+      cost_of_mistakes: {
+        total_mistake_loss: 0,
+        total_mistake_trades: 0,
+        top_mistake: null,
+        breakdown: [],
+      },
     };
   }
 
@@ -348,6 +376,59 @@ export const calculateAnalyticsFromTrades = (trades = [], fallbackAnalytics = nu
     };
   });
 
+  // Calculate Psychological Cost of Mistakes
+  let totalMistakeLoss = 0;
+  let totalMistakeTrades = 0;
+  const mistakeGroupMap = {};
+
+  closedTrades.forEach(t => {
+    const m = (t.mistake || 'NONE').toUpperCase();
+    const net = parseFloat(t.net_pnl) || 0;
+    if (m !== 'NONE') {
+      totalMistakeTrades++;
+      if (net < 0) {
+        totalMistakeLoss += Math.abs(net);
+      }
+    }
+    if (!mistakeGroupMap[m]) {
+      mistakeGroupMap[m] = { count: 0, loss: 0, wins: 0, losses: 0, net_pnl: 0 };
+    }
+    mistakeGroupMap[m].count++;
+    mistakeGroupMap[m].net_pnl += net;
+    if (net < 0) {
+      mistakeGroupMap[m].loss += Math.abs(net);
+      mistakeGroupMap[m].losses++;
+    } else if (net > 0) {
+      mistakeGroupMap[m].wins++;
+    }
+  });
+
+  const mistakeBreakdown = Object.keys(mistakeGroupMap)
+    .filter(m => m !== 'NONE')
+    .map(m => {
+      const info = getMistakeInfo(m);
+      return {
+        mistake: m,
+        name: info.label,
+        icon: info.icon,
+        count: mistakeGroupMap[m].count,
+        loss: Math.round(mistakeGroupMap[m].loss * 100) / 100,
+        losses: mistakeGroupMap[m].losses,
+        wins: mistakeGroupMap[m].wins,
+        net_pnl: Math.round(mistakeGroupMap[m].net_pnl * 100) / 100,
+      };
+    })
+    .sort((a, b) => b.loss - a.loss);
+
+  const topMistake = mistakeBreakdown.length > 0 ? mistakeBreakdown[0] : null;
+
+  const costOfMistakes = {
+    total_mistake_loss: Math.round(totalMistakeLoss * 100) / 100,
+    total_mistake_trades: totalMistakeTrades,
+    top_mistake: topMistake,
+    breakdown: mistakeBreakdown,
+  };
+
   return {
     overview: {
       total_trades: totalTrades,
@@ -382,5 +463,6 @@ export const calculateAnalyticsFromTrades = (trades = [], fallbackAnalytics = nu
     pnl_by_session,
     pnl_by_emotion,
     equity_curve,
+    cost_of_mistakes: costOfMistakes,
   };
 };

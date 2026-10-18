@@ -8,8 +8,8 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from datetime import datetime
 
-from .models import Strategy, Trade
-from .serializers import StrategySerializer, TradeSerializer, UserSerializer
+from .models import Strategy, Trade, DailyNote
+from .serializers import StrategySerializer, TradeSerializer, UserSerializer, DailyNoteSerializer
 from .services import AnalyticsService
 
 # User Authentication Views
@@ -158,11 +158,49 @@ class TradeViewSet(viewsets.ModelViewSet):
                 trade_ids = [t.id for t in closed_queryset if t.net_pnl == 0]
                 queryset = queryset.filter(id__in=trade_ids)
 
+        # Filter by mistake
+        mistake = params.get('mistake')
+        if mistake:
+            queryset = queryset.filter(mistake=mistake)
+
         return queryset
 
     def perform_create(self, serializer):
         user = self.request.user if self.request.user.is_authenticated else None
         serializer.save(user=user)
+
+
+class DailyNoteViewSet(viewsets.ModelViewSet):
+    serializer_class = DailyNoteSerializer
+
+    def get_queryset(self):
+        if self.request.user.is_authenticated:
+            queryset = DailyNote.objects.filter(Q(user=self.request.user) | Q(user__isnull=True))
+        else:
+            queryset = DailyNote.objects.all()
+
+        date_param = self.request.query_params.get('date')
+        if date_param:
+            queryset = queryset.filter(date=date_param)
+
+        month_param = self.request.query_params.get('month')
+        if month_param:
+            queryset = queryset.filter(date__startswith=month_param)
+
+        return queryset
+
+    def perform_create(self, serializer):
+        user = self.request.user if self.request.user.is_authenticated else None
+        date_val = serializer.validated_data.get('date')
+        existing = DailyNote.objects.filter(user=user, date=date_val).first()
+        if existing:
+            for key, val in serializer.validated_data.items():
+                setattr(existing, key, val)
+            existing.save()
+            serializer.instance = existing
+        else:
+            serializer.save(user=user)
+
 
 
 @api_view(['GET'])

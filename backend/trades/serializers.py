@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Strategy, Trade
+from .models import Strategy, Trade, DailyNote
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -36,6 +36,7 @@ class TradeSerializer(serializers.ModelSerializer):
             'session',
             'currency',
             'trade_mode',
+            'mistake',
             'entry_price',
             'exit_price',
             'stop_loss',
@@ -61,3 +62,19 @@ class TradeSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
         ]
+
+
+class DailyNoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DailyNote
+        fields = [
+            'id',
+            'date',
+            'pre_market_plan',
+            'post_market_review',
+            'mood',
+            'rating',
+            'created_at',
+            'updated_at',
+        ]
+

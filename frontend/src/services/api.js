@@ -143,4 +143,28 @@ export const getAnalytics = async (filters = {}) => {
   return response.data;
 };
 
+// Daily Notes (Pre/Post Market Journal Diary) API Calls
+export const getDailyNotes = async (monthOrDate = '') => {
+  const params = new URLSearchParams();
+  if (monthOrDate) {
+    if (monthOrDate.length === 7) {
+      params.append('month', monthOrDate);
+    } else {
+      params.append('date', monthOrDate);
+    }
+  }
+  const response = await api.get(`/daily-notes/?${params.toString()}`);
+  return response.data;
+};
+
+export const saveDailyNote = async (noteData) => {
+  const response = await api.post('/daily-notes/', noteData);
+  return response.data;
+};
+
+export const deleteDailyNote = async (id) => {
+  const response = await api.delete(`/daily-notes/${id}/`);
+  return response.data;
+};
+
 export default api;

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { X, TrendingUp, TrendingDown, Star, Image as ImageIcon, Calendar, Target, DollarSign, Brain, Layers, Maximize2, Tag } from 'lucide-react';
+import { X, TrendingUp, TrendingDown, Star, Image as ImageIcon, Calendar, Target, DollarSign, Brain, Layers, Maximize2, Tag, AlertTriangle } from 'lucide-react';
 import ChartLightboxModal from './ChartLightboxModal';
 import { getMediaUrl } from '../services/api';
-import { getTradeCurrency, getCurrencySymbol } from '../utils/analyticsUtils';
+import { getTradeCurrency, getCurrencySymbol, getMistakeInfo } from '../utils/analyticsUtils';
 
 export default function TradeDetailModal({ trade, isOpen, onClose }) {
   if (!isOpen || !trade) return null;
@@ -127,13 +127,23 @@ export default function TradeDetailModal({ trade, isOpen, onClose }) {
               <span className="text-base font-bold font-mono text-blue-400 mt-1 block">1:{trade.risk_reward_ratio}</span>
             </div>
             <div className="p-4 rounded-xl bg-[#151921] border border-slate-800">
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Mindset / Rating</span>
-              <div className="flex items-center gap-2 mt-1">
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Mindset / Discipline</span>
+              <div className="flex flex-wrap items-center gap-2 mt-1">
                 <span className="text-xs font-bold text-emerald-400 font-mono">{trade.emotion}</span>
                 <div className="flex items-center text-amber-400">
                   <Star className="w-3.5 h-3.5 fill-amber-400" />
                   <span className="text-xs font-bold ml-1">{trade.rating}</span>
                 </div>
+                {trade.mistake && trade.mistake !== 'NONE' ? (
+                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-300 border border-rose-500/30 font-mono flex items-center gap-1">
+                    <span>{getMistakeInfo(trade.mistake).icon}</span>
+                    <span>{getMistakeInfo(trade.mistake).label}</span>
+                  </span>
+                ) : (
+                  <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
+                    ✅ Plan Followed
+                  </span>
+                )}
               </div>
             </div>
           </div>

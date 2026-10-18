@@ -3,6 +3,7 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     StrategyViewSet, 
     TradeViewSet, 
+    DailyNoteViewSet,
     analytics_view,
     register_view,
     login_view,
@@ -13,6 +14,7 @@ from .views import (
 router = DefaultRouter()
 router.register(r'strategies', StrategyViewSet, basename='strategy')
 router.register(r'trades', TradeViewSet, basename='trade')
+router.register(r'daily-notes', DailyNoteViewSet, basename='daily-note')
 
 urlpatterns = [
     path('', include(router.urls)),
