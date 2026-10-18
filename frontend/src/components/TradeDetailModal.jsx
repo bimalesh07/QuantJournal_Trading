@@ -54,6 +54,11 @@ export default function TradeDetailModal({ trade, isOpen, onClose }) {
                 }`}>
                   {tradeCurr === 'INR' ? '₹ INR' : '$ USD'}
                 </span>
+                <span className={`text-xs px-2.5 py-0.5 rounded-full font-mono border font-semibold uppercase ${
+                  (trade.trade_mode || 'LIVE') === 'LIVE' ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40' : 'bg-amber-500/15 text-amber-300 border-amber-500/40'
+                }`}>
+                  {(trade.trade_mode || 'LIVE') === 'LIVE' ? '🟢 LIVE' : '🧪 PAPER'}
+                </span>
                 <span className="text-xs px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/30 font-mono font-semibold">
                   {trade.session === 'NEW_YORK' ? 'New York Session' : trade.session === 'LONDON' ? 'London Session' : trade.session === 'ASIAN' ? 'Asian Session' : 'New York Session'}
                 </span>

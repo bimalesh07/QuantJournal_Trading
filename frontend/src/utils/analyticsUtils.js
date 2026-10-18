@@ -23,6 +23,11 @@ export const getCurrencySymbol = (currencyOrTrade) => {
   return currency === 'INR' ? '₹' : '$';
 };
 
+export const getTradeMode = (trade) => {
+  if (!trade) return 'LIVE';
+  return (trade.trade_mode || 'LIVE').toUpperCase();
+};
+
 
 export const isTradeInTimeframe = (trade, timeframe) => {
   if (!timeframe || timeframe === 'All Time') return true;

@@ -57,6 +57,11 @@ class Trade(models.Model):
         ('USD', 'USD ($)'),
     ]
 
+    TRADE_MODE_CHOICES = [
+        ('LIVE', 'Live Real Money'),
+        ('PAPER', 'Paper / Demo Simulation'),
+    ]
+
     # Owner & Basic Info
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='trades')
     symbol = models.CharField(max_length=30)
@@ -64,6 +69,7 @@ class Trade(models.Model):
     asset_class = models.CharField(max_length=20, choices=ASSET_CLASS_CHOICES, default='CRYPTO')
     session = models.CharField(max_length=20, choices=SESSION_CHOICES, default='NEW_YORK')
     currency = models.CharField(max_length=5, choices=CURRENCY_CHOICES, default='USD')
+    trade_mode = models.CharField(max_length=10, choices=TRADE_MODE_CHOICES, default='LIVE')
 
     # Price & Size
     entry_price = models.DecimalField(max_digits=18, decimal_places=6)

@@ -116,6 +116,11 @@ class TradeViewSet(viewsets.ModelViewSet):
         if currency_param:
             queryset = queryset.filter(currency=currency_param)
 
+        # Filter by trade_mode (LIVE or PAPER)
+        trade_mode_param = params.get('trade_mode')
+        if trade_mode_param and trade_mode_param.upper() != 'ALL':
+            queryset = queryset.filter(trade_mode=trade_mode_param.upper())
+
         # Filter by status
         trade_status = params.get('status')
         if trade_status:

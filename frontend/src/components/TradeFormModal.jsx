@@ -2,7 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { X, Upload, Star, Calculator, Image as ImageIcon, ShieldCheck, CheckSquare, Square, Check, ArrowUpRight, ArrowDownRight, Tag } from 'lucide-react';
 import RichNoteEditor from './RichNoteEditor';
 
-export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData = null, strategies = [], onOpenRiskCalculator }) {
+export default function TradeFormModal({ 
+  isOpen, 
+  onClose, 
+  onSubmit, 
+  initialData = null, 
+  strategies = [], 
+  onOpenRiskCalculator,
+  defaultTradeMode = 'LIVE'
+}) {
   if (!isOpen) return null;
 
   const isIndianAssetOrSymbol = (symbolStr, assetStr) => {
@@ -17,6 +25,7 @@ export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData 
     asset_class: 'CRYPTO',
     session: 'NEW_YORK',
     currency: 'USD',
+    trade_mode: defaultTradeMode || 'LIVE',
     entry_price: '',
     exit_price: '',
     stop_loss: '',
@@ -57,6 +66,7 @@ export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData 
         asset_class: initialAsset,
         session: initialData.session || 'NEW_YORK',
         currency: initialCurr,
+        trade_mode: initialData.trade_mode || defaultTradeMode || 'LIVE',
         entry_price: initialData.entry_price || '',
         exit_price: initialData.exit_price || '',
         stop_loss: initialData.stop_loss || '',
@@ -81,6 +91,10 @@ export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData 
         noNews: true,
       });
     } else {
+      setFormData(prev => ({
+        ...prev,
+        trade_mode: defaultTradeMode || 'LIVE',
+      }));
       setChecklist({
         maxRisk: true,
         htfAlignment: true,
@@ -88,7 +102,7 @@ export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData 
         noNews: true,
       });
     }
-  }, [initialData]);
+  }, [initialData, defaultTradeMode]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -385,6 +399,40 @@ export default function TradeFormModal({ isOpen, onClose, onSubmit, initialData 
 
           {/* SECTION 3: Execution Prices & Numbers */}
           <div className="space-y-3">
+            {/* Trading Book Mode (Live Real vs Paper Simulation) */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2.5 bg-[#141926] rounded-xl border border-slate-800 font-mono">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">Trading Book *</span>
+                <span className="text-[10px] text-slate-500 font-normal">(Real vs Simulation Book)</span>
+              </div>
+              <div className="flex items-center gap-1.5 p-1 bg-[#161B27] rounded-lg border border-slate-700/70">
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, trade_mode: 'LIVE' }))}
+                  className={`px-3 py-1 rounded-md text-xs font-bold font-mono transition-all flex items-center gap-1.5 cursor-pointer ${
+                    (formData.trade_mode || 'LIVE') === 'LIVE'
+                      ? 'bg-emerald-500/25 text-emerald-300 border border-emerald-500/50 shadow-sm font-black'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                  <span>🟢 Live Real Money</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, trade_mode: 'PAPER' }))}
+                  className={`px-3 py-1 rounded-md text-xs font-bold font-mono transition-all flex items-center gap-1.5 cursor-pointer ${
+                    formData.trade_mode === 'PAPER'
+                      ? 'bg-amber-500/25 text-amber-300 border border-amber-500/50 shadow-sm font-black'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                  <span>🧪 Paper Simulation</span>
+                </button>
+              </div>
+            </div>
+
             {/* Currency Book Toggle */}
             <div className="flex items-center justify-between p-2.5 bg-[#141926] rounded-xl border border-slate-800 font-mono">
               <div className="flex items-center gap-2">

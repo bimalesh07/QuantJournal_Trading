@@ -88,8 +88,21 @@ export default function App() {
     setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
   };
 
+  // Trading Book Mode: 'LIVE' or 'PAPER' (Separate Simulation Book)
+  const [tradeMode, setTradeMode] = useState(() => localStorage.getItem('quant_journal_trade_mode') || 'LIVE');
+
+  const handleToggleTradeMode = (mode) => {
+    setTradeMode(mode);
+    localStorage.setItem('quant_journal_trade_mode', mode);
+    setFilters(prev => ({
+      ...prev,
+      trade_mode: mode
+    }));
+    showNotification(`Switched to ${mode === 'LIVE' ? '🟢 Live Real Money Book' : '🧪 Paper / Simulation Book'}`);
+  };
+
   // Filters State
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState(() => ({
     symbol: '',
     asset_class: '',
     trade_type: '',
@@ -97,7 +110,8 @@ export default function App() {
     outcome: '',
     date_from: '',
     date_to: '',
-  });
+    trade_mode: localStorage.getItem('quant_journal_trade_mode') || 'LIVE',
+  }));
 
   // Modal States
   const [isTradeModalOpen, setIsTradeModalOpen] = useState(false);
@@ -399,6 +413,7 @@ export default function App() {
       outcome: '',
       date_from: '',
       date_to: '',
+      trade_mode: tradeMode,
     });
   };
 
@@ -442,10 +457,26 @@ export default function App() {
         onLogout={handleLogout}
         theme={theme}
         onToggleTheme={handleToggleTheme}
+        tradeMode={tradeMode}
+        onToggleTradeMode={handleToggleTradeMode}
       />
 
       {/* Live Market Ticker Tape */}
       <MarketTicker theme={theme} />
+
+      {/* Simulation Mode Floating Status Ribbon */}
+      {tradeMode === 'PAPER' && (
+        <div className="bg-gradient-to-r from-amber-500/15 via-purple-500/15 to-amber-500/15 border-b border-amber-500/30 px-4 py-2 text-center text-xs font-mono font-bold text-amber-300 flex items-center justify-center gap-2 shadow-inner">
+          <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+          <span>🧪 SIMULATION BOOK ACTIVE: Real capital is NOT at risk. Paper & demo trade records are strictly separated.</span>
+          <button
+            onClick={() => handleToggleTradeMode('LIVE')}
+            className="ml-2 px-2 py-0.5 rounded bg-amber-500/20 text-amber-200 hover:text-white border border-amber-500/40 text-[10px] cursor-pointer"
+          >
+            Switch to Live Book &rarr;
+          </button>
+        </div>
+      )}
 
       {/* Notification Toast */}
       {notification && (
@@ -475,6 +506,8 @@ export default function App() {
                   trades={trades} 
                   theme={theme} 
                   onOpenTradeModal={handleOpenNewTradeModal}
+                  tradeMode={tradeMode}
+                  onToggleTradeMode={handleToggleTradeMode}
                 />
                 <AnalyticsCharts analytics={analytics} trades={trades} theme={theme} />
                 <TraderMilestones analytics={analytics} trades={trades} theme={theme} />
@@ -528,6 +561,8 @@ export default function App() {
                   activeTimeframe={analyticsTimeframe}
                   onTimeframeChange={handleAnalyticsTimeframeChange}
                   isTransitioning={isAnalyticsTransitioning}
+                  tradeMode={tradeMode}
+                  onToggleTradeMode={handleToggleTradeMode}
                 />
                 <AnalyticsCharts
                   analytics={effectiveAnalytics}
@@ -611,6 +646,7 @@ export default function App() {
         initialData={editingTrade}
         strategies={strategies}
         onOpenRiskCalculator={() => setIsRiskCalculatorOpen(true)}
+        defaultTradeMode={tradeMode}
       />
 
       <TradeDetailModal

@@ -145,10 +145,14 @@ export default function TradeFilterBar({
           const rrr = parseFloat(getVal(['rrr', 'riskreward', 'ratio'])) || 1;
           const emotion = (getVal(['mindset', 'emotion', 'rating']) || 'DISCIPLINED').toUpperCase();
 
+          const rawMode = (getVal(['book mode', 'mode', 'trade_mode', 'trade mode']) || '').toUpperCase();
+          const tradeMode = rawMode.includes('PAPER') ? 'PAPER' : 'LIVE';
+
           importedTrades.push({
             symbol,
             trade_type: tradeType.includes('SHORT') ? 'SHORT' : 'LONG',
             asset_class: ['CRYPTO','STOCKS','FOREX','OPTIONS','FUTURES'].includes(assetClass) ? assetClass : 'CRYPTO',
+            trade_mode: tradeMode,
             entry_price: entryPrice,
             exit_price: exitPrice,
             net_pnl: netPnl,
@@ -199,6 +203,17 @@ export default function TradeFilterBar({
         {/* Dropdown Filters & Actions Row */}
         <div className="flex flex-wrap items-center gap-2">
           
+          {/* Trading Book Mode Filter */}
+          <select
+            value={filters.trade_mode || ''}
+            onChange={(e) => handleFilterChange('trade_mode', e.target.value)}
+            className="bg-[#161F2E] text-xs font-mono font-bold text-slate-200 px-3 py-2 rounded-xl border border-slate-700/80 focus:border-cyan-400 focus:outline-none cursor-pointer"
+          >
+            <option value="" className="bg-[#121622] text-white">All Book Modes</option>
+            <option value="LIVE" className="bg-[#121622] text-emerald-400">🟢 Live Real Book</option>
+            <option value="PAPER" className="bg-[#121622] text-amber-400">🧪 Paper Demo Book</option>
+          </select>
+
           {/* Asset Class Filter */}
           <select
             value={filters.asset_class || ''}

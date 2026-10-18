@@ -31,7 +31,9 @@ export default function Navbar({
   currentUser,
   onLogout,
   theme = 'dark',
-  onToggleTheme
+  onToggleTheme,
+  tradeMode = 'LIVE',
+  onToggleTradeMode
 }) {
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: PieChart },
@@ -139,6 +141,20 @@ export default function Navbar({
 
           {/* Mobile Quick Action Buttons (+ Log & Hamburger Toggle) */}
           <div className="flex lg:hidden items-center gap-1.5 shrink-0">
+            {/* Quick Mobile Mode Pill */}
+            <button
+              onClick={() => onToggleTradeMode && onToggleTradeMode(tradeMode === 'LIVE' ? 'PAPER' : 'LIVE')}
+              className={`h-7 px-2 rounded-lg text-[10px] font-mono font-black border flex items-center gap-1 cursor-pointer active:scale-95 transition-all ${
+                tradeMode === 'LIVE'
+                  ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40'
+                  : 'bg-amber-500/15 text-amber-300 border-amber-500/40'
+              }`}
+              title="Click to toggle between Live and Paper Simulation Book"
+            >
+              <span className={`w-1.5 h-1.5 rounded-full ${tradeMode === 'LIVE' ? 'bg-emerald-400' : 'bg-amber-400 animate-pulse'}`}></span>
+              <span>{tradeMode}</span>
+            </button>
+
             <button
               onClick={() => onOpenTradeModal()}
               className="h-8 px-2.5 sm:px-3 flex items-center gap-1 rounded-full text-[11px] font-mono font-black text-slate-950 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 shadow-md shadow-emerald-500/20 shrink-0 cursor-pointer active:scale-95 transition-transform whitespace-nowrap"
@@ -185,6 +201,36 @@ export default function Navbar({
 
         {/* 3. Right Action Buttons (Desktop MD+ Only) */}
         <div className="hidden md:flex items-center gap-1 xl:gap-1.5 2xl:gap-2 shrink-0">
+          {/* Institutional Trading Book Switcher Pill (Live vs Paper Simulation) */}
+          <div className="flex items-center p-0.5 rounded-full bg-[#080C16] border border-white/15 shadow-inner shrink-0 font-mono">
+            <button
+              type="button"
+              onClick={() => onToggleTradeMode && onToggleTradeMode('LIVE')}
+              className={`h-7 px-2.5 rounded-full text-[10.5px] font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                tradeMode === 'LIVE'
+                  ? 'bg-gradient-to-r from-emerald-500/25 to-teal-500/25 text-emerald-300 border border-emerald-500/50 shadow-md shadow-emerald-500/20 font-black'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+              title="Real Money Live Trading Book"
+            >
+              <span className={`w-2 h-2 rounded-full ${tradeMode === 'LIVE' ? 'bg-emerald-400 animate-pulse' : 'bg-slate-600'}`} />
+              <span>LIVE</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => onToggleTradeMode && onToggleTradeMode('PAPER')}
+              className={`h-7 px-2.5 rounded-full text-[10.5px] font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                tradeMode === 'PAPER'
+                  ? 'bg-gradient-to-r from-amber-500/25 to-purple-500/25 text-amber-300 border border-amber-500/50 shadow-md shadow-amber-500/20 font-black'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+              title="Virtual Capital Paper Simulation Book"
+            >
+              <span className={`w-2 h-2 rounded-full ${tradeMode === 'PAPER' ? 'bg-amber-400 animate-pulse' : 'bg-slate-600'}`} />
+              <span>PAPER</span>
+            </button>
+          </div>
+
           {/* Theme Toggle */}
           <button
             onClick={onToggleTheme}
@@ -347,6 +393,41 @@ export default function Navbar({
                 </button>
               </div>
             )}
+
+            {/* Mobile Book Mode Selector */}
+            <div className="p-2.5 rounded-xl bg-[#0F1420] border border-white/10 space-y-1.5 font-mono">
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Trading Book Mode</p>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => {
+                    onToggleTradeMode && onToggleTradeMode('LIVE');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={`py-2 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                    tradeMode === 'LIVE'
+                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 font-black'
+                      : 'bg-[#141A29] text-slate-400 border border-transparent'
+                  }`}
+                >
+                  <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                  <span>🟢 Live Real</span>
+                </button>
+                <button
+                  onClick={() => {
+                    onToggleTradeMode && onToggleTradeMode('PAPER');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={`py-2 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                    tradeMode === 'PAPER'
+                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/50 font-black'
+                      : 'bg-[#141A29] text-slate-400 border border-transparent'
+                  }`}
+                >
+                  <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+                  <span>🧪 Paper Demo</span>
+                </button>
+              </div>
+            </div>
 
             {/* Mobile Nav Options */}
             <div className="space-y-1">

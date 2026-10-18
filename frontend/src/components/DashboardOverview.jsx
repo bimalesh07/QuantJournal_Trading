@@ -117,7 +117,9 @@ export default function DashboardOverview({
   onTimeframeChange,
   isTransitioning: propIsTransitioning = false,
   onOpenTradeModal,
-  hideTimeframeDropdown = false
+  hideTimeframeDropdown = false,
+  tradeMode = 'LIVE',
+  onToggleTradeMode
 }) {
   const [localTimeframe, setLocalTimeframe] = useState('All Time');
   const [localTransitioning, setLocalTransitioning] = useState(false);
@@ -145,9 +147,10 @@ export default function DashboardOverview({
     return (trades || []).filter((t) => {
       const matchesTimeframe = isTradeInTimeframe(t, currentTimeframe);
       const tradeCurr = getTradeCurrency(t);
-      return matchesTimeframe && tradeCurr === activeCurrencyBook;
+      const matchesMode = !tradeMode || tradeMode === 'ALL' || (t.trade_mode || 'LIVE').toUpperCase() === tradeMode.toUpperCase();
+      return matchesTimeframe && tradeCurr === activeCurrencyBook && matchesMode;
     });
-  }, [trades, currentTimeframe, activeCurrencyBook]);
+  }, [trades, currentTimeframe, activeCurrencyBook, tradeMode]);
 
   const effectiveAnalytics = useMemo(() => {
     return calculateAnalyticsFromTrades(currencyFilteredTrades, analytics);
@@ -190,17 +193,21 @@ export default function DashboardOverview({
     const todayTrades = (trades || []).filter((t) => {
       const entryStr = t.entry_time ? new Date(t.entry_time).toISOString().slice(0, 10) : '';
       const tradeCurr = getTradeCurrency(t);
-      return entryStr === todayStr && tradeCurr === activeCurrencyBook;
+      const matchesMode = !tradeMode || tradeMode === 'ALL' || (t.trade_mode || 'LIVE').toUpperCase() === tradeMode.toUpperCase();
+      return entryStr === todayStr && tradeCurr === activeCurrencyBook && matchesMode;
     });
     return todayTrades.reduce((acc, t) => acc + (parseFloat(t.net_pnl) || 0), 0);
-  }, [trades, activeCurrencyBook]);
+  }, [trades, activeCurrencyBook, tradeMode]);
 
   const DAILY_MAX_LOSS_LIMIT = activeCurrencyBook === 'INR' ? 16000 : 200; // ₹16,000 or $200 limit
   const dailyLossRatio = todayNetPnL < 0 ? Math.abs(todayNetPnL) / DAILY_MAX_LOSS_LIMIT : 0;
 
   // Calculate Trader Discipline Psychology Score (0-100 PTS)
   const disciplineScore = useMemo(() => {
-    const bookTrades = (trades || []).filter(t => getTradeCurrency(t) === activeCurrencyBook);
+    const bookTrades = (trades || []).filter(t => {
+      const matchesMode = !tradeMode || tradeMode === 'ALL' || (t.trade_mode || 'LIVE').toUpperCase() === tradeMode.toUpperCase();
+      return getTradeCurrency(t) === activeCurrencyBook && matchesMode;
+    });
     if (!bookTrades || bookTrades.length === 0) return 92;
     let totalScore = 0;
     bookTrades.forEach((t) => {
@@ -212,7 +219,7 @@ export default function DashboardOverview({
       totalScore += Math.min(100, score);
     });
     return Math.round(totalScore / bookTrades.length);
-  }, [trades, activeCurrencyBook]);
+  }, [trades, activeCurrencyBook, tradeMode]);
 
   // PDF Report Generator
   const generatePDFReport = () => {
@@ -378,9 +385,40 @@ export default function DashboardOverview({
 
         <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
           <Calendar className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-          <span>Book: <strong className="text-emerald-400 font-bold">{activeCurrencyBook === 'INR' ? '🇮🇳 INR (₹)' : '🌐 USD ($)'}</strong> | Scope: <strong className="text-cyan-300 font-bold">{currentTimeframe}</strong> ({currencyFilteredTrades.length} trades evaluated)</span>
+          <span>Mode: <strong className={tradeMode === 'LIVE' ? 'text-emerald-400 font-bold' : 'text-amber-400 font-bold'}>{tradeMode === 'LIVE' ? '🟢 LIVE' : '🧪 PAPER'}</strong> | Book: <strong className="text-emerald-400 font-bold">{activeCurrencyBook === 'INR' ? '🇮🇳 INR (₹)' : '🌐 USD ($)'}</strong> | Scope: <strong className="text-cyan-300 font-bold">{currentTimeframe}</strong> ({currencyFilteredTrades.length} trades evaluated)</span>
         </div>
       </div>
+
+      {/* 🧪 Paper Simulation Book Banner */}
+      {tradeMode === 'PAPER' && (
+        <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-purple-500/10 to-amber-500/10 border border-amber-500/30 text-amber-200 font-mono text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xl backdrop-blur-xl">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40 text-base font-black shrink-0">
+              🧪
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-extrabold text-amber-300 text-sm tracking-wide">Paper / Demo Trading Simulation Book Active</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 font-black uppercase tracking-wider">
+                  Zero Capital Risk
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-300 mt-0.5 font-sans">
+                You are currently viewing simulated forward-test performance. Metrics, win rate, and equity curves are 100% isolated from your live real-money trades.
+              </p>
+            </div>
+          </div>
+          {onOpenTradeModal && (
+            <button
+              onClick={onOpenTradeModal}
+              className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-mono text-xs font-black flex items-center gap-1.5 shadow-md shadow-amber-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer shrink-0"
+            >
+              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>+ Log Paper Trade</span>
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Top Section Header with Title & PDF Export Action */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1">
@@ -389,9 +427,13 @@ export default function DashboardOverview({
             <h2 className="text-xl sm:text-2xl font-black font-mono text-white tracking-wide">
               Quantitative Executive Overview
             </h2>
-            <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-              LIVE TELEMETRY
+            <span className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full border flex items-center gap-1 ${
+              tradeMode === 'LIVE'
+                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+                : 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+            }`}>
+              <span className={`w-1.5 h-1.5 rounded-full animate-ping ${tradeMode === 'LIVE' ? 'bg-emerald-400' : 'bg-amber-400'}`}></span>
+              {tradeMode === 'LIVE' ? 'LIVE TELEMETRY' : 'SIMULATION TELEMETRY'}
             </span>
           </div>
           <p className="text-xs text-slate-400 font-sans mt-1">

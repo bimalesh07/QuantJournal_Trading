@@ -56,6 +56,7 @@ export default function TradeTable({
       'Symbol',
       'Asset Class',
       'Currency',
+      'Book Mode',
       'Type',
       'Strategy',
       'Entry Price',
@@ -76,6 +77,7 @@ export default function TradeTable({
         `"${(t.symbol || '').replace(/"/g, '""')}"`,
         `"${t.asset_class || ''}"`,
         `"${getTradeCurrency(t)}"`,
+        `"${(t.trade_mode || 'LIVE')}"`,
         `"${t.trade_type || ''}"`,
         `"${(t.strategy_name || '').replace(/"/g, '""')}"`,
         t.entry_price ?? '',
@@ -459,6 +461,11 @@ export default function TradeTable({
                           tradeCurr === 'INR' ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30' : 'bg-cyan-500/10 text-cyan-300 border-cyan-500/30'
                         }`}>
                           {tradeCurr === 'INR' ? '₹ INR' : '$ USD'}
+                        </span>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-md font-mono border font-semibold uppercase ${
+                          (t.trade_mode || 'LIVE') === 'LIVE' ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40' : 'bg-amber-500/15 text-amber-300 border-amber-500/40'
+                        }`}>
+                          {(t.trade_mode || 'LIVE') === 'LIVE' ? '🟢 LIVE' : '🧪 PAPER'}
                         </span>
                         <span className="text-[10px] px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-300 font-mono border border-blue-500/30 font-semibold uppercase">
                           {t.session === 'NEW_YORK' ? 'NY' : t.session === 'LONDON' ? 'London' : t.session === 'ASIAN' ? 'Asian' : 'NY'}

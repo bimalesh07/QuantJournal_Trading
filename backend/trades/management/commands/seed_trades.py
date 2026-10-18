@@ -82,13 +82,15 @@ class Command(BaseCommand):
             exit_dt = entry_dt + timedelta(hours=random.randint(2, 48))
 
             session_choice = random.choice(['ASIAN', 'LONDON', 'NEW_YORK'])
-            notes = f"Executed {trade_type} trade on {sym} during {session_choice} session using strategy '{strat.name}'. Emotion during entry was {emotion}."
+            t_mode = 'PAPER' if i % 4 == 0 else 'LIVE'
+            notes = f"Executed {t_mode.lower()} {trade_type} trade on {sym} during {session_choice} session using strategy '{strat.name}'. Emotion during entry was {emotion}."
 
             Trade.objects.create(
                 symbol=sym,
                 trade_type=trade_type,
                 asset_class=asset,
                 session=session_choice,
+                trade_mode=t_mode,
                 entry_price=entry,
                 exit_price=exit_p,
                 stop_loss=stop,
@@ -105,4 +107,4 @@ class Command(BaseCommand):
             )
             created_count += 1
 
-        self.stdout.write(self.style.SUCCESS(f'Successfully seeded {created_count} demo trades!'))
+        self.stdout.write(self.style.SUCCESS(f'Successfully seeded {created_count} trades (with separate LIVE and PAPER simulation books)!'))
