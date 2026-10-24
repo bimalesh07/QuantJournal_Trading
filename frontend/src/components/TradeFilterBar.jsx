@@ -211,8 +211,8 @@ export default function TradeFilterBar({
             className="bg-[#161F2E] text-xs font-mono font-bold text-slate-200 px-3 py-2 rounded-xl border border-slate-700/80 focus:border-cyan-400 focus:outline-none cursor-pointer"
           >
             <option value="" className="bg-[#121622] text-white">All Book Modes</option>
-            <option value="LIVE" className="bg-[#121622] text-emerald-400">🟢 Live Real Book</option>
-            <option value="PAPER" className="bg-[#121622] text-amber-400">🧪 Paper Demo Book</option>
+            <option value="LIVE" className="bg-[#121622] text-emerald-400">🟢 Live Book</option>
+            <option value="PAPER" className="bg-[#121622] text-amber-400">🧪 Paper Book</option>
           </select>
 
           {/* Asset Class Filter */}

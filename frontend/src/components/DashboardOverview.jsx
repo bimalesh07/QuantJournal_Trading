@@ -390,32 +390,26 @@ export default function DashboardOverview({
         </div>
       </div>
 
-      {/* 🧪 Paper Simulation Book Banner */}
+      {/* 🧪 Paper Simulation Book Minimal Bar */}
       {tradeMode === 'PAPER' && (
-        <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-purple-500/10 to-amber-500/10 border border-amber-500/30 text-amber-200 font-mono text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xl backdrop-blur-xl">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40 text-base font-black shrink-0">
-              🧪
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-extrabold text-amber-300 text-sm tracking-wide">Paper / Demo Trading Simulation Book Active</span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 font-black uppercase tracking-wider">
-                  Zero Capital Risk
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-300 mt-0.5 font-sans">
-                You are currently viewing simulated forward-test performance. Metrics, win rate, and equity curves are 100% isolated from your live real-money trades.
-              </p>
-            </div>
+        <div className="px-3.5 py-2 rounded-xl bg-amber-500/[0.06] border border-amber-500/20 backdrop-blur-md flex items-center justify-between gap-3 text-xs font-mono">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />
+            <span className="font-bold text-amber-300 tracking-wide flex items-center gap-1.5 shrink-0">
+              <span>🧪</span> Paper Trading Book
+            </span>
+            <span className="text-amber-500/30 hidden sm:inline">•</span>
+            <span className="text-slate-400 font-sans text-[11px] hidden sm:inline truncate">
+              Simulated forward-test environment (Isolated from Live)
+            </span>
           </div>
           {onOpenTradeModal && (
             <button
               onClick={onOpenTradeModal}
-              className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-mono text-xs font-black flex items-center gap-1.5 shadow-md shadow-amber-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer shrink-0"
+              className="px-3 py-1.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 font-mono text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm shadow-amber-500/20 hover:scale-[1.02] active:scale-[0.98] cursor-pointer shrink-0"
             >
               <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-              <span>+ Log Paper Trade</span>
+              <span>Log Paper Trade</span>
             </button>
           )}
         </div>
@@ -434,7 +428,7 @@ export default function DashboardOverview({
                 : 'bg-amber-500/20 text-amber-300 border-amber-500/30'
             }`}>
               <span className={`w-1.5 h-1.5 rounded-full animate-ping ${tradeMode === 'LIVE' ? 'bg-emerald-400' : 'bg-amber-400'}`}></span>
-              {tradeMode === 'LIVE' ? 'LIVE TELEMETRY' : 'SIMULATION TELEMETRY'}
+              {tradeMode === 'LIVE' ? 'LIVE' : 'PAPER'}
             </span>
           </div>
           <p className="text-xs text-slate-400 font-sans mt-1">

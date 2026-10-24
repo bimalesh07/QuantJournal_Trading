@@ -407,7 +407,6 @@ export default function TradeFormModal({
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2.5 bg-[#141926] rounded-xl border border-slate-800 font-mono">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">Trading Book *</span>
-                <span className="text-[10px] text-slate-500 font-normal">(Real vs Simulation Book)</span>
               </div>
               <div className="flex items-center gap-1.5 p-1 bg-[#161B27] rounded-lg border border-slate-700/70">
                 <button
@@ -420,7 +419,7 @@ export default function TradeFormModal({
                   }`}
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                  <span>🟢 Live Real Money</span>
+                  <span>🟢 Live</span>
                 </button>
                 <button
                   type="button"
@@ -432,7 +431,7 @@ export default function TradeFormModal({
                   }`}
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                  <span>🧪 Paper Simulation</span>
+                  <span>🧪 Paper</span>
                 </button>
               </div>
             </div>

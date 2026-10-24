@@ -463,14 +463,16 @@ export default function App() {
 
       {/* Simulation Mode Floating Status Ribbon */}
       {tradeMode === 'PAPER' && (
-        <div className="bg-gradient-to-r from-amber-500/15 via-purple-500/15 to-amber-500/15 border-b border-amber-500/30 px-4 py-2 text-center text-xs font-mono font-bold text-amber-300 flex items-center justify-center gap-2 shadow-inner">
-          <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
-          <span>🧪 SIMULATION BOOK ACTIVE: Real capital is NOT at risk. Paper & demo trade records are strictly separated.</span>
+        <div className="bg-amber-500/[0.08] border-b border-amber-500/20 px-4 py-1.5 text-center text-xs font-mono text-amber-300 flex items-center justify-center gap-2 backdrop-blur-md">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+          <span className="font-semibold tracking-wide">🧪 Paper Trading Active</span>
+          <span className="text-amber-500/40 hidden sm:inline">•</span>
+          <span className="text-slate-400 font-sans text-[11px] hidden sm:inline">Simulated Book</span>
           <button
             onClick={() => handleToggleTradeMode('LIVE')}
-            className="ml-2 px-2 py-0.5 rounded bg-amber-500/20 text-amber-200 hover:text-white border border-amber-500/40 text-[10px] cursor-pointer"
+            className="ml-2 px-2.5 py-0.5 rounded-md bg-amber-500/15 hover:bg-amber-500/25 text-amber-200 hover:text-white border border-amber-500/30 text-[10px] font-mono transition-all cursor-pointer"
           >
-            Switch to Live Book &rarr;
+            Switch to Live &rarr;
           </button>
         </div>
       )}
