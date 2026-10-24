@@ -130,19 +130,8 @@ export const calculateAnalyticsFromTrades = (trades = [], fallbackAnalytics = nu
       worst_asset: null,
       strategy_performance: [],
       pnl_by_day: [],
-      pnl_by_session: [
-        { session: 'New York', net_pnl: 0 },
-        { session: 'London', net_pnl: 0 },
-        { session: 'Asian', net_pnl: 0 },
-      ],
-      pnl_by_emotion: [
-        { emotion: 'Disciplined', net_pnl: 0 },
-        { emotion: 'Patient', net_pnl: 0 },
-        { emotion: 'FOMO', net_pnl: 0 },
-        { emotion: 'Revenge', net_pnl: 0 },
-        { emotion: 'Fearful', net_pnl: 0 },
-        { emotion: 'Greedy', net_pnl: 0 },
-      ],
+      pnl_by_session: [],
+      pnl_by_emotion: [],
       equity_curve: [],
       monthly_pnl: [],
       calendar_data: {},
@@ -331,7 +320,7 @@ export const calculateAnalyticsFromTrades = (trades = [], fallbackAnalytics = nu
   const worst_asset = symbolList.length > 0 ? symbolList[symbolList.length - 1] : null;
 
   // Trading Sessions breakdown
-  const sessionMap = { 'New York': 0, 'London': 0, 'Asian': 0 };
+  const sessionMap = {};
   closedTrades.forEach((t) => {
     let sess = t.session || 'NEW_YORK';
     if (sess === 'NEW_YORK') sess = 'New York';
@@ -346,7 +335,7 @@ export const calculateAnalyticsFromTrades = (trades = [], fallbackAnalytics = nu
   }));
 
   // Emotion breakdown
-  const emotionMap = { Disciplined: 0, Patient: 0, FOMO: 0, Revenge: 0, Fearful: 0, Greedy: 0 };
+  const emotionMap = {};
   closedTrades.forEach((t) => {
     let emo = t.emotion || 'DISCIPLINED';
     const formattedEmo = emo.charAt(0).toUpperCase() + emo.slice(1).toLowerCase();

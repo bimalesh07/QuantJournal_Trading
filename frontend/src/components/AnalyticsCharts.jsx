@@ -103,63 +103,70 @@ export default function AnalyticsCharts({ analytics, trades = [], isTransitionin
         </div>
 
         {/* Dual Grid: Horizontal Bar Chart on Left + Asset Breakdown List Cards on Right */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-          
-          {/* Left: Horizontal Bar Chart */}
-          <div className="h-80 w-full font-mono bg-transparent">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                layout="vertical"
-                data={assetClassData}
-                margin={{ top: 5, right: 20, left: 40, bottom: 5 }}
-                style={{ backgroundColor: 'transparent' }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" horizontal={false} />
-                <XAxis type="number" stroke="#64748B" fontSize={10} tickFormatter={formatCurrencyCondensed} />
-                <YAxis type="category" dataKey="name" stroke="#94A3B8" fontSize={11} width={100} tickLine={false} />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255, 255, 255, 0.04)' }} />
-                <Bar dataKey="pnl" name="Net PnL" maxBarSize={20} radius={[0, 6, 6, 0]}>
-                  {assetClassData.map((entry, index) => (
-                    <Cell
-                      key={`asset-cell-${index}`}
-                      fill={entry.pnl >= 0 ? 'url(#emeraldBarGrad)' : 'url(#roseBarGrad)'}
-                    />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+        {assetClassData && assetClassData.length > 0 ? (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+            
+            {/* Left: Horizontal Bar Chart */}
+            <div className="h-80 w-full font-mono bg-transparent">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  layout="vertical"
+                  data={assetClassData}
+                  margin={{ top: 5, right: 20, left: 40, bottom: 5 }}
+                  style={{ backgroundColor: 'transparent' }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" horizontal={false} />
+                  <XAxis type="number" stroke="#64748B" fontSize={10} tickFormatter={formatCurrencyCondensed} />
+                  <YAxis type="category" dataKey="name" stroke="#94A3B8" fontSize={11} width={100} tickLine={false} />
+                  <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255, 255, 255, 0.04)' }} />
+                  <Bar dataKey="pnl" name="Net PnL" maxBarSize={20} radius={[0, 6, 6, 0]}>
+                    {assetClassData.map((entry, index) => (
+                      <Cell
+                        key={`asset-cell-${index}`}
+                        fill={entry.pnl >= 0 ? 'url(#emeraldBarGrad)' : 'url(#roseBarGrad)'}
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
 
-          {/* Right: Stacked Asset Cards List */}
-          <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden font-mono">
-            {assetClassData.map((asset, idx) => (
-              <div
-                key={idx}
-                className="p-3.5 rounded-xl bg-[#0D1220] border border-white/10 hover:border-emerald-500/30 flex items-center justify-between transition-all"
-              >
-                <div className="flex items-center gap-3">
-                  <span className={`w-2.5 h-2.5 rounded-full ${asset.isProfit ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]' : 'bg-rose-500'}`}></span>
-                  <div>
-                    <h4 className="text-xs sm:text-sm font-bold text-white">{asset.name}</h4>
-                    <span className="text-[10px] text-slate-400">{asset.trades} trades</span>
+            {/* Right: Stacked Asset Cards List */}
+            <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden font-mono">
+              {assetClassData.map((asset, idx) => (
+                <div
+                  key={idx}
+                  className="p-3.5 rounded-xl bg-[#0D1220] border border-white/10 hover:border-emerald-500/30 flex items-center justify-between transition-all"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className={`w-2.5 h-2.5 rounded-full ${asset.isProfit ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]' : 'bg-rose-500'}`}></span>
+                    <div>
+                      <h4 className="text-xs sm:text-sm font-bold text-white">{asset.name}</h4>
+                      <span className="text-[10px] text-slate-400">{asset.trades} trades</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4 text-xs">
+                    <div className="flex items-center gap-1 text-slate-300">
+                      <Target className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                      <span className="font-bold">{asset.winRate}%</span>
+                    </div>
+
+                    <div className={`font-extrabold ${asset.isProfit ? 'text-emerald-400' : 'text-rose-400'}`}>
+                      {asset.isProfit ? '+' : ''}${asset.pnl.toLocaleString()}
+                    </div>
                   </div>
                 </div>
+              ))}
+            </div>
 
-                <div className="flex items-center gap-4 text-xs">
-                  <div className="flex items-center gap-1 text-slate-300">
-                    <Target className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                    <span className="font-bold">{asset.winRate}%</span>
-                  </div>
-
-                  <div className={`font-extrabold ${asset.isProfit ? 'text-emerald-400' : 'text-rose-400'}`}>
-                    {asset.isProfit ? '+' : ''}${asset.pnl.toLocaleString()}
-                  </div>
-                </div>
-              </div>
-            ))}
           </div>
-
-        </div>
+        ) : (
+          <div className="h-36 flex flex-col items-center justify-center text-slate-500 text-xs font-mono space-y-1">
+            <span>No Asset Class Data Logged Yet</span>
+            <span className="text-[10px] text-slate-600">Log trades across Crypto, Stocks, Forex, etc. to see accuracy & PnL</span>
+          </div>
+        )}
       </div>
 
       {/* 2. PnL by Trading Session & Emotional Mindset Grid */}
@@ -179,31 +186,30 @@ export default function AnalyticsCharts({ analytics, trades = [], isTransitionin
             </div>
           </div>
 
-          <div className="h-60 w-full font-mono bg-transparent">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart 
-                data={pnl_by_session.length > 0 ? pnl_by_session : [
-                  { session: 'New York', net_pnl: 14500 },
-                  { session: 'London', net_pnl: 8200 },
-                  { session: 'Asian', net_pnl: -1200 }
-                ]}
-                style={{ backgroundColor: 'transparent' }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
-                <XAxis dataKey="session" stroke="#94A3B8" fontSize={11} />
-                <YAxis stroke="#94A3B8" fontSize={11} tickFormatter={formatCurrencyCondensed} />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255, 255, 255, 0.04)' }} />
-                <Bar dataKey="net_pnl" maxBarSize={45} radius={[8, 8, 0, 0]}>
-                  {(pnl_by_session.length > 0 ? pnl_by_session : [
-                    { session: 'New York', net_pnl: 14500 },
-                    { session: 'London', net_pnl: 8200 },
-                    { session: 'Asian', net_pnl: -1200 }
-                  ]).map((entry, index) => (
-                    <Cell key={`sess-${index}`} fill={entry.net_pnl >= 0 ? '#34D399' : '#FB7185'} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+          <div className="h-60 w-full font-mono bg-transparent flex items-center justify-center">
+            {pnl_by_session && pnl_by_session.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart 
+                  data={pnl_by_session}
+                  style={{ backgroundColor: 'transparent' }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
+                  <XAxis dataKey="session" stroke="#94A3B8" fontSize={11} />
+                  <YAxis stroke="#94A3B8" fontSize={11} tickFormatter={formatCurrencyCondensed} />
+                  <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255, 255, 255, 0.04)' }} />
+                  <Bar dataKey="net_pnl" maxBarSize={45} radius={[8, 8, 0, 0]}>
+                    {pnl_by_session.map((entry, index) => (
+                      <Cell key={`sess-${index}`} fill={entry.net_pnl >= 0 ? '#34D399' : '#FB7185'} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex flex-col items-center justify-center text-slate-500 text-xs font-mono space-y-1">
+                <span>No Session Trades Logged Yet</span>
+                <span className="text-[10px] text-slate-600">Assign New York, London, or Asian sessions to trades</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -221,33 +227,30 @@ export default function AnalyticsCharts({ analytics, trades = [], isTransitionin
             </div>
           </div>
 
-          <div className="h-60 w-full font-mono bg-transparent">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart 
-                data={pnl_by_emotion.length > 0 ? pnl_by_emotion : [
-                  { emotion: 'Disciplined', net_pnl: 22400 },
-                  { emotion: 'Patient', net_pnl: 12100 },
-                  { emotion: 'FOMO', net_pnl: -4500 },
-                  { emotion: 'Revenge', net_pnl: -8200 }
-                ]}
-                style={{ backgroundColor: 'transparent' }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
-                <XAxis dataKey="emotion" stroke="#94A3B8" fontSize={11} />
-                <YAxis stroke="#94A3B8" fontSize={11} tickFormatter={formatCurrencyCondensed} />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255, 255, 255, 0.04)' }} />
-                <Bar dataKey="net_pnl" maxBarSize={45} radius={[8, 8, 0, 0]}>
-                  {(pnl_by_emotion.length > 0 ? pnl_by_emotion : [
-                    { emotion: 'Disciplined', net_pnl: 22400 },
-                    { emotion: 'Patient', net_pnl: 12100 },
-                    { emotion: 'FOMO', net_pnl: -4500 },
-                    { emotion: 'Revenge', net_pnl: -8200 }
-                  ]).map((entry, index) => (
-                    <Cell key={`emo-${index}`} fill={entry.net_pnl >= 0 ? '#34D399' : '#FB7185'} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+          <div className="h-60 w-full font-mono bg-transparent flex items-center justify-center">
+            {pnl_by_emotion && pnl_by_emotion.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart 
+                  data={pnl_by_emotion}
+                  style={{ backgroundColor: 'transparent' }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
+                  <XAxis dataKey="emotion" stroke="#94A3B8" fontSize={11} />
+                  <YAxis stroke="#94A3B8" fontSize={11} tickFormatter={formatCurrencyCondensed} />
+                  <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255, 255, 255, 0.04)' }} />
+                  <Bar dataKey="net_pnl" maxBarSize={45} radius={[8, 8, 0, 0]}>
+                    {pnl_by_emotion.map((entry, index) => (
+                      <Cell key={`emo-${index}`} fill={entry.net_pnl >= 0 ? '#34D399' : '#FB7185'} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex flex-col items-center justify-center text-slate-500 text-xs font-mono space-y-1">
+                <span>No Mindset Data Logged Yet</span>
+                <span className="text-[10px] text-slate-600">Tag trades with Disciplined, Patient, FOMO, etc.</span>
+              </div>
+            )}
           </div>
         </div>
 
